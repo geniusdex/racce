@@ -104,6 +104,7 @@ type Session struct {
     PostRacePenalties []*Penalty `json:"post_race_penalties"`
     
     EndTime time.Time
+    SessionTypeString string
 }
 
 

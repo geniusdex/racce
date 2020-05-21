@@ -23,7 +23,7 @@
  <tr>
   <td>{{add $index 1}}.</td>
   <td>{{.Car.RaceNumber}}</td>
-  <td>{{.CurrentDriver.FirstName}} {{.CurrentDriver.LastName}}</td>
+  <td><a href="../player/{{.CurrentDriver.PlayerId}}">{{.CurrentDriver.FirstName}} {{.CurrentDriver.LastName}}</a></td>
   <td>{{.Timing.LapCount}}</td>
   <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.TotalTime}}{{else}}-{{end}}</td>
   <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.BestLap}}{{else}}-{{end}}</td>
@@ -49,7 +49,7 @@
     {{$driver := index $car.Drivers .DriverIndex}}
  <tr>
   <td>{{$car.RaceNumber}}</td>
-  <td>{{$driver.FirstName}} {{$driver.LastName}}</td>
+  <td><a href="../player/{{$driver.PlayerId}}">{{$driver.FirstName}} {{$driver.LastName}}</a></td>
   <td>{{.Reason}}</td>
   <td>{{.ViolationInLap}}</td>
   <td>{{.Penalty}}</td>

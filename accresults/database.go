@@ -8,6 +8,14 @@ import (
     "time"
 )
 
+var (
+    sessionTypeNames = map[SessionType]string{
+        "FP": "Free Practice",
+        "Q": "Qualifying",
+        "R": "Race",
+    }
+)
+
 type Database struct {
     Sessions map[string]*Session
     SessionNamesSortedOnEndTime []string
@@ -30,6 +38,7 @@ func (db* Database) getOrCreatePlayer(playerId string) *Player {
 func (db *Database) postprocess() {
     for sessionName, session := range db.Sessions {
         db.SessionNamesSortedOnEndTime = append(db.SessionNamesSortedOnEndTime, sessionName)
+        session.SessionTypeString = sessionTypeNames[session.SessionType]
         for _, line := range session.SessionResult.LeaderBoardLines {
             for _, driver := range line.Car.Drivers {
                 player := db.getOrCreatePlayer(driver.PlayerId)

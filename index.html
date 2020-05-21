@@ -11,6 +11,7 @@
   <th>Name</th>
   <th>Date / Time</th>
   <th>Track</th>
+  <th>Session Type</th>
  </tr>
 {{range .SessionNamesSortedOnEndTime}}
     {{$session := index $db.Sessions .}}
@@ -18,6 +19,7 @@
   <td><a href="session/{{.}}">{{.}}</a></td>
   <td>{{$session.EndTime.Format "2006-01-02 15:04:05"}}</td>
   <td>{{$session.TrackName}}</td>
+  <td>{{$session.SessionTypeString}}</td>
  </tr>
 {{end}}
 </table>
