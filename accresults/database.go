@@ -56,7 +56,7 @@ func (db *Database) postprocess() {
 }
 
 func parseTimeFromSessionName(name string) time.Time {
-    result, err := time.ParseInLocation("060102_150405", strings.TrimRight(name, "_PQR"), time.Local)
+    result, err := time.ParseInLocation("060102_150405", strings.TrimRight(name, "_FPQR"), time.Local)
     if err != nil {
         log.Printf("Cannot parse time from session name '%s': %v", name, err)
         return time.Unix(0, 0)
