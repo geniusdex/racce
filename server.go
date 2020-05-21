@@ -29,6 +29,14 @@ func templateFunctionMap(session *accresults.Session) template.FuncMap{
         "car": func(carId int) *accresults.Car {
             return session.FindCarById(carId)
         },
+        "contains": func(haystack []string, needle string) bool {
+            for _, element := range haystack {
+                if element == needle {
+                    return true
+                }
+            }
+            return false
+        },
     }
 }
 
@@ -75,9 +83,44 @@ func sessionHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+type playerPage struct {
+    Database *accresults.Database
+    Player *accresults.Player
+}
+
+func playerHandler(w http.ResponseWriter, r *http.Request) {
+    pathComponents := strings.Split(r.URL.Path, "/")
+    if len(pathComponents) != 3 {
+        log.Printf("Not enough components in path '%s', components: %v, len: %v", r.URL.Path, pathComponents, len(pathComponents))
+        w.WriteHeader(http.StatusNotFound)
+        return
+    }
+    
+    playerId := pathComponents[2]
+    player, ok := accdb.Players[playerId]
+    if !ok {
+        log.Printf("Player '%s' not found in database", playerId)
+        w.WriteHeader(http.StatusNotFound)
+        return
+    }
+    
+    t,err := template.New("player.html").Funcs(templateFunctionMap(nil)).ParseFiles("player.html")
+    if err != nil {
+        log.Print(err)
+        w.Write([]byte(err.Error()))
+    }
+    
+    err = t.Execute(w, &playerPage{accdb, player})
+    if err != nil {
+        log.Print(err)
+        w.Write([]byte(err.Error()))
+    }
+}
+
 func RunServer(database *accresults.Database) error {
     accdb = database
     http.HandleFunc("/", indexHandler)
     http.HandleFunc("/session/", sessionHandler)
+    http.HandleFunc("/player/", playerHandler)
     return http.ListenAndServe(":8099", nil)
 }

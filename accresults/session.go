@@ -3,7 +3,7 @@ package accresults
 import (
     "encoding/json"
     "io/ioutil"
-//    "time"
+    "time"
 
     "golang.org/x/text/encoding/unicode"
     "golang.org/x/text/transform"
@@ -102,6 +102,8 @@ type Session struct {
     Laps []*Lap `json:"laps"`
     Penalties []*Penalty `json:"penalties"`
     PostRacePenalties []*Penalty `json:"post_race_penalties"`
+    
+    EndTime time.Time
 }
 
 
@@ -125,7 +127,7 @@ func readUtf16File(filename string) ([]byte, error) {
     return decodedContents, err2
 }
 
-func LoadSessionFromFile(filename string) (*Session, error) {
+func LoadSessionFromFile(filename string, endTime time.Time) (*Session, error) {
     fileContents, err := readUtf16File(filename)
     if err != nil {
         return nil, err
@@ -136,6 +138,8 @@ func LoadSessionFromFile(filename string) (*Session, error) {
     if err != nil {
         return nil, err
     }
+    
+    session.EndTime = endTime
     
     return &session, nil
 }

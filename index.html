@@ -1,18 +1,38 @@
+{{$db := .}}
 <!DOCTYPE html>
 <html>
 <head>
-<title>Past Sessions</title>
+<title>Index</title>
 </head>
 <body>
-<h1>Past Sessions</h1>
-
+<h2>Sessions</h2>
 <table>
  <tr>
   <th>Name</th>
+  <th>Date / Time</th>
+  <th>Track</th>
  </tr>
-{{range $name, $session := .Sessions}}
+{{range .SessionNamesSortedOnEndTime}}
+    {{$session := index $db.Sessions .}}
  <tr>
-  <td><a href="session/{{$name}}">{{$name}}</a></td>
+  <td><a href="session/{{.}}">{{.}}</a></td>
+  <td>{{$session.EndTime.Format "2006-01-02 15:04:05"}}</td>
+  <td>{{$session.TrackName}}</td>
+ </tr>
+{{end}}
+</table>
+
+<h2>Players</h2>
+<table>
+ <tr>
+  <th></th>
+  <th>Name</th>
+ </tr>
+{{range .PlayerIdsSortedOnLastName}}
+    {{$player := index $db.Players .}}
+ <tr>
+  <td>{{$player.MostRecentName.ShortName}}</td>
+  <td><a href="player/{{.}}">{{$player.MostRecentName.FirstName}} {{$player.MostRecentName.LastName}}</a></td>
  </tr>
 {{end}}
 </table>
