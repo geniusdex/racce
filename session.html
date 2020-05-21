@@ -73,10 +73,10 @@
   <th>Sector 3</th>
   <th>Valid</th>
  </tr>
+    {{$lapnr := 0}}
     {{range $lap := $laps}}
-        {{$lapnr := 0}}
         {{if eq .CarId $car.CarId}}
-            {{$lapnr := add $lapnr 1}}
+            {{$lapnr = add $lapnr 1}}
  <tr>
   <td>{{$lapnr}}</td>
   <td>{{(index $car.Drivers .DriverIndex).ShortName}}</td>

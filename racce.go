@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-    session, err := accresults.LoadSessionFromFile("200520_215813_R.json")
+    session, err := accresults.LoadDatabase("results/")
     if err != nil {
         log.Fatal(err)
     }

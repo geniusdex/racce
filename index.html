@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Past Sessions</title>
+</head>
+<body>
+<h1>Past Sessions</h1>
+
+<table>
+ <tr>
+  <th>Name</th>
+ </tr>
+{{range $name, $session := .Sessions}}
+ <tr>
+  <td><a href="session/{{$name}}">{{$name}}</a></td>
+ </tr>
+{{end}}
+</table>
+
+</body>
+</html>
