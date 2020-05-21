@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{.TrackName}}</title>
+</head>
+<body>
+<h1>{{.ServerName}} - {{.TrackName}}</h1>
+
+<h2>Leader Board</h2>
+<table>
+ <tr>
+  <th>Pos</th>
+  <th>Car</th>
+  <th>Driver</th>
+  <th>Laps</th>
+  <th>Total time</th>
+  <th>Best lap</th>
+  <th>Best Sector 1</th>
+  <th>Best Sector 2</th>
+  <th>Best Sector 3</th>
+ </tr>
+{{range $index, $line := .SessionResult.LeaderBoardLines}}
+ <tr>
+  <td>{{add $index 1}}.</td>
+  <td>{{.Car.RaceNumber}}</td>
+  <td>{{.CurrentDriver.FirstName}} {{.CurrentDriver.LastName}}</td>
+  <td>{{.Timing.LapCount}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.TotalTime}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.BestLap}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 0)}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 1)}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 2)}}{{else}}-{{end}}</td>
+ </tr>
+{{end}}
+</table>
+
+<h2>Penalties</h2>
+<table>
+ <tr>
+  <th>Car</th>
+  <th>Driver</th>
+  <th>Violation</th>
+  <th>In lap</th>
+  <th>Penalty</th>
+  <th>Cleared in lap</th>
+ </tr>
+{{range .Penalties}}
+    {{$car := car .CarId}}
+    {{$driver := index $car.Drivers .DriverIndex}}
+ <tr>
+  <td>{{$car.RaceNumber}}</td>
+  <td>{{$driver.FirstName}} {{$driver.LastName}}</td>
+  <td>{{.Reason}}</td>
+  <td>{{.ViolationInLap}}</td>
+  <td>{{.Penalty}}</td>
+  <td>{{.ClearedInLap}}</td>
+ </tr>
+{{end}}
+</table>
+
+<h2>Laps per cars</h2>
+{{$laps := .Laps}}
+{{range .SessionResult.LeaderBoardLines}}
+    {{$car := .Car}}
+<h3>Car {{.Car.RaceNumber}} - {{range $index, $driver := .Car.Drivers}}{{if gt $index 0}}, {{end}}{{.FirstName}} {{.LastName}}{{end}}</h3>
+<table>
+ <tr>
+  <th>Lap</th>
+  <th>Driver</th>
+  <th>Laptime</th>
+  <th>Sector 1</th>
+  <th>Sector 2</th>
+  <th>Sector 3</th>
+  <th>Valid</th>
+ </tr>
+    {{range $lap := $laps}}
+        {{$lapnr := 0}}
+        {{if eq .CarId $car.CarId}}
+            {{$lapnr := add $lapnr 1}}
+ <tr>
+  <td>{{$lapnr}}</td>
+  <td>{{(index $car.Drivers .DriverIndex).ShortName}}</td>
+  <td>{{laptime .Laptime}}</td>
+  <td>{{laptime (index .Splits 0)}}</td>
+  <td>{{laptime (index .Splits 1)}}</td>
+  <td>{{laptime (index .Splits 2)}}</td>
+  <td>{{if .IsValidForBest}}true{{else}}false{{end}}</td>
+ </tr>
+        {{end}}
+    {{end}}
+</table>
+{{end}}
+
+</body>
+</html>
