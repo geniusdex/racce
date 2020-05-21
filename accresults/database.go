@@ -1,7 +1,6 @@
 package accresults
 
 import (
-    "fmt"
     "io/ioutil"
 )
 
