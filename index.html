@@ -5,6 +5,19 @@
 <title>Index</title>
 </head>
 <body>
+<h2>Events</h2>
+<table>
+ <tr>
+  <th>Date / Time</th>
+  <th>Track</th>
+ </tr>
+{{range $index, $event := .Events}}
+ <tr>
+  <td><a href="event/{{$index}}">{{.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
+  <td>{{.TrackName}}</td>
+ </tr>
+{{end}}
+</table>
 <h2>Sessions</h2>
 <table>
  <tr>

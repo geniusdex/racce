@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Event at {{.TrackName}}</title>
+</head>
+<body>
+<h2>Sessions</h2>
+<table>
+ <tr>
+  <th>Name</th>
+  <th>Date / Time</th>
+  <th>Track</th>
+  <th>Session Type</th>
+ </tr>
+{{range .Sessions}}
+ <tr>
+  <td><a href="../session/{{.SessionName}}">{{.SessionName}}</a></td>
+  <td>{{.EndTime.Format "2006-01-02 15:04:05"}}</td>
+  <td>{{.TrackName}}</td>
+  <td>{{.SessionTypeString}}</td>
+ </tr>
+{{end}}
+</table>
+
+{{range $session := .Sessions}}
+<h2>{{.SessionTypeString}}</h2>
+<table>
+ <tr>
+  <th>Pos</th>
+  <th>Car</th>
+  <th>Driver</th>
+  <th>Laps</th>
+  <th>Total time</th>
+  <th>Best lap</th>
+  <th>Best Sector 1</th>
+  <th>Best Sector 2</th>
+  <th>Best Sector 3</th>
+ </tr>
+    {{range $index, $line := .SessionResult.LeaderBoardLines}}
+ <tr>
+  <td>{{add $index 1}}.</td>
+  <td><a href="../sessioncar/{{$session.SessionName}}/{{.Car.CarId}}">{{.Car.RaceNumber}}</a></td>
+  <td><a href="../player/{{.CurrentDriver.PlayerId}}">{{.CurrentDriver.FirstName}} {{.CurrentDriver.LastName}}</a></td>
+  <td>{{.Timing.LapCount}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.TotalTime}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.BestLap}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 0)}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 1)}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 2)}}{{else}}-{{end}}</td>
+ </tr>
+    {{end}}
+</table>
+{{end}}
+
+</body>
+</html>

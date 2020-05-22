@@ -58,6 +58,39 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+func eventHandler(w http.ResponseWriter, r *http.Request) {
+    pathComponents := strings.Split(r.URL.Path, "/")
+    if len(pathComponents) != 3 {
+        log.Printf("Not enough components in path '%s', components: %v, len: %v", r.URL.Path, pathComponents, len(pathComponents))
+        w.WriteHeader(http.StatusNotFound)
+        return
+    }
+    
+    eventId,err := strconv.Atoi(pathComponents[2])
+    if err != nil {
+        log.Printf("Event ID '%s' is not numeric", eventId)
+        w.WriteHeader(http.StatusNotFound)
+        return
+    }
+    if eventId >= len(accdb.Events) {
+        log.Printf("Event ID '%d' not present in database", eventId)
+        w.WriteHeader(http.StatusNotFound)
+        return
+    }
+    event := accdb.Events[eventId]
+    
+    t,err := template.New("event.html").Funcs(templateFunctionMap(nil)).ParseFiles("event.html")
+    if err != nil {
+        log.Print(err)
+        w.Write([]byte(err.Error()))
+    }
+    
+    err = t.Execute(w, event)
+    if err != nil {
+        log.Print(err)
+        w.Write([]byte(err.Error()))
+    }
+}
 func sessionHandler(w http.ResponseWriter, r *http.Request) {
     pathComponents := strings.Split(r.URL.Path, "/")
     if len(pathComponents) != 3 {
@@ -170,6 +203,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 func RunServer(database *accresults.Database) error {
     accdb = database
     http.HandleFunc("/", indexHandler)
+    http.HandleFunc("/event/", eventHandler)
     http.HandleFunc("/player/", playerHandler)
     http.HandleFunc("/session/", sessionHandler)
     http.HandleFunc("/sessioncar/", sessionCarHandler)

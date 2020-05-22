@@ -16,12 +16,20 @@ var (
     }
 )
 
+type Event struct {
+    TrackName string
+    EndTime time.Time
+    Sessions []*Session
+}
+
 type Database struct {
     Sessions map[string]*Session
     SessionNamesSortedOnEndTime []string
     
     Players map[string]*Player
     PlayerIdsSortedOnLastName []string
+    
+    Events []*Event
 }
 
 func (db* Database) getOrCreatePlayer(playerId string) *Player {
@@ -63,6 +71,20 @@ func (db *Database) postprocess() {
         }
         return strings.ToLower(a.LastName) < strings.ToLower(b.LastName)
     })
+    
+    event := &Event{"__", time.Now(), nil}
+    for i := len(db.SessionNamesSortedOnEndTime)-1; i >= 0; i-- {
+        session := db.Sessions[db.SessionNamesSortedOnEndTime[i]]
+        if event.TrackName != session.TrackName || session.SessionIndex == 0 {
+            event = &Event{session.TrackName, session.EndTime, nil}
+            db.Events = append(db.Events, event)
+        }
+        event.EndTime = session.EndTime
+        event.Sessions = append(event.Sessions, session)
+    }
+    for i, j := 0, len(db.Events)-1; i < j; i, j = i+1, j-1 {
+        db.Events[i], db.Events[j] = db.Events[j], db.Events[i]
+    }
 }
 
 func parseTimeFromSessionName(name string) time.Time {
@@ -80,6 +102,7 @@ func LoadDatabase(resultsPath string) (*Database, error) {
         nil,
         make(map[string]*Player),
         nil,
+        make([]*Event, 0),
     }
     
     files, err := ioutil.ReadDir(resultsPath)
