@@ -29,12 +29,14 @@
  <tr>
   <th></th>
   <th>Name</th>
+  <th># Sessions</th>
  </tr>
 {{range .PlayerIdsSortedOnLastName}}
     {{$player := index $db.Players .}}
  <tr>
   <td>{{$player.MostRecentName.ShortName}}</td>
   <td><a href="player/{{.}}">{{$player.MostRecentName.FirstName}} {{$player.MostRecentName.LastName}}</a></td>
+  <td>{{len $player.SessionNames}}</td>
  </tr>
 {{end}}
 </table>

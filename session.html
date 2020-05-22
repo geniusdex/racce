@@ -1,3 +1,4 @@
+{{$session := .}}
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,7 +23,7 @@
 {{range $index, $line := .SessionResult.LeaderBoardLines}}
  <tr>
   <td>{{add $index 1}}.</td>
-  <td>{{.Car.RaceNumber}}</td>
+  <td><a href="../sessioncar/{{$session.SessionName}}/{{.Car.CarId}}">{{.Car.RaceNumber}}</a></td>
   <td><a href="../player/{{.CurrentDriver.PlayerId}}">{{.CurrentDriver.FirstName}} {{.CurrentDriver.LastName}}</a></td>
   <td>{{.Timing.LapCount}}</td>
   <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.TotalTime}}{{else}}-{{end}}</td>
