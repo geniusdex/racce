@@ -10,29 +10,14 @@
  <tr>
   <th>Date / Time</th>
   <th>Track</th>
+  <th>Sessions</th>
  </tr>
-{{range $index, $event := .Events}}
+{{range .EventIdsSortedOnEndTime}}
+    {{$event := index $db.Events .}}
  <tr>
-  <td><a href="event/{{$index}}">{{.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
-  <td>{{.TrackName}}</td>
- </tr>
-{{end}}
-</table>
-<h2>Sessions</h2>
-<table>
- <tr>
-  <th>Name</th>
-  <th>Date / Time</th>
-  <th>Track</th>
-  <th>Session Type</th>
- </tr>
-{{range .SessionNamesSortedOnEndTime}}
-    {{$session := index $db.Sessions .}}
- <tr>
-  <td><a href="session/{{.}}">{{.}}</a></td>
-  <td>{{$session.EndTime.Format "2006-01-02 15:04:05"}}</td>
-  <td>{{$session.TrackName}}</td>
-  <td>{{$session.SessionTypeString}}</td>
+  <td><a href="event/{{.}}">{{$event.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
+  <td>{{$event.TrackName}}</td>
+  <td>{{range $event.Sessions}}{{if ne .SessionIndex 0}}, {{end}}{{.SessionType}}{{end}}</td>
  </tr>
 {{end}}
 </table>

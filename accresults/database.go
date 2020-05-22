@@ -17,6 +17,7 @@ var (
 )
 
 type Event struct {
+    EventId string
     TrackName string
     EndTime time.Time
     Sessions []*Session
@@ -29,7 +30,8 @@ type Database struct {
     Players map[string]*Player
     PlayerIdsSortedOnLastName []string
     
-    Events []*Event
+    Events map[string]*Event
+    EventIdsSortedOnEndTime []string
 }
 
 func (db* Database) getOrCreatePlayer(playerId string) *Player {
@@ -72,19 +74,24 @@ func (db *Database) postprocess() {
         return strings.ToLower(a.LastName) < strings.ToLower(b.LastName)
     })
     
-    event := &Event{"__", time.Now(), nil}
+    event := &Event{"__", "__", time.Now(), nil}
     for i := len(db.SessionNamesSortedOnEndTime)-1; i >= 0; i-- {
         session := db.Sessions[db.SessionNamesSortedOnEndTime[i]]
         if event.TrackName != session.TrackName || session.SessionIndex == 0 {
-            event = &Event{session.TrackName, session.EndTime, nil}
-            db.Events = append(db.Events, event)
+            eventId := strings.TrimRight(session.SessionName, "_FPQR")
+            event = &Event{eventId, session.TrackName, session.EndTime, nil}
+            db.Events[eventId] = event
+            db.EventIdsSortedOnEndTime = append(db.EventIdsSortedOnEndTime, eventId)
         }
         event.EndTime = session.EndTime
         event.Sessions = append(event.Sessions, session)
     }
-    for i, j := 0, len(db.Events)-1; i < j; i, j = i+1, j-1 {
-        db.Events[i], db.Events[j] = db.Events[j], db.Events[i]
-    }
+    
+    sort.Slice(db.EventIdsSortedOnEndTime, func(i, j int) bool {
+        a := db.Events[db.EventIdsSortedOnEndTime[i]]
+        b := db.Events[db.EventIdsSortedOnEndTime[j]]
+        return a.EndTime.After(b.EndTime)
+    })
 }
 
 func parseTimeFromSessionName(name string) time.Time {
@@ -102,7 +109,8 @@ func LoadDatabase(resultsPath string) (*Database, error) {
         nil,
         make(map[string]*Player),
         nil,
-        make([]*Event, 0),
+        make(map[string]*Event),
+        nil,
     }
     
     files, err := ioutil.ReadDir(resultsPath)

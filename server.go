@@ -66,18 +66,13 @@ func eventHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    eventId,err := strconv.Atoi(pathComponents[2])
-    if err != nil {
-        log.Printf("Event ID '%s' is not numeric", eventId)
+    eventId := pathComponents[2]
+    event, ok := accdb.Events[eventId]
+    if !ok {
+        log.Printf("Event '%s' not found in database", eventId)
         w.WriteHeader(http.StatusNotFound)
         return
     }
-    if eventId >= len(accdb.Events) {
-        log.Printf("Event ID '%d' not present in database", eventId)
-        w.WriteHeader(http.StatusNotFound)
-        return
-    }
-    event := accdb.Events[eventId]
     
     t,err := template.New("event.html").Funcs(templateFunctionMap(nil)).ParseFiles("event.html")
     if err != nil {
