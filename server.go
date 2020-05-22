@@ -14,7 +14,7 @@ var (
     accdb *accresults.Database
 )
 
-func templateFunctionMap(session *accresults.Session) template.FuncMap{
+func templateFunctionMap() template.FuncMap{
     return template.FuncMap{
         "add": func(a, b int) int {
             return a + b
@@ -30,7 +30,7 @@ func templateFunctionMap(session *accresults.Session) template.FuncMap{
             
             return fmt.Sprintf("%d:%02d.%03d", minutes, seconds, milliseconds)
         },
-        "car": func(carId int) *accresults.Car {
+        "carInSession": func(carId int, session *accresults.Session) *accresults.Car {
             return session.FindCarById(carId)
         },
         "contains": func(haystack []string, needle string) bool {
@@ -44,18 +44,22 @@ func templateFunctionMap(session *accresults.Session) template.FuncMap{
     }
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-    t,err := template.New("index.html").Funcs(templateFunctionMap(nil)).ParseFiles("index.html")
+func executeTemplate(w http.ResponseWriter, name string, data interface{}) {
+    t,err := template.New("templates").Funcs(templateFunctionMap()).ParseGlob("templates/*.html")
     if err != nil {
         log.Print(err)
-        w.Write([]byte(err.Error()))
+        http.Error(w, err.Error(), http.StatusInternalServerError)
     }
     
-    err = t.Execute(w, accdb)
+    err = t.ExecuteTemplate(w, name, data)
     if err != nil {
         log.Print(err)
-        w.Write([]byte(err.Error()))
+        http.Error(w, err.Error(), http.StatusInternalServerError)
     }
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+    executeTemplate(w, "index.html", accdb)
 }
 
 func eventHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,18 +78,33 @@ func eventHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    t,err := template.New("event.html").Funcs(templateFunctionMap(nil)).ParseFiles("event.html")
-    if err != nil {
-        log.Print(err)
-        w.Write([]byte(err.Error()))
+    executeTemplate(w, "event.html", event)
+}
+
+type playerPage struct {
+    Database *accresults.Database
+    Player *accresults.Player
+}
+
+func playerHandler(w http.ResponseWriter, r *http.Request) {
+    pathComponents := strings.Split(r.URL.Path, "/")
+    if len(pathComponents) != 3 {
+        log.Printf("Not enough components in path '%s', components: %v, len: %v", r.URL.Path, pathComponents, len(pathComponents))
+        w.WriteHeader(http.StatusNotFound)
+        return
     }
     
-    err = t.Execute(w, event)
-    if err != nil {
-        log.Print(err)
-        w.Write([]byte(err.Error()))
+    playerId := pathComponents[2]
+    player, ok := accdb.Players[playerId]
+    if !ok {
+        log.Printf("Player '%s' not found in database", playerId)
+        w.WriteHeader(http.StatusNotFound)
+        return
     }
+    
+    executeTemplate(w, "player.html", &playerPage{accdb, player})
 }
+
 func sessionHandler(w http.ResponseWriter, r *http.Request) {
     pathComponents := strings.Split(r.URL.Path, "/")
     if len(pathComponents) != 3 {
@@ -102,17 +121,7 @@ func sessionHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    t,err := template.New("session.html").Funcs(templateFunctionMap(session)).ParseFiles("session.html")
-    if err != nil {
-        log.Print(err)
-        w.Write([]byte(err.Error()))
-    }
-    
-    err = t.Execute(w, session)
-    if err != nil {
-        log.Print(err)
-        w.Write([]byte(err.Error()))
-    }
+    executeTemplate(w, "session.html", session)
 }
 
 type sessionCarPage struct {
@@ -148,51 +157,7 @@ func sessionCarHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    t,err := template.New("sessioncar.html").Funcs(templateFunctionMap(session)).ParseFiles("sessioncar.html")
-    if err != nil {
-        log.Print(err)
-        w.Write([]byte(err.Error()))
-    }
-    
-    err = t.Execute(w, &sessionCarPage{session, car})
-    if err != nil {
-        log.Print(err)
-        w.Write([]byte(err.Error()))
-    }
-}
-
-type playerPage struct {
-    Database *accresults.Database
-    Player *accresults.Player
-}
-
-func playerHandler(w http.ResponseWriter, r *http.Request) {
-    pathComponents := strings.Split(r.URL.Path, "/")
-    if len(pathComponents) != 3 {
-        log.Printf("Not enough components in path '%s', components: %v, len: %v", r.URL.Path, pathComponents, len(pathComponents))
-        w.WriteHeader(http.StatusNotFound)
-        return
-    }
-    
-    playerId := pathComponents[2]
-    player, ok := accdb.Players[playerId]
-    if !ok {
-        log.Printf("Player '%s' not found in database", playerId)
-        w.WriteHeader(http.StatusNotFound)
-        return
-    }
-    
-    t,err := template.New("player.html").Funcs(templateFunctionMap(nil)).ParseFiles("player.html")
-    if err != nil {
-        log.Print(err)
-        w.Write([]byte(err.Error()))
-    }
-    
-    err = t.Execute(w, &playerPage{accdb, player})
-    if err != nil {
-        log.Print(err)
-        w.Write([]byte(err.Error()))
-    }
+    executeTemplate(w, "sessioncar.html", &sessionCarPage{session, car})
 }
 
 func RunServer(database *accresults.Database) error {

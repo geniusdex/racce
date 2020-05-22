@@ -46,7 +46,7 @@
   <th>Cleared in lap</th>
  </tr>
 {{range .Penalties}}
-    {{$car := car .CarId}}
+    {{$car := carInSession .CarId $session}}
     {{$driver := index $car.Drivers .DriverIndex}}
  <tr>
   <td>{{$car.RaceNumber}}</td>
