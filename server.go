@@ -59,6 +59,9 @@ func executeTemplate(w http.ResponseWriter, name string, data interface{}) {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+    accdb.Mutex.RLock()
+    defer accdb.Mutex.RUnlock()
+    
     executeTemplate(w, "index.html", accdb)
 }
 
@@ -69,6 +72,9 @@ func eventHandler(w http.ResponseWriter, r *http.Request) {
         w.WriteHeader(http.StatusNotFound)
         return
     }
+    
+    accdb.Mutex.RLock()
+    defer accdb.Mutex.RUnlock()
     
     eventId := pathComponents[2]
     event, ok := accdb.Events[eventId]
@@ -94,6 +100,9 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     
+    accdb.Mutex.RLock()
+    defer accdb.Mutex.RUnlock()
+    
     playerId := pathComponents[2]
     player, ok := accdb.Players[playerId]
     if !ok {
@@ -112,6 +121,9 @@ func sessionHandler(w http.ResponseWriter, r *http.Request) {
         w.WriteHeader(http.StatusNotFound)
         return
     }
+    
+    accdb.Mutex.RLock()
+    defer accdb.Mutex.RUnlock()
     
     sessionName := pathComponents[2]
     session, ok := accdb.Sessions[sessionName]
@@ -136,6 +148,9 @@ func sessionCarHandler(w http.ResponseWriter, r *http.Request) {
         w.WriteHeader(http.StatusNotFound)
         return
     }
+    
+    accdb.Mutex.RLock()
+    defer accdb.Mutex.RUnlock()
     
     sessionName := pathComponents[2]
     session, ok := accdb.Sessions[sessionName]

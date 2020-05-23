@@ -3,9 +3,12 @@ package accresults
 import (
     "io/ioutil"
     "log"
+    "path/filepath"
     "sort"
     "strings"
+    "sync"
     "time"
+    "github.com/fsnotify/fsnotify"
 )
 
 var (
@@ -24,6 +27,8 @@ type Event struct {
 }
 
 type Database struct {
+    Mutex *sync.RWMutex
+    
     Sessions map[string]*Session
     SessionNamesSortedOnEndTime []string
     
@@ -32,6 +37,17 @@ type Database struct {
     
     Events map[string]*Event
     EventIdsSortedOnEndTime []string
+    lastEvent *Event
+}
+
+func (db *Database) addSessionName(sessionName string) {
+    db.SessionNamesSortedOnEndTime = append(db.SessionNamesSortedOnEndTime, sessionName)
+    
+    sort.Slice(db.SessionNamesSortedOnEndTime, func(i, j int) bool {
+        a := db.Sessions[db.SessionNamesSortedOnEndTime[i]]
+        b := db.Sessions[db.SessionNamesSortedOnEndTime[j]]
+        return a.EndTime.After(b.EndTime)
+    })
 }
 
 func (db* Database) getOrCreatePlayer(playerId string) *Player {
@@ -45,25 +61,14 @@ func (db* Database) getOrCreatePlayer(playerId string) *Player {
     return player
 }
 
-func (db *Database) postprocess() {
-    for sessionName, session := range db.Sessions {
-        db.SessionNamesSortedOnEndTime = append(db.SessionNamesSortedOnEndTime, sessionName)
-        session.SessionName = sessionName
-        session.SessionTypeString = sessionTypeNames[session.SessionType]
-        for _, line := range session.SessionResult.LeaderBoardLines {
-            for _, driver := range line.Car.Drivers {
-                player := db.getOrCreatePlayer(driver.PlayerId)
-                player.mergeDriver(driver)
-                player.SessionNames = append(player.SessionNames, sessionName)
-            }
+func (db *Database) resolvePlayersInSession(sessionName string, session *Session) {
+    for _, line := range session.SessionResult.LeaderBoardLines {
+        for _, driver := range line.Car.Drivers {
+            player := db.getOrCreatePlayer(driver.PlayerId)
+            player.mergeDriver(driver)
+            player.SessionNames = append(player.SessionNames, sessionName)
         }
     }
-    
-    sort.Slice(db.SessionNamesSortedOnEndTime, func(i, j int) bool {
-        a := db.Sessions[db.SessionNamesSortedOnEndTime[i]]
-        b := db.Sessions[db.SessionNamesSortedOnEndTime[j]]
-        return a.EndTime.After(b.EndTime)
-    })
     
     sort.Slice(db.PlayerIdsSortedOnLastName, func(i, j int) bool {
         a := db.Players[db.PlayerIdsSortedOnLastName[i]].MostRecentName
@@ -73,25 +78,33 @@ func (db *Database) postprocess() {
         }
         return strings.ToLower(a.LastName) < strings.ToLower(b.LastName)
     })
-    
-    event := &Event{"__", "__", time.Now(), nil}
-    for i := len(db.SessionNamesSortedOnEndTime)-1; i >= 0; i-- {
-        session := db.Sessions[db.SessionNamesSortedOnEndTime[i]]
-        if event.TrackName != session.TrackName || session.SessionIndex == 0 {
-            eventId := strings.TrimRight(session.SessionName, "_FPQR")
-            event = &Event{eventId, session.TrackName, session.EndTime, nil}
-            db.Events[eventId] = event
-            db.EventIdsSortedOnEndTime = append(db.EventIdsSortedOnEndTime, eventId)
-        }
-        event.EndTime = session.EndTime
-        event.Sessions = append(event.Sessions, session)
+}
+
+func (db *Database) resolveEventForSession(session *Session) {
+    if db.lastEvent.TrackName != session.TrackName || session.SessionIndex == 0 {
+        eventId := strings.TrimRight(session.SessionName, "_FPQR")
+        db.lastEvent = &Event{eventId, session.TrackName, session.EndTime, nil}
+        db.Events[eventId] = db.lastEvent
+        db.EventIdsSortedOnEndTime = append(db.EventIdsSortedOnEndTime, eventId)
+        
+        sort.Slice(db.EventIdsSortedOnEndTime, func(i, j int) bool {
+            a := db.Events[db.EventIdsSortedOnEndTime[i]]
+            b := db.Events[db.EventIdsSortedOnEndTime[j]]
+            return a.EndTime.After(b.EndTime)
+        })
     }
-    
-    sort.Slice(db.EventIdsSortedOnEndTime, func(i, j int) bool {
-        a := db.Events[db.EventIdsSortedOnEndTime[i]]
-        b := db.Events[db.EventIdsSortedOnEndTime[j]]
-        return a.EndTime.After(b.EndTime)
-    })
+    db.lastEvent.EndTime = session.EndTime
+    db.lastEvent.Sessions = append(db.lastEvent.Sessions, session)
+}
+
+
+func (db *Database) addSession(sessionName string, session *Session) {
+    session.SessionName = sessionName
+    session.SessionTypeString = sessionTypeNames[session.SessionType]
+    db.Sessions[sessionName] = session
+    db.addSessionName(sessionName)
+    db.resolvePlayersInSession(sessionName, session)
+    db.resolveEventForSession(session)
 }
 
 func parseTimeFromSessionName(name string) time.Time {
@@ -103,32 +116,75 @@ func parseTimeFromSessionName(name string) time.Time {
     return result
 }
 
+func (db *Database) loadSessionFile(resultsPath string, fileName string) {
+    sessionName := strings.TrimSuffix(fileName, ".json")
+    sessionTime := parseTimeFromSessionName(sessionName)
+    session, err := LoadSessionFromFile(resultsPath + fileName, sessionTime)
+    if err != nil {
+        log.Print(err)
+        return
+    }
+    
+    db.Mutex.Lock()
+    defer db.Mutex.Unlock()
+    db.addSession(sessionName, session)
+}
+
+func (db *Database) monitorResultsDir(resultsPath string) {
+    watcher, err := fsnotify.NewWatcher()
+    if err != nil {
+        log.Fatal(err)
+    }
+    err = watcher.Add(resultsPath)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    for {
+        select {
+        case event := <-watcher.Events:
+            fileName := filepath.Base(event.Name)
+            if event.Op == fsnotify.Create {
+                time.AfterFunc(5 * time.Second, func() {
+                    log.Printf("Loading new session file '%s'", fileName)
+                    db.loadSessionFile(resultsPath, fileName)
+                })
+            }
+        case err := <-watcher.Errors:
+            log.Fatal(err)
+        }
+    }
+}
+
 func LoadDatabase(resultsPath string) (*Database, error) {
     var db = &Database{
+        &sync.RWMutex{},
         make(map[string]*Session),
         nil,
         make(map[string]*Player),
         nil,
         make(map[string]*Event),
         nil,
+        &Event{"__", "__", time.Now(), nil},
     }
+    
+    resultsPath = strings.TrimRight(resultsPath, "/") + "/"
     
     files, err := ioutil.ReadDir(resultsPath)
     if err != nil {
         return nil, err
     }
     
+    sort.Slice(files, func(i, j int) bool {
+        return files[i].Name() < files[j].Name()
+    })
+    
     for _, f := range files {
         fileName := f.Name()
-        sessionName := strings.TrimSuffix(fileName, ".json")
-        sessionTime := parseTimeFromSessionName(sessionName)
-        db.Sessions[sessionName], err = LoadSessionFromFile(resultsPath + fileName, sessionTime)
-        if err != nil {
-            return db, err
-        }
+        db.loadSessionFile(resultsPath, fileName)
     }
     
-    db.postprocess()
+    go db.monitorResultsDir(resultsPath)
     
     return db, err
 }
