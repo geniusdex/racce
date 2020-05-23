@@ -1,64 +1,96 @@
 {{$session := .}}
 {{template "header.inc.html" .TrackName}}
 
-<h2>Leader Board</h2>
-{{template "sessionleaderboard.inc.html" .}}
+<div class="mdl-grid">
 
-<h2>Penalties</h2>
-<table>
- <tr>
-  <th>Car</th>
-  <th>Driver</th>
-  <th>Violation</th>
-  <th>In lap</th>
-  <th>Penalty</th>
-  <th>Cleared in lap</th>
- </tr>
+<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+  <div class="mdl-card__title mdl-card--table__header">
+    <h2 class="mdl-card__title-text mdl-typography--title">Leader Board</h2>
+  </div>
+  <div class="mdl-card__table">
+    {{template "sessionleaderboard.inc.html" .}}
+  </div>
+</div>
+
+<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
+  <div class="mdl-card__title mdl-card--table__header">
+    <h2 class="mdl-card__title-text mdl-typography--title">Penalties</h2>
+  </div>
+  <div class="mdl-card__table">
+    <table class="mdl-data-table mdl-js-data-table">
+      <thead>
+        <tr>
+          <th>Car</th>
+          <th class="mdl-data-table__cell--non-numeric">Driver</th>
+          <th class="mdl-data-table__cell--non-numeric">Violation</th>
+          <th>In lap</th>
+          <th class="mdl-data-table__cell--non-numeric">Penalty</th>
+          <th>Cleared in lap</th>
+        </tr>
+      </thead>
+      <tbody>
 {{range .Penalties}}
     {{$car := carInSession .CarId $session}}
     {{$driver := index $car.Drivers .DriverIndex}}
- <tr>
-  <td>{{$car.RaceNumber}}</td>
-  <td><a href="{{basePath}}/player/{{$driver.PlayerId}}">{{$driver.FirstName}} {{$driver.LastName}}</a></td>
-  <td>{{.Reason}}</td>
-  <td>{{.ViolationInLap}}</td>
-  <td>{{.Penalty}}</td>
-  <td>{{.ClearedInLap}}</td>
- </tr>
+        <tr>
+          <td>{{$car.RaceNumber}}</td>
+          <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/player/{{$driver.PlayerId}}">{{$driver.FirstName}} {{$driver.LastName}}</a></td>
+          <td class="mdl-data-table__cell--non-numeric">{{.Reason}}</td>
+          <td>{{.ViolationInLap}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{.Penalty}}</td>
+          <td>{{.ClearedInLap}}</td>
+        </tr>
 {{end}}
-</table>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="mdl-cell mdl-cell--6-col"></div>
 
-<h2>Laps per cars</h2>
+<!--
 {{$laps := .Laps}}
 {{range .SessionResult.LeaderBoardLines}}
     {{$car := .Car}}
-<h3>Car {{.Car.RaceNumber}} - {{range $index, $driver := .Car.Drivers}}{{if gt $index 0}}, {{end}}{{.FirstName}} {{.LastName}}{{end}}</h3>
-<table>
- <tr>
-  <th>Lap</th>
-  <th>Driver</th>
-  <th>Laptime</th>
-  <th>Sector 1</th>
-  <th>Sector 2</th>
-  <th>Sector 3</th>
-  <th>Valid</th>
- </tr>
+<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+  <div class="mdl-card__title mdl-card--table__header">
+    <h2 class="mdl-card__title-text mdl-typography--title">Car {{.Car.RaceNumber}} - {{range $index, $driver := .Car.Drivers}}{{if gt $index 0}}, {{end}}{{.FirstName}} {{.LastName}}{{end}}</h2>
+  </div>
+  <div class="mdl-card__table">
+    <table class="mdl-data-table mdl-js-data-table">
+      <thead>
+        <tr>
+          <th>Lap</th>
+          <th class="mdl-data-table__cell--non-numeric">Driver</th>
+          <th>Laptime</th>
+          <th>Sector 1</th>
+          <th>Sector 2</th>
+          <th>Sector 3</th>
+          <th class="mdl-data-table__cell--non-numeric">Valid</th>
+        </tr>
+      </thead>
+      <tbody>
     {{$lapnr := 0}}
     {{range $lap := $laps}}
         {{if eq .CarId $car.CarId}}
             {{$lapnr = add $lapnr 1}}
- <tr>
-  <td>{{$lapnr}}</td>
-  <td>{{(index $car.Drivers .DriverIndex).ShortName}}</td>
-  <td>{{laptime .Laptime}}</td>
-  <td>{{laptime (index .Splits 0)}}</td>
-  <td>{{laptime (index .Splits 1)}}</td>
-  <td>{{laptime (index .Splits 2)}}</td>
-  <td>{{if .IsValidForBest}}true{{else}}false{{end}}</td>
- </tr>
+        <tr>
+          <td>{{$lapnr}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{(index $car.Drivers .DriverIndex).ShortName}}</td>
+          <td>{{laptime .Laptime}}</td>
+          <td>{{laptime (index .Splits 0)}}</td>
+          <td>{{laptime (index .Splits 1)}}</td>
+          <td>{{laptime (index .Splits 2)}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{if .IsValidForBest}}true{{else}}false{{end}}</td>
+        </tr>
         {{end}}
     {{end}}
-</table>
+      </tbody>
+    </table>
+  </div>
+</div>
 {{end}}
+-->
+
+</div>
 
 {{template "footer.inc.html"}}

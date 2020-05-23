@@ -1,26 +1,40 @@
 {{$db := .Database}}
 {{$player := .Player}}
 {{$name := $player.MostRecentName}}
+
 {{template "header.inc.html" (print $name.FirstName " " $name.LastName)}}
-<h2>Sessions</h2>
-<table>
- <tr>
-  <th>Name</th>
-  <th>Date / Time</th>
-  <th>Track</th>
-  <th>Session Type</th>
- </tr>
+
+<div class="mdl-grid">
+<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
+  <div class="mdl-card__title mdl-card--table__header">
+    <h2 class="mdl-card__title-text mdl-typography--title">Sessions</h2>
+  </div>
+  <div class="mdl-card__table">
+    <table class="mdl-data-table mdl-js-data-table">
+      <thead>
+        <tr>
+          <th class="mdl-data-table__cell--non-numeric">Name</th>
+          <th class="mdl-data-table__cell--non-numeric">Date / Time</th>
+          <th class="mdl-data-table__cell--non-numeric">Track</th>
+          <th class="mdl-data-table__cell--non-numeric">Sessions</th>
+        </tr>
+      </thead>
+      <tbody>
 {{range $db.SessionNamesSortedOnEndTime}}
     {{if contains $player.SessionNames .}}
         {{$session := index $db.Sessions .}}
- <tr>
-  <td><a href="{{basePath}}/session/{{.}}">{{.}}</a></td>
-  <td>{{$session.EndTime.Format "2006-01-02 15:04:05"}}</td>
-  <td>{{$session.TrackName}}</td>
-  <td>{{$session.SessionTypeString}}</td>
- </tr>
+        <tr>
+          <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/session/{{.}}">{{.}}</a></td>
+          <td class="mdl-data-table__cell--non-numeric">{{$session.EndTime.Format "2006-01-02 15:04:05"}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{$session.TrackName}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{$session.SessionTypeString}}</td>
+        </tr>
     {{end}}
 {{end}}
-</table>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
 
 {{template "footer.inc.html"}}

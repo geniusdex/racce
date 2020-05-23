@@ -1,0 +1,29 @@
+body {
+    background: #fafafa;
+    position: relative;
+}
+
+.mdl-card__table > table {
+    width: 100%;
+    margin: 0em;
+}
+
+.mdl-card__list > ul {
+    width: 100%;
+    margin: 0em;
+}
+
+.page-content {
+}
+
+.events_card {
+    max-width: 500px;
+}
+
+.drivers_card {
+    min-height: 0em;
+}
+
+.laptimes_chart_container {
+    width: calc(100% - 32px);
+}
