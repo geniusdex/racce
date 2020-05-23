@@ -14,14 +14,16 @@ var (
     accdb *accresults.Database
 )
 
-func templateFunctionMap() template.FuncMap{
+func templateFunctionMap(basePath string) template.FuncMap{
     return template.FuncMap{
+    // Arithmetic
         "add": func(a, b int) int {
             return a + b
         },
         "div": func(a, b int) float64 {
             return float64(a) / float64(b)
         },
+    // Formatting
         "laptime": func(time int) string {
             milliseconds := time % 1000
             time = time / 1000
@@ -30,9 +32,11 @@ func templateFunctionMap() template.FuncMap{
             
             return fmt.Sprintf("%d:%02d.%03d", minutes, seconds, milliseconds)
         },
+    // Data lookups
         "carInSession": func(carId int, session *accresults.Session) *accresults.Car {
             return session.FindCarById(carId)
         },
+    // Utility
         "contains": func(haystack []string, needle string) bool {
             for _, element := range haystack {
                 if element == needle {
@@ -41,11 +45,17 @@ func templateFunctionMap() template.FuncMap{
             }
             return false
         },
+    // Environment
+        "basePath": func() string {
+            return basePath
+        },
     }
 }
 
-func executeTemplate(w http.ResponseWriter, name string, data interface{}) {
-    t,err := template.New("templates").Funcs(templateFunctionMap()).ParseGlob("templates/*.html")
+func executeTemplate(w http.ResponseWriter, r *http.Request, name string, data interface{}) {
+    basePath := r.Header.Get("X-Forwarded-Prefix")
+    
+    t,err := template.New("templates").Funcs(templateFunctionMap(basePath)).ParseGlob("templates/*.html")
     if err != nil {
         log.Print(err)
         http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -59,10 +69,15 @@ func executeTemplate(w http.ResponseWriter, name string, data interface{}) {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+    if len(strings.Trim(r.URL.Path, "/")) > 0 {
+        w.WriteHeader(http.StatusNotFound)
+        return
+    }
+    
     accdb.Mutex.RLock()
     defer accdb.Mutex.RUnlock()
     
-    executeTemplate(w, "index.html", accdb)
+    executeTemplate(w, r, "index.html", accdb)
 }
 
 func eventHandler(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +99,7 @@ func eventHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    executeTemplate(w, "event.html", event)
+    executeTemplate(w, r, "event.html", event)
 }
 
 type playerPage struct {
@@ -111,7 +126,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    executeTemplate(w, "player.html", &playerPage{accdb, player})
+    executeTemplate(w, r, "player.html", &playerPage{accdb, player})
 }
 
 func sessionHandler(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +148,7 @@ func sessionHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    executeTemplate(w, "session.html", session)
+    executeTemplate(w, r, "session.html", session)
 }
 
 type sessionCarPage struct {
@@ -172,7 +187,7 @@ func sessionCarHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    executeTemplate(w, "sessioncar.html", &sessionCarPage{session, car})
+    executeTemplate(w, r, "sessioncar.html", &sessionCarPage{session, car})
 }
 
 func RunServer(database *accresults.Database) error {
@@ -182,5 +197,6 @@ func RunServer(database *accresults.Database) error {
     http.HandleFunc("/player/", playerHandler)
     http.HandleFunc("/session/", sessionHandler)
     http.HandleFunc("/sessioncar/", sessionCarHandler)
+    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
     return http.ListenAndServe(":8099", nil)
 }

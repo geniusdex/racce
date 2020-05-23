@@ -5,7 +5,7 @@
 <h2>Drivers</h2>
 <ul>
 {{range .Car.Drivers}}
- <li><a href="../../player/{{.PlayerId}}">{{.FirstName}} {{.LastName}}</a></li>
+ <li><a href="{{basePath}}/player/{{.PlayerId}}">{{.FirstName}} {{.LastName}}</a></li>
 {{end}}
 </ul>
 

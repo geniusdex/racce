@@ -19,7 +19,7 @@
     {{$driver := index $car.Drivers .DriverIndex}}
  <tr>
   <td>{{$car.RaceNumber}}</td>
-  <td><a href="../player/{{$driver.PlayerId}}">{{$driver.FirstName}} {{$driver.LastName}}</a></td>
+  <td><a href="{{basePath}}/player/{{$driver.PlayerId}}">{{$driver.FirstName}} {{$driver.LastName}}</a></td>
   <td>{{.Reason}}</td>
   <td>{{.ViolationInLap}}</td>
   <td>{{.Penalty}}</td>

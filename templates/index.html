@@ -10,7 +10,7 @@
 {{range .EventIdsSortedOnEndTime}}
     {{$event := index $db.Events .}}
  <tr>
-  <td><a href="event/{{.}}">{{$event.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
+  <td><a href="{{basePath}}/event/{{.}}">{{$event.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
   <td>{{$event.TrackName}}</td>
   <td>{{range $event.Sessions}}{{if ne .SessionIndex 0}}, {{end}}{{.SessionType}}{{end}}</td>
  </tr>
@@ -28,7 +28,7 @@
     {{$player := index $db.Players .}}
  <tr>
   <td>{{$player.MostRecentName.ShortName}}</td>
-  <td><a href="player/{{.}}">{{$player.MostRecentName.FirstName}} {{$player.MostRecentName.LastName}}</a></td>
+  <td><a href="{{basePath}}/player/{{.}}">{{$player.MostRecentName.FirstName}} {{$player.MostRecentName.LastName}}</a></td>
   <td>{{len $player.SessionNames}}</td>
  </tr>
 {{end}}
