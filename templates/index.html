@@ -1,10 +1,5 @@
 {{$db := .}}
-<!DOCTYPE html>
-<html>
-<head>
-<title>Index</title>
-</head>
-<body>
+{{template "header.inc.html" "Index"}}
 <h2>Events</h2>
 <table>
  <tr>
@@ -38,6 +33,4 @@
  </tr>
 {{end}}
 </table>
-
-</body>
-</html>
+{{template "footer.inc.html"}}

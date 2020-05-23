@@ -1,16 +1,15 @@
 {{$session := .Session}}
 {{$car := .Car}}
-<!DOCTYPE html>
-<html>
-<head>
-<title>{{$session.TrackName}} {{$car.RaceNumber}}</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js" integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI=" crossorigin="anonymous"></script>
-</head>
-<body>
-<h1>{{$session.ServerName}} - {{$session.TrackName}} - Car {{$car.RaceNumber}}</h1>
+{{template "header.inc.html" (print $session.TrackName " - Car " $car.RaceNumber)}}
 
-<h2>Laps per cars</h2>
-<h3>Car {{.Car.RaceNumber}} - {{range $index, $driver := .Car.Drivers}}{{if gt $index 0}}, {{end}}{{.FirstName}} {{.LastName}}{{end}}</h3>
+<h2>Drivers</h2>
+<ul>
+{{range .Car.Drivers}}
+ <li><a href="../../player/{{.PlayerId}}">{{.FirstName}} {{.LastName}}</a></li>
+{{end}}
+</ul>
+
+<h2>Lap times</h2>
 <table>
  <tr>
   <th>Lap</th>
@@ -90,5 +89,4 @@ var myChart = new Chart(ctx, {
 });
 </script>
 
-</body>
-</html>
+{{template "footer.inc.html"}}

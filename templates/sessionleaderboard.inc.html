@@ -1,0 +1,27 @@
+{{$session := .}}
+<table>
+ <tr>
+  <th>Pos</th>
+  <th>Car</th>
+  <th>Driver</th>
+  <th>Laps</th>
+  <th>Total time</th>
+  <th>Best lap</th>
+  <th>Best Sector 1</th>
+  <th>Best Sector 2</th>
+  <th>Best Sector 3</th>
+ </tr>
+{{range $index, $line := .SessionResult.LeaderBoardLines}}
+ <tr>
+  <td>{{add $index 1}}.</td>
+  <td><a href="../sessioncar/{{$session.SessionName}}/{{.Car.CarId}}">{{.Car.RaceNumber}}</a></td>
+  <td><a href="../player/{{.CurrentDriver.PlayerId}}">{{.CurrentDriver.FirstName}} {{.CurrentDriver.LastName}}</a></td>
+  <td>{{.Timing.LapCount}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.TotalTime}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.BestLap}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 0)}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 1)}}{{else}}-{{end}}</td>
+  <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 2)}}{{else}}-{{end}}</td>
+ </tr>
+{{end}}
+</table>

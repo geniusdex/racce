@@ -1,13 +1,7 @@
 {{$db := .Database}}
 {{$player := .Player}}
 {{$name := $player.MostRecentName}}
-<!DOCTYPE html>
-<html>
-<head>
-<title>{{$name.FirstName}} {{$name.LastName}}</title>
-</head>
-<body>
-<h1>{{$name.FirstName}} {{$name.LastName}}</h1>
+{{template "header.inc.html" (print $name.FirstName " " $name.LastName)}}
 <h2>Sessions</h2>
 <table>
  <tr>
@@ -29,5 +23,4 @@
 {{end}}
 </table>
 
-</body>
-</html>
+{{template "footer.inc.html"}}
