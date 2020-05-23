@@ -30,7 +30,7 @@
       </thead>
       <tbody>
 {{range .Penalties}}
-    {{$car := carInSession .CarId $session}}
+    {{$car := $session.FindCarById .CarId}}
     {{$driver := index $car.Drivers .DriverIndex}}
         <tr>
           <td>{{$car.RaceNumber}}</td>

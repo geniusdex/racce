@@ -54,8 +54,7 @@ func (db *Database) addSessionName(sessionName string) {
 func (db* Database) getOrCreatePlayer(playerId string) *Player {
     player, ok := db.Players[playerId]
     if !ok {
-        player = &Player{}
-        player.PlayerId = playerId
+        player = NewPlayer(playerId)
         db.Players[playerId] = player
         db.PlayerIdsSortedOnLastName = append(db.PlayerIdsSortedOnLastName, playerId)
         db.PlayerIdsSortedOnNrSessions = append(db.PlayerIdsSortedOnNrSessions, playerId)
@@ -63,12 +62,13 @@ func (db* Database) getOrCreatePlayer(playerId string) *Player {
     return player
 }
 
-func (db *Database) resolvePlayersInSession(sessionName string, session *Session) {
+func (db *Database) resolvePlayersInSession(sessionName string, session *Session, event *Event) {
     for _, line := range session.SessionResult.LeaderBoardLines {
         for _, driver := range line.Car.Drivers {
             player := db.getOrCreatePlayer(driver.PlayerId)
             player.mergeDriver(driver)
             player.SessionNames = append(player.SessionNames, sessionName)
+            player.Events[event.EventId] = event
         }
     }
     
@@ -88,7 +88,7 @@ func (db *Database) resolvePlayersInSession(sessionName string, session *Session
     })
 }
 
-func (db *Database) resolveEventForSession(session *Session) {
+func (db *Database) resolveEventForSession(session *Session) *Event {
     if db.lastEvent.TrackName != session.TrackName || session.SessionIndex == 0 {
         eventId := strings.TrimRight(session.SessionName, "_FPQR")
         db.lastEvent = &Event{eventId, session.TrackName, session.EndTime, nil}
@@ -103,6 +103,7 @@ func (db *Database) resolveEventForSession(session *Session) {
     }
     db.lastEvent.EndTime = session.EndTime
     db.lastEvent.Sessions = append(db.lastEvent.Sessions, session)
+    return db.lastEvent
 }
 
 
@@ -111,8 +112,8 @@ func (db *Database) addSession(sessionName string, session *Session) {
     session.SessionTypeString = sessionTypeNames[session.SessionType]
     db.Sessions[sessionName] = session
     db.addSessionName(sessionName)
-    db.resolvePlayersInSession(sessionName, session)
-    db.resolveEventForSession(session)
+    event := db.resolveEventForSession(session)
+    db.resolvePlayersInSession(sessionName, session, event)
 }
 
 func parseTimeFromSessionName(name string) time.Time {

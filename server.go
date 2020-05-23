@@ -5,6 +5,8 @@ import (
     "html/template"
     "log"
     "net/http"
+    "reflect"
+    "sort"
     "strings"
     "strconv"
     "github.com/geniusdex/racce/accresults"
@@ -20,6 +22,9 @@ func templateFunctionMap(basePath string) template.FuncMap{
         "add": func(a, b int) int {
             return a + b
         },
+        "sub": func(a, b int) int {
+            return a + b
+        },
         "div": func(a, b int) float64 {
             return float64(a) / float64(b)
         },
@@ -32,10 +37,6 @@ func templateFunctionMap(basePath string) template.FuncMap{
             
             return fmt.Sprintf("%d:%02d.%03d", minutes, seconds, milliseconds)
         },
-    // Data lookups
-        "carInSession": func(carId int, session *accresults.Session) *accresults.Car {
-            return session.FindCarById(carId)
-        },
     // Utility
         "contains": func(haystack []string, needle string) bool {
             for _, element := range haystack {
@@ -44,6 +45,48 @@ func templateFunctionMap(basePath string) template.FuncMap{
                 }
             }
             return false
+        },
+        "keys": func(data interface{}) []string {
+            value := reflect.ValueOf(data)
+            keys := make([]string, value.Len())
+            for i, key := range value.MapKeys() {
+                keys[i] = key.String()
+            }
+            return keys
+        },
+        "sort": func(in []string) []string {
+            out := make([]string, len(in))
+            copy(out, in)
+            sort.Strings(out)
+            return out
+        },
+        "sortOn": func(data interface{}, field string) []interface{} {
+            dataval := reflect.ValueOf(data)
+            values := make([]interface{}, 0, dataval.Len())
+            if dataval.Kind() == reflect.Map {
+                iter := dataval.MapRange()
+                for iter.Next() {
+                    values = append(values, iter.Value().Elem().Interface())
+                }
+            } else {
+                for i := 0; i < dataval.Len(); i++ {
+                    values = append(values, dataval.Index(i).Elem().Interface())
+                }
+            }
+            sort.Slice(values, func(i, j int) bool {
+                a := reflect.ValueOf(values[i]).FieldByName(field)
+                b := reflect.ValueOf(values[j]).FieldByName(field)
+                return a.String() < b.String()
+            })
+            return values
+        },
+        "reverse": func(data interface{}) []interface{} {
+            dataval := reflect.ValueOf(data)
+            values := make([]interface{}, dataval.Len())
+            for i, o := dataval.Len() - 1, 0; i >= 0; i, o = i-1, o+1 {
+                values[o] = dataval.Index(i).Interface()
+            }
+            return values
         },
     // Environment
         "basePath": func() string {

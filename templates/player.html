@@ -7,29 +7,25 @@
 <div class="mdl-grid">
 <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
   <div class="mdl-card__title mdl-card--table__header">
-    <h2 class="mdl-card__title-text mdl-typography--title">Sessions</h2>
+    <h2 class="mdl-card__title-text mdl-typography--title">Events</h2>
   </div>
   <div class="mdl-card__table">
     <table class="mdl-data-table mdl-js-data-table">
       <thead>
         <tr>
-          <th class="mdl-data-table__cell--non-numeric">Name</th>
           <th class="mdl-data-table__cell--non-numeric">Date / Time</th>
           <th class="mdl-data-table__cell--non-numeric">Track</th>
           <th class="mdl-data-table__cell--non-numeric">Sessions</th>
         </tr>
       </thead>
       <tbody>
-{{range $db.SessionNamesSortedOnEndTime}}
-    {{if contains $player.SessionNames .}}
-        {{$session := index $db.Sessions .}}
+{{range reverse (sortOn $player.Events "EventId")}}
+<!--{range $index, $event := $player.Events}-->
         <tr>
-          <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/session/{{.}}">{{.}}</a></td>
-          <td class="mdl-data-table__cell--non-numeric">{{$session.EndTime.Format "2006-01-02 15:04:05"}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{$session.TrackName}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{$session.SessionTypeString}}</td>
+          <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/event/{{.EventId}}">{{.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
+          <td class="mdl-data-table__cell--non-numeric">{{.TrackName}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{range .Sessions}}{{if ne .SessionIndex 0}}, {{end}}{{.SessionType}}{{end}}</td>
         </tr>
-    {{end}}
 {{end}}
       </tbody>
     </table>
