@@ -44,7 +44,7 @@
         </tr>
       </thead>
       <tbody>
-{{range .PlayerIdsSortedOnLastName}}
+{{range .PlayerIdsSortedOnNrSessions}}
     {{$player := index $db.Players .}}
         <tr>
           <td class="mdl-data-table__cell--non-numeric">{{$player.MostRecentName.ShortName}}</td>

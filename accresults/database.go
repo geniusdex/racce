@@ -34,6 +34,7 @@ type Database struct {
     
     Players map[string]*Player
     PlayerIdsSortedOnLastName []string
+    PlayerIdsSortedOnNrSessions []string
     
     Events map[string]*Event
     EventIdsSortedOnEndTime []string
@@ -57,6 +58,7 @@ func (db* Database) getOrCreatePlayer(playerId string) *Player {
         player.PlayerId = playerId
         db.Players[playerId] = player
         db.PlayerIdsSortedOnLastName = append(db.PlayerIdsSortedOnLastName, playerId)
+        db.PlayerIdsSortedOnNrSessions = append(db.PlayerIdsSortedOnNrSessions, playerId)
     }
     return player
 }
@@ -77,6 +79,12 @@ func (db *Database) resolvePlayersInSession(sessionName string, session *Session
             return strings.ToLower(a.FirstName) < strings.ToLower(b.FirstName)
         }
         return strings.ToLower(a.LastName) < strings.ToLower(b.LastName)
+    })
+    
+    sort.Slice(db.PlayerIdsSortedOnNrSessions, func(i, j int) bool {
+        a := db.Players[db.PlayerIdsSortedOnNrSessions[i]]
+        b := db.Players[db.PlayerIdsSortedOnNrSessions[j]]
+        return len(a.SessionNames) > len(b.SessionNames)
     })
 }
 
@@ -162,6 +170,7 @@ func LoadDatabase(resultsPath string) (*Database, error) {
         make(map[string]*Session),
         nil,
         make(map[string]*Player),
+        nil,
         nil,
         make(map[string]*Event),
         nil,
