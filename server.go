@@ -29,6 +29,9 @@ func addTemplateFunctions(t *template.Template, basePath string) *template.Templ
 		"div": func(a, b int) float64 {
 			return float64(a) / float64(b)
 		},
+		"mul": func(a, b int) int {
+			return a * b
+		},
 		// Formatting
 		"laptime": func(time int) string {
 			milliseconds := time % 1000
