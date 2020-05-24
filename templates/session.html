@@ -46,7 +46,7 @@ var myChart = new Chart(ctx, {
     {{$positions := index $session.SessionResult.CarPositionsPerLap $carId}}
     {{$car := $session.FindCarById $carId}}
         {
-            label: 'Car {{$car.RaceNumber}}',
+            label: 'Car {{$car.RaceNumber}}: {{range $i,$j := $car.Drivers}}{{if ne $i 0}}, {{end}}{{.FirstName}} {{.LastName}}{{end}}',
             backgroundColor: getCarPositionColor({{$carId}}),
             borderColor: getCarPositionColor({{$carId}}),
             borderWidth: 2,
@@ -67,7 +67,10 @@ var myChart = new Chart(ctx, {
                     reverse: true,
                 }
             }]
-        }
+        },
+        'legend': {
+            position: 'left',
+        },
     }
 });
 </script>
