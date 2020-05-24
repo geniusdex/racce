@@ -10,6 +10,7 @@ import (
     "strings"
     "strconv"
     "github.com/geniusdex/racce/accresults"
+    "github.com/geniusdex/racce/qogs"
 )
 
 var (
@@ -46,13 +47,8 @@ func templateFunctionMap(basePath string) template.FuncMap{
             }
             return false
         },
-        "keys": func(data interface{}) []string {
-            value := reflect.ValueOf(data)
-            keys := make([]string, value.Len())
-            for i, key := range value.MapKeys() {
-                keys[i] = key.String()
-            }
-            return keys
+        "keys": func(data interface{}) []interface{} {
+            return qogs.Keys(data)
         },
         "sort": func(in []string) []string {
             out := make([]string, len(in))
@@ -61,24 +57,8 @@ func templateFunctionMap(basePath string) template.FuncMap{
             return out
         },
         "sortOn": func(data interface{}, field string) []interface{} {
-            dataval := reflect.ValueOf(data)
-            values := make([]interface{}, 0, dataval.Len())
-            if dataval.Kind() == reflect.Map {
-                iter := dataval.MapRange()
-                for iter.Next() {
-                    values = append(values, iter.Value().Elem().Interface())
-                }
-            } else {
-                for i := 0; i < dataval.Len(); i++ {
-                    values = append(values, dataval.Index(i).Elem().Interface())
-                }
-            }
-            sort.Slice(values, func(i, j int) bool {
-                a := reflect.ValueOf(values[i]).FieldByName(field)
-                b := reflect.ValueOf(values[j]).FieldByName(field)
-                return a.String() < b.String()
-            })
-            return values
+            values := qogs.Values(data)
+            return qogs.SortOn(values, field)
         },
         "reverse": func(data interface{}) []interface{} {
             dataval := reflect.ValueOf(data)
