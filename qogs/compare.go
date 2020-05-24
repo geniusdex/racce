@@ -2,7 +2,6 @@ package qogs
 
 import (
 	"fmt"
-	"log"
 	"reflect"
 	"strings"
 	"time"
@@ -35,9 +34,7 @@ func resolveCompareTo(value reflect.Value) reflect.Value {
 		})
 	}
 	compareTo := value.MethodByName("CompareTo")
-	log.Printf("1 value='%v' compareTo='%v' canAddr='%v'", value.Type(), compareTo, value.CanAddr())
 	if !compareTo.IsValid() && value.CanAddr() {
-		log.Printf("2 value='%v' compareTo='%v'", value.Addr().Type(), value.Addr().MethodByName("CompareTo"))
 		return value.Addr().MethodByName("CompareTo")
 	}
 	return compareTo

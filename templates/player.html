@@ -19,7 +19,7 @@
         </tr>
       </thead>
       <tbody>
-{{range reverse (sortOn $player.Events "EventId")}}
+{{range reverse (sortOn $player.Events ".EndTime")}}
 <!--{range $index, $event := $player.Events}-->
         <tr>
           <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/event/{{.EventId}}">{{.EndTime.Format "2006-01-02 15:04:05"}}</a></td>

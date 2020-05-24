@@ -32,13 +32,10 @@ type Database struct {
 
 	Sessions map[string]*Session
 
-	Players                     map[string]*Player
-	PlayerIdsSortedOnLastName   []string
-	PlayerIdsSortedOnNrSessions []string
+	Players map[string]*Player
 
-	Events                  map[string]*Event
-	EventIdsSortedOnEndTime []string
-	lastEvent               *Event
+	Events    map[string]*Event
+	lastEvent *Event
 }
 
 func (db *Database) getOrCreatePlayer(playerId string) *Player {
@@ -46,8 +43,6 @@ func (db *Database) getOrCreatePlayer(playerId string) *Player {
 	if !ok {
 		player = NewPlayer(playerId)
 		db.Players[playerId] = player
-		db.PlayerIdsSortedOnLastName = append(db.PlayerIdsSortedOnLastName, playerId)
-		db.PlayerIdsSortedOnNrSessions = append(db.PlayerIdsSortedOnNrSessions, playerId)
 	}
 	return player
 }
@@ -62,20 +57,6 @@ func (db *Database) resolvePlayersInSession(sessionName string, session *Session
 		}
 	}
 
-	sort.Slice(db.PlayerIdsSortedOnLastName, func(i, j int) bool {
-		a := db.Players[db.PlayerIdsSortedOnLastName[i]].MostRecentName
-		b := db.Players[db.PlayerIdsSortedOnLastName[j]].MostRecentName
-		if strings.ToLower(a.LastName) == strings.ToLower(b.LastName) {
-			return strings.ToLower(a.FirstName) < strings.ToLower(b.FirstName)
-		}
-		return strings.ToLower(a.LastName) < strings.ToLower(b.LastName)
-	})
-
-	sort.Slice(db.PlayerIdsSortedOnNrSessions, func(i, j int) bool {
-		a := db.Players[db.PlayerIdsSortedOnNrSessions[i]]
-		b := db.Players[db.PlayerIdsSortedOnNrSessions[j]]
-		return len(a.SessionNames) > len(b.SessionNames)
-	})
 }
 
 func (db *Database) resolveEventForSession(session *Session) *Event {
@@ -83,13 +64,6 @@ func (db *Database) resolveEventForSession(session *Session) *Event {
 		eventId := strings.TrimRight(session.SessionName, "_FPQR")
 		db.lastEvent = &Event{eventId, session.TrackName, session.EndTime, nil}
 		db.Events[eventId] = db.lastEvent
-		db.EventIdsSortedOnEndTime = append(db.EventIdsSortedOnEndTime, eventId)
-
-		sort.Slice(db.EventIdsSortedOnEndTime, func(i, j int) bool {
-			a := db.Events[db.EventIdsSortedOnEndTime[i]]
-			b := db.Events[db.EventIdsSortedOnEndTime[j]]
-			return a.EndTime.After(b.EndTime)
-		})
 	}
 	db.lastEvent.EndTime = session.EndTime
 	db.lastEvent.Sessions = append(db.lastEvent.Sessions, session)
@@ -158,10 +132,7 @@ func LoadDatabase(resultsPath string) (*Database, error) {
 		&sync.RWMutex{},
 		make(map[string]*Session),
 		make(map[string]*Player),
-		nil,
-		nil,
 		make(map[string]*Event),
-		nil,
 		&Event{"__", "__", time.Now(), nil},
 	}
 

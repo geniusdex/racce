@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-{{range reverse (sortOn $db.Events "EndTime")}}
+{{range reverse (sortOn $db.Events ".EndTime")}}
         <tr>
           <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/event/{{.EventId}}">{{.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
           <td class="mdl-data-table__cell--non-numeric">{{.TrackName}}</td>
@@ -39,16 +39,15 @@
         <tr>
           <th class="mdl-data-table__cell--non-numeric"></th>
           <th class="mdl-data-table__cell--non-numeric">Name</th>
-          <th># Sessions</th>
+          <th># Events</th>
         </tr>
       </thead>
       <tbody>
-{{range .PlayerIdsSortedOnNrSessions}}
-    {{$player := index $db.Players .}}
+{{range reverse (sortOn (reverse (sortOn $db.Players "tolower .MostRecentName.LastName")) "len .Events")}}
         <tr>
-          <td class="mdl-data-table__cell--non-numeric">{{$player.MostRecentName.ShortName}}</td>
-          <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/player/{{.}}">{{$player.MostRecentName.FirstName}} {{$player.MostRecentName.LastName}}</a></td>
-          <td>{{len $player.SessionNames}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{.MostRecentName.ShortName}}</td>
+          <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/player/{{.PlayerId}}">{{.MostRecentName.FirstName}} {{.MostRecentName.LastName}}</a></td>
+          <td>{{len .Events}}</td>
         </tr>
       </tbody>
 {{end}}

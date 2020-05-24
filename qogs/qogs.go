@@ -77,19 +77,21 @@ func SortOn(data interface{}, path string) []interface{} {
 	return values
 }
 
-// pathValue is Path but returns a reflection value instead
-func pathValue(data interface{}, path string) reflect.Value {
-	return elemValue(data).FieldByName(path)
+// Reverse reverses the reversed values of an array, slice, map or string
+func Reverse(data interface{}) []interface{} {
+	values := Values(data)
+	for i, j := len(values)-1, 0; i > j; i, j = i-1, j+1 {
+		values[i], values[j] = values[j], values[i]
+	}
+	return values
 }
 
-// Path looks up a value by parsing the given path.
-//
-// A path is a dot-separated list of fieldnames.
-func Path(data interface{}, path string) interface{} {
-	return pathValue(data, path).Interface()
-}
-
-// pathElemValue is Path but returns a reflection value after Elem instead
-func pathElemValue(data interface{}, path string) reflect.Value {
-	return elemValueFromValue(pathValue(data, path))
+// Contains checks if a certain value is present in an array, slice, map or string
+func Contains(haystack interface{}, needle interface{}) bool {
+	for _, element := range Values(haystack) {
+		if Compare(element, needle) == 0 {
+			return true
+		}
+	}
+	return false
 }

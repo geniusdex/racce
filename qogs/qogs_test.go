@@ -34,11 +34,6 @@ func TestKeys(t *testing.T) {
 	assert.ElementsMatch(t, []string{"foo", "bar"}, Keys(data))
 }
 
-func TestPath(t *testing.T) {
-	assert.Equal(t, 2, Path(testData{2, ""}, "Integer"))
-	assert.Equal(t, "test", Path(testData{2, "test"}, "String"))
-}
-
 func TestSortOn(t *testing.T) {
 	data := []testData{
 		testData{5, "c"},
@@ -55,8 +50,8 @@ func TestSortOn(t *testing.T) {
 		testData{3, "b"},
 		testData{5, "c"},
 	}
-	assert.Equal(t, dataOnInt, SortOn(data, "Integer"))
-	assert.Equal(t, dataOnString, SortOn(data, "String"))
+	assert.Equal(t, dataOnInt, SortOn(data, ".Integer"))
+	assert.Equal(t, dataOnString, SortOn(data, ".String"))
 }
 
 func TestValues(t *testing.T) {
@@ -67,4 +62,16 @@ func TestValues(t *testing.T) {
 
 	array := []string{"test", "1", "2", "3"}
 	assert.Equal(t, []interface{}{"test", "1", "2", "3"}, Values(array))
+}
+
+func TestReverse(t *testing.T) {
+	assert.Equal(t, []interface{}{3, 2, 1}, Reverse([]int{1, 2, 3}))
+	assert.Equal(t, []interface{}{"bar", "foo"}, Reverse([]string{"foo", "bar"}))
+}
+
+func TestContains(t *testing.T) {
+	assert.True(t, Contains([]int{12, 72, 42}, 72))
+	assert.False(t, Contains([]int{12, 72, 42}, 5))
+	assert.True(t, Contains([]string{"foo", "bar"}, "foo"))
+	assert.False(t, Contains([]string{"foo", "bar"}, "test"))
 }
