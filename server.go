@@ -187,7 +187,7 @@ func sessionCarHandler(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(w, r, "sessioncar.html", &sessionCarPage{session, car})
 }
 
-func RunServer(database *accresults.Database) error {
+func RunServer(config *configurationFrontend, database *accresults.Database) error {
 	accdb = database
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/event/", eventHandler)
@@ -195,5 +195,5 @@ func RunServer(database *accresults.Database) error {
 	http.HandleFunc("/session/", sessionHandler)
 	http.HandleFunc("/sessioncar/", sessionCarHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	return http.ListenAndServe(":8099", nil)
+	return http.ListenAndServe(config.Listen, nil)
 }

@@ -1,12 +1,6 @@
 // Package qogs provides primitives to query collections of nested structs.
 package qogs
 
-// TODO
-// - Support proper paths in pathValue
-// - Unit tests
-// - Add Comparable interface for Sort(), model after go-linq Comparable, allow function with correct argument type
-// - Implement Comparable for built-in types
-
 import (
 	"reflect"
 	"sort"

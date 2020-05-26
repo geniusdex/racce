@@ -1,0 +1,6 @@
+{
+    "frontend": {
+        "listen": ":8099"
+    },
+    "resultsDir": "results/"
+}
