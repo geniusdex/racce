@@ -42,13 +42,13 @@ type Car struct {
 
 type LeaderBoardTiming struct {
 	// TODO: durations
-	LastLap     int    `json:"lastLap"`
-	LastSplits  []*int `json:"lastSplits"`
-	BestLap     int    `json:"bestLap"`
-	BestSplits  []*int `json:"bestSplits"`
-	TotalTime   int    `json:"totalTime"`
-	LapCount    int    `json:"lapCount"`
-	LastSplitId int    `json:"lastSplitId"`
+	LastLap     int   `json:"lastLap"`
+	LastSplits  []int `json:"lastSplits"`
+	BestLap     int   `json:"bestLap"`
+	BestSplits  []int `json:"bestSplits"`
+	TotalTime   int   `json:"totalTime"`
+	LapCount    int   `json:"lapCount"`
+	LastSplitId int   `json:"lastSplitId"`
 }
 
 type LeaderBoardLine struct {
@@ -58,14 +58,14 @@ type LeaderBoardLine struct {
 	Timing                  *LeaderBoardTiming `json:"timing"`
 	MissingMandatoryPitstop int                `json:"missingMandatoryPitstop`
 	//    DriverTotalTimes []*time.Duration `json:"driverTotalTimes"`
-	DriverTotalTimes []*float64 `json:"driverTotalTimes"`
+	DriverTotalTimes []float64 `json:"driverTotalTimes"`
 }
 
 type SessionResult struct {
 	//    BestLap *time.Duration `json:"bestLap"`
 	BestLap int `json:"bestLap"`
 	//    BestSplits []*time.Duration `json:"bestSplits"`
-	BestSplits       []*int             `json:"bestSplits"`
+	BestSplits       []int              `json:"bestSplits"`
 	IsWetSession     int                `json:"isWetSession"`
 	Type             int                `json:"type"`
 	LeaderBoardLines []*LeaderBoardLine `json:"leaderBoardLines"`

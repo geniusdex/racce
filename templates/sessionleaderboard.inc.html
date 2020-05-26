@@ -21,10 +21,18 @@
       <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/player/{{.CurrentDriver.PlayerId}}">{{.CurrentDriver.FirstName}} {{.CurrentDriver.LastName}}</a></td>
       <td>{{.Timing.LapCount}}</td>
       <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.TotalTime}}{{else}}-{{end}}</td>
-      <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.BestLap}}{{else}}-{{end}}</td>
-      <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 0)}}{{else}}-{{end}}</td>
-      <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 1)}}{{else}}-{{end}}</td>
-      <td>{{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 2)}}{{else}}-{{end}}</td>
+      <td{{if eq .Timing.BestLap $session.SessionResult.BestLap}} class="leaderboard_bestlap"{{end}}>
+        {{if gt .Timing.LapCount 0}}{{laptime .Timing.BestLap}}{{else}}-{{end}}
+      </td>
+      <td{{if eq (index .Timing.BestSplits 0) (index $session.SessionResult.BestSplits 0)}} class="leaderboard_bestsplit"{{end}}>
+        {{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 0)}}{{else}}-{{end}}
+      </td>
+      <td{{if eq (index .Timing.BestSplits 1) (index $session.SessionResult.BestSplits 1)}} class="leaderboard_bestsplit"{{end}}>
+        {{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 1)}}{{else}}-{{end}}
+      </td>
+      <td{{if eq (index .Timing.BestSplits 2) (index $session.SessionResult.BestSplits 2)}} class="leaderboard_bestsplit"{{end}}>
+        {{if gt .Timing.LapCount 0}}{{laptime (index .Timing.BestSplits 2)}}{{else}}-{{end}}
+      </td>
     </tr>
   </tbody>
 {{end}}
