@@ -50,6 +50,8 @@ var myChart = new Chart(ctx, {
             backgroundColor: getCarPositionColor({{$carId}}),
             borderColor: getCarPositionColor({{$carId}}),
             borderWidth: 2,
+            hoverBorderColor: 'black',
+            hoverBorderWidth: 2,
             fill: false,
             lineTension: 0,
             data: [{{range $positions}}{{.}}, {{end}}],
@@ -68,8 +70,25 @@ var myChart = new Chart(ctx, {
                 }
             }]
         },
-        'legend': {
+        legend: {
             position: 'left',
+        },
+        hover: {
+            mode: 'dataset',
+        },
+        tooltips: {
+            mode: 'index',
+            itemSort: function(a, b) {
+                return a.value - b.value;
+            },
+            callbacks: {
+                title: function(tooltipItems, data) {
+                    return 'Lap ' + tooltipItems[0].label;
+                },
+                label: function(tooltipItem, data) {
+                    return 'P' + tooltipItem.yLabel + ' - ' + data.datasets[tooltipItem.datasetIndex].label;
+                },
+            },
         },
     }
 });
