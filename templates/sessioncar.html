@@ -77,29 +77,29 @@
 <script>
 var ctx = document.getElementById('lapTimesChart').getContext('2d');
 var myChart = new Chart(ctx, {
-    type: 'line',
+    type: 'bar',
     data: {
         labels: [{{$lapnr := 0}}{{range $session.Laps}}{{if eq .CarId $car.CarId}}{{$lapnr = add $lapnr 1}}{{$lapnr}}, {{end}}{{end}}],
         datasets: [{
-            label: 'Lap',
-            backgroundColor: 'rgba(1, 51, 112, 1)',
-            borderColor: 'rgba(1, 51, 112, 1)',
-            borderWidth: 2,
-            fill: false,
-            data: [{{range $session.Laps}}{{if eq .CarId $car.CarId}}{{div .Laptime 1000}}, {{end}}{{end}}],
-        },
-        {
+        //     label: 'Lap',
+        //     backgroundColor: 'rgba(1, 51, 112, 1)',
+        //     borderColor: 'rgba(1, 51, 112, 1)',
+        //     borderWidth: 2,
+        //     fill: false,
+        //     data: [{{range $session.Laps}}{{if eq .CarId $car.CarId}}{{div .Laptime 1000}}, {{end}}{{end}}],
+        // },
+        // {
             label: 'Sector 1',
-            backgroundColor: 'rgba(255, 0, 0, 1)',
-            borderColor: 'rgba(255, 0, 0, 1)',
+            backgroundColor: 'rgba(223, 0, 0, 1)',
+            borderColor: 'rgba(223, 0, 0, 1)',
             borderWidth: 2,
             fill: false,
             data: [{{range $session.Laps}}{{if eq .CarId $car.CarId}}{{div (index .Splits 0) 1000}}, {{end}}{{end}}],
         },
         {
             label: 'Sector 2',
-            backgroundColor: 'rgba(0, 255, 0, 1)',
-            borderColor: 'rgba(0, 255, 0, 1)',
+            backgroundColor: 'rgba(0, 223, 0, 1)',
+            borderColor: 'rgba(0, 223, 0, 1)',
             borderWidth: 2,
             fill: false,
             data: [{{range $session.Laps}}{{if eq .CarId $car.CarId}}{{div (index .Splits 1) 1000}}, {{end}}{{end}}],
@@ -115,11 +115,15 @@ var myChart = new Chart(ctx, {
     },
     options: {
         scales: {
+            xAxes: [{
+                stacked: true,
+            }],
             yAxes: [{
                 ticks: {
-                    beginAtZero: true
-                }
-            }]
+                    beginAtZero: true,
+                },
+                stacked: true,
+            }],
         }
     }
 });
