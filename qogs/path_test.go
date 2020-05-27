@@ -30,10 +30,18 @@ func TestPath(t *testing.T) {
 		},
 	}
 
+	// Selectors
 	assert.Equal(5, Path(data, ".ID"))
 	assert.Equal("Entry", Path(data, ".Entry.Name"))
 
+	// Numeric constants
+	assert.Equal(int64(27), Path(data, "27"))
+	assert.InEpsilon(3.1415926535, Path(data, "3.1415926535"), 1e-9)
+	assert.Equal(int64(-5), Path(data, "-5"))
+
+	// Function 'len'
 	assert.Equal(2, Path(data, "len .Names"))
 
+	// Function 'tolower'
 	assert.Equal("entry", Path(data, "tolower .Entry.Name"))
 }

@@ -4,6 +4,7 @@ package qogs
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -32,6 +33,14 @@ func pathValueFromValue(value reflect.Value, path string) reflect.Value {
 		}
 		fieldName = path[1:end]
 		return pathValueFromValue(value.FieldByName(fieldName), path[end:])
+	} else if (path[0] >= '0' && path[0] <= '9') || path[0] == '-' {
+		if i, err := strconv.ParseInt(path, 10, 64); err == nil {
+			return reflect.ValueOf(i)
+		}
+		if f, err := strconv.ParseFloat(path, 64); err == nil {
+			return reflect.ValueOf(f)
+		}
+		panic(fmt.Sprintf("qogs cannot parse numeric value '%s'", path))
 	}
 	entries := strings.Split(path, " ")
 	return evaluatePathFunction(value, entries[0], entries[1:])

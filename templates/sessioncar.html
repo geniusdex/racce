@@ -42,6 +42,7 @@
         </tr>
       </thead>
       <tbody>
+{{$timing := (index (filterEq $session.SessionResult.LeaderBoardLines ".Car.CarId" $car.CarId) 0).Timing}}
 {{$lapnr := 0}}
 {{range $lap := $session.Laps}}
     {{if eq .CarId $car.CarId}}
@@ -49,10 +50,18 @@
         <tr>
           <td>{{$lapnr}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{(index $car.Drivers .DriverIndex).ShortName}}</td>
-          <td>{{laptime .Laptime}}</td>
-          <td>{{laptime (index .Splits 0)}}</td>
-          <td>{{laptime (index .Splits 1)}}</td>
-          <td>{{laptime (index .Splits 2)}}</td>
+          <td{{if eq .Laptime $session.SessionResult.BestLap}} class="laptimes_sessionbest"{{else if eq .Laptime $timing.BestLap}} class="laptimes_personalbest"{{end}}>
+              {{laptime .Laptime}}
+          </td>
+          <td{{if eq (index .Splits 0) (index $session.SessionResult.BestSplits 0)}} class="laptimes_sessionbest"{{else if eq (index .Splits 0) (index $timing.BestSplits 0)}} class="laptimes_personalbest"{{end}}>
+              {{laptime (index .Splits 0)}}
+          </td>
+          <td{{if eq (index .Splits 1) (index $session.SessionResult.BestSplits 1)}} class="laptimes_sessionbest"{{else if eq (index .Splits 1) (index $timing.BestSplits 1)}} class="laptimes_personalbest"{{end}}>
+              {{laptime (index .Splits 1)}}
+          </td>
+          <td{{if eq (index .Splits 2) (index $session.SessionResult.BestSplits 2)}} class="laptimes_sessionbest"{{else if eq (index .Splits 2) (index $timing.BestSplits 2)}} class="laptimes_personalbest"{{end}}>
+              {{laptime (index .Splits 2)}}
+          </td>
           <td class="mdl-data-table__cell--non-numeric">{{if .IsValidForBest}}true{{else}}false{{end}}</td>
         </tr>
     {{end}}

@@ -54,6 +54,20 @@ func TestSortOn(t *testing.T) {
 	assert.Equal(t, dataOnString, SortOn(data, ".String"))
 }
 
+func TestFilterEq(t *testing.T) {
+	data := []testData{
+		testData{5, "c"},
+		testData{3, "b"},
+		testData{4, "a"},
+		testData{4, "d"},
+	}
+	dataFiltered := []interface{}{
+		testData{4, "a"},
+		testData{4, "d"},
+	}
+	assert.Equal(t, dataFiltered, FilterEq(data, ".Integer", "4"))
+}
+
 func TestValues(t *testing.T) {
 	mapData := make(map[string]int)
 	mapData["foo"] = 42

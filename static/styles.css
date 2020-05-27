@@ -28,10 +28,14 @@ body {
     width: calc(100% - 32px);
 }
 
-.leaderboard_bestlap {
+.leaderboard_bestlap, .leaderboard_bestsplit {
     color: rgb(192, 0, 192);
 }
 
-.leaderboard_bestsplit {
+.laptimes_sessionbest {
     color: rgb(192, 0, 192);
+}
+
+.laptimes_personalbest {
+    color: rgb(0, 192, 0);
 }

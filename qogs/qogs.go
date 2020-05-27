@@ -71,6 +71,25 @@ func SortOn(data interface{}, path string) []interface{} {
 	return values
 }
 
+// FilterEq selects all values which are equal to a given value.
+//
+// The first argument determines the root data to use. It must be an array, slice,
+// map or string. For a map, only the values are returned.
+//
+// The second argument is the path of the value to filter. This is resolved for
+// every element iterated over.
+//
+// The this argument is the path to compare to. This is evaluated once.
+func FilterEq(data interface{}, valuePath, comparePath string) []interface{} {
+	result := make([]interface{}, 0)
+	for _, value := range Values(data) {
+		if Compare(Path(value, valuePath), Path(data, comparePath)) == 0 {
+			result = append(result, value)
+		}
+	}
+	return result
+}
+
 // Reverse reverses the reversed values of an array, slice, map or string
 func Reverse(data interface{}) []interface{} {
 	values := Values(data)
