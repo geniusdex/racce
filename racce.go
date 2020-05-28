@@ -6,15 +6,12 @@ import (
 	"log"
 
 	"github.com/geniusdex/racce/accresults"
+	"github.com/geniusdex/racce/frontend"
 )
 
-type configurationFrontend struct {
-	Listen string `json:"listen"`
-}
-
 type configuration struct {
-	Frontend   *configurationFrontend `json:"frontend"`
-	ResultsDir string                 `json:"resultsDir"`
+	Frontend   *frontend.Configuration `json:"frontend"`
+	ResultsDir string                  `json:"resultsDir"`
 }
 
 func loadConfiguration(filename string) (*configuration, error) {
@@ -45,5 +42,5 @@ func main() {
 	}
 
 	log.Printf("Starting server...")
-	log.Fatal(RunServer(config.Frontend, db))
+	log.Fatal(frontend.Run(config.Frontend, db))
 }

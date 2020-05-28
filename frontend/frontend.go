@@ -1,4 +1,4 @@
-package main
+package frontend
 
 import (
 	"fmt"
@@ -11,6 +11,11 @@ import (
 	"github.com/geniusdex/racce/accresults"
 	"github.com/geniusdex/racce/qogs"
 )
+
+// Configuration specifies the frontend configuration
+type Configuration struct {
+	Listen string `json:"listen"`
+}
 
 var (
 	accdb *accresults.Database
@@ -187,7 +192,8 @@ func sessionCarHandler(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(w, r, "sessioncar.html", &sessionCarPage{session, car})
 }
 
-func RunServer(config *configurationFrontend, database *accresults.Database) error {
+// Run runs the frontend with the given configuration and database
+func Run(config *Configuration, database *accresults.Database) error {
 	accdb = database
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/event/", eventHandler)
