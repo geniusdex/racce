@@ -10,8 +10,8 @@ import (
 )
 
 type configuration struct {
-	Frontend   *frontend.Configuration `json:"frontend"`
-	ResultsDir string                  `json:"resultsDir"`
+	Frontend *frontend.Configuration   `json:"frontend"`
+	Results  *accresults.Configuration `json:"results"`
 }
 
 func loadConfiguration(filename string) (*configuration, error) {
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	log.Printf("Populating database...")
-	db, err := accresults.LoadDatabase(config.ResultsDir)
+	db, err := accresults.LoadDatabase(config.Results)
 	if err != nil {
 		log.Fatal(err)
 	}

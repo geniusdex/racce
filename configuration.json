@@ -2,5 +2,8 @@
     "frontend": {
         "listen": ":8099"
     },
-    "resultsDir": "results/"
+    "results": {
+        "resultsDir": "results/",
+        "newFileDelay": 5
+    }
 }

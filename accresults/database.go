@@ -20,6 +20,19 @@ var (
 	}
 )
 
+// Configuration contains the configuration options for the database
+type Configuration struct {
+	// ResultsDir is the directory which contains the results files
+	ResultsDir string `json:"resultsDir"`
+	// NewFileDelay is the number of seconds to wait after a new file appears before reading it
+	NewFileDelay int `json:"newFileDelay"`
+}
+
+// resultsDir returns the ResultsDir with a single slash at the end
+func (c *Configuration) resultsDir() string {
+	return strings.TrimRight(c.ResultsDir, "/") + "/"
+}
+
 type Event struct {
 	EventId   string
 	TrackName string
@@ -101,33 +114,50 @@ func (db *Database) loadSessionFile(resultsPath string, fileName string) {
 	db.addSession(sessionName, session)
 }
 
-func (db *Database) monitorResultsDir(resultsPath string) {
+func (db *Database) monitorResultsDir(config *Configuration) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = watcher.Add(resultsPath)
+	err = watcher.Add(config.resultsDir())
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("Aborting watcher due to error: %v", r)
+		}
+		log.Print("Closing results dir watcher...")
+		if err := watcher.Close(); err != nil {
+			log.Printf("Error closing results dir watcher: %v", err)
+		}
+	}()
+
 	for {
 		select {
-		case event := <-watcher.Events:
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
 			fileName := filepath.Base(event.Name)
-			if event.Op == fsnotify.Create {
-				time.AfterFunc(5*time.Second, func() {
+			if event.Op&fsnotify.Create == fsnotify.Create {
+				time.AfterFunc(time.Duration(config.NewFileDelay)*time.Second, func() {
 					log.Printf("Loading new session file '%s'", fileName)
-					db.loadSessionFile(resultsPath, fileName)
+					db.loadSessionFile(config.resultsDir(), fileName)
 				})
 			}
-		case err := <-watcher.Errors:
-			log.Fatal(err)
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			log.Panic(err)
 		}
 	}
 }
 
-func LoadDatabase(resultsPath string) (*Database, error) {
+// LoadDatabase loads a database from disk and starts monitoring it
+func LoadDatabase(config *Configuration) (*Database, error) {
 	var db = &Database{
 		&sync.RWMutex{},
 		make(map[string]*Session),
@@ -136,9 +166,7 @@ func LoadDatabase(resultsPath string) (*Database, error) {
 		&Event{"__", "__", time.Now(), nil},
 	}
 
-	resultsPath = strings.TrimRight(resultsPath, "/") + "/"
-
-	files, err := ioutil.ReadDir(resultsPath)
+	files, err := ioutil.ReadDir(config.resultsDir())
 	if err != nil {
 		return nil, err
 	}
@@ -149,10 +177,10 @@ func LoadDatabase(resultsPath string) (*Database, error) {
 
 	for _, f := range files {
 		fileName := f.Name()
-		db.loadSessionFile(resultsPath, fileName)
+		db.loadSessionFile(config.resultsDir(), fileName)
 	}
 
-	go db.monitorResultsDir(resultsPath)
+	go db.monitorResultsDir(config)
 
 	return db, err
 }
