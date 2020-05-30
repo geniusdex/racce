@@ -43,6 +43,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	server, err := accserver.NewServer(config.Server)
+	if err != nil {
+		log.Printf("Server cannot be managed: %v", err)
+	}
+
 	log.Printf("Populating database...")
 	db, err := accresults.LoadDatabase(config.makeDatabaseConfiguration())
 	if err != nil {
@@ -50,5 +55,5 @@ func main() {
 	}
 
 	log.Printf("Starting frontend...")
-	log.Fatal(frontend.Run(config.Frontend, db))
+	log.Fatal(frontend.Run(config.Frontend, db, server))
 }

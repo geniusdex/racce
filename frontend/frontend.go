@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/geniusdex/racce/accresults"
+	"github.com/geniusdex/racce/accserver"
 	"github.com/geniusdex/racce/qogs"
 	"github.com/gorilla/sessions"
 )
@@ -82,7 +83,7 @@ func executeTemplate(w http.ResponseWriter, r *http.Request, name string, data i
 }
 
 // Run runs the frontend with the given configuration and database
-func Run(config *Configuration, database *accresults.Database) error {
+func Run(config *Configuration, database *accresults.Database, server *accserver.Server) error {
 	f := &frontend{
 		config,
 		database,
@@ -94,7 +95,7 @@ func Run(config *Configuration, database *accresults.Database) error {
 	http.HandleFunc("/session/", f.sessionHandler)
 	http.HandleFunc("/sessioncar/", f.sessionCarHandler)
 
-	admin := newAdmin(config)
+	admin := newAdmin(config, server)
 	http.Handle("/admin/", admin)
 	http.Handle("/admin", admin)
 

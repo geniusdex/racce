@@ -3,11 +3,24 @@
 <div class="mdl-grid">
     <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--top">
         <div class="mdl-card__title">
-            <h2 class="mdl-card__title-text mdl-typography--title">Admin</h2>
+            <h2 class="mdl-card__title-text mdl-typography--title">Server</h2>
         </div>
         <div class="mdl-card__supporting-text">
+            <ul class="mdl-list">
+                <li class="mdl-list__item">
+                <span class="mdl-list__item-primary-content">
+                    <i class="material-icons mdl-list__item-icon">computer</i>
+{{if .Server}}
+                    <a href="{{basePath}}/admin/server">{{.Server.Cfg.Settings.ServerName}}</a>
+{{else}}
+                    No server to manage
+{{end}}
+                </span>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
+
 
 {{template "footer.inc.html"}}

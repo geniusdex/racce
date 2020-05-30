@@ -1,10 +1,10 @@
 package frontend
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/geniusdex/racce/accserver"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 )
@@ -13,16 +13,19 @@ type admin struct {
 	config   *Configuration
 	store    sessions.Store
 	serveMux *http.ServeMux
+	server   *accserver.Server
 }
 
-func newAdmin(config *Configuration) *admin {
+func newAdmin(config *Configuration, accServer *accserver.Server) *admin {
 	admin := &admin{
 		config,
 		sessions.NewCookieStore(securecookie.GenerateRandomKey(32)),
 		http.NewServeMux(),
+		accServer,
 	}
 
-	// admin.serveMux.HandleFunc("/admin/login", admin.loginHandler)
+	admin.serveMux.HandleFunc("/admin/server", admin.serverHandler)
+	admin.serveMux.HandleFunc("/admin", admin.indexHandler)
 
 	return admin
 }
@@ -56,6 +59,18 @@ func (a *admin) loginHandler(w http.ResponseWriter, r *http.Request, session *se
 	executeTemplate(w, r, "admin-login.html", page)
 }
 
+type adminIndexPage struct {
+	Server *accserver.Server
+}
+
+func (a *admin) indexHandler(w http.ResponseWriter, r *http.Request) {
+	executeTemplate(w, r, "admin.html", &adminIndexPage{a.server})
+}
+
+func (a *admin) serverHandler(w http.ResponseWriter, r *http.Request) {
+	executeTemplate(w, r, "admin-server.html", a.server)
+}
+
 func (a *admin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sessionName := "admin-session"
 	session, err := a.store.Get(r, sessionName)
@@ -74,5 +89,5 @@ func (a *admin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	executeTemplate(w, r, "admin.html", fmt.Sprintf("%#v", r.URL))
+	a.serveMux.ServeHTTP(w, r)
 }
