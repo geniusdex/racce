@@ -1,6 +1,7 @@
 {
     "frontend": {
-        "listen": ":8099"
+        "listen": ":8099",
+        "adminPassword": ""
     },
     "results": {
         "resultsDir": "results/",

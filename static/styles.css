@@ -13,7 +13,8 @@ body {
     margin: 0em;
 }
 
-.page-content {
+.mdl-card {
+    min-height: 50px;
 }
 
 .events_card {
@@ -38,4 +39,8 @@ body {
 
 .laptimes_personalbest {
     color: rgb(0, 192, 0);
+}
+
+.admin_login_error {
+    color: red;
 }

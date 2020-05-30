@@ -41,6 +41,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Starting server...")
+	log.Printf("Starting frontend...")
 	log.Fatal(frontend.Run(config.Frontend, db))
 }

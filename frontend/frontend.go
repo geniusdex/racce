@@ -10,11 +10,16 @@ import (
 
 	"github.com/geniusdex/racce/accresults"
 	"github.com/geniusdex/racce/qogs"
+	"github.com/gorilla/sessions"
 )
 
 // Configuration specifies the frontend configuration
 type Configuration struct {
+	// Listen specifies the IP and port to listen on. IP can be empty for all interfaces.
 	Listen string `json:"listen"`
+	// AdminPassword specifies the password needed to login as an admin. Leave empty to
+	// disable admin access.
+	AdminPassword string `json:"adminPassword"`
 }
 
 var (
@@ -54,10 +59,14 @@ func addTemplateFunctions(t *template.Template, basePath string) *template.Templ
 	return t
 }
 
-func executeTemplate(w http.ResponseWriter, r *http.Request, name string, data interface{}) {
-	basePath := r.Header.Get("X-Forwarded-Prefix")
+func basePath(r *http.Request) string {
+	return r.Header.Get("X-Forwarded-Prefix")
+}
 
-	t, err := addTemplateFunctions(template.New("templates"), basePath).ParseGlob("templates/*.html")
+func executeTemplate(w http.ResponseWriter, r *http.Request, name string, data interface{}) {
+	sessions.Save(r, w)
+
+	t, err := addTemplateFunctions(template.New("templates"), basePath(r)).ParseGlob("templates/*.html")
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -200,6 +209,12 @@ func Run(config *Configuration, database *accresults.Database) error {
 	http.HandleFunc("/player/", playerHandler)
 	http.HandleFunc("/session/", sessionHandler)
 	http.HandleFunc("/sessioncar/", sessionCarHandler)
+
+	admin := newAdmin(config)
+	http.Handle("/admin/", admin)
+	http.Handle("/admin", admin)
+
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
 	return http.ListenAndServe(config.Listen, nil)
 }
