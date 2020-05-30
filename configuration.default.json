@@ -3,8 +3,8 @@
         "listen": ":8099",
         "adminPassword": ""
     },
-    "results": {
-        "resultsDir": "results/",
-        "newFileDelay": 5
+    "server": {
+        "installationDir": "C:/Program Files (x86)/Steam/steamapps/common/Assetto Corsa Competizione/server",
+        "newResultsDelay": 5
     }
 }

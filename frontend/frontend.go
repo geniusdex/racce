@@ -18,6 +18,9 @@ type Configuration struct {
 	// AdminPassword specifies the password needed to login as an admin. Leave empty to
 	// disable admin access.
 	AdminPassword string `json:"adminPassword"`
+	// AdminWithoutPassword allows logging in without specifying a password at all. Use
+	// with care! This is primarily meant for development.
+	AdminWithoutPassword bool `json:"adminWithoutPassword"`
 }
 
 type frontend struct {

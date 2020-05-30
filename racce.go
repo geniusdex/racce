@@ -6,12 +6,20 @@ import (
 	"log"
 
 	"github.com/geniusdex/racce/accresults"
+	"github.com/geniusdex/racce/accserver"
 	"github.com/geniusdex/racce/frontend"
 )
 
 type configuration struct {
-	Frontend *frontend.Configuration   `json:"frontend"`
-	Results  *accresults.Configuration `json:"results"`
+	Frontend *frontend.Configuration  `json:"frontend"`
+	Server   *accserver.Configuration `json:"server"`
+}
+
+func (c *configuration) makeDatabaseConfiguration() *accresults.Configuration {
+	return &accresults.Configuration{
+		ResultsDir:   c.Server.ResolveResultsDir(),
+		NewFileDelay: c.Server.NewResultsDelay,
+	}
 }
 
 func loadConfiguration(filename string) (*configuration, error) {
@@ -36,7 +44,7 @@ func main() {
 	}
 
 	log.Printf("Populating database...")
-	db, err := accresults.LoadDatabase(config.Results)
+	db, err := accresults.LoadDatabase(config.makeDatabaseConfiguration())
 	if err != nil {
 		log.Fatal(err)
 	}

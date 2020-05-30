@@ -42,7 +42,7 @@ func (a *admin) loginHandler(w http.ResponseWriter, r *http.Request, session *se
 		if a.config.AdminPassword == "" {
 			log.Printf("Admin login disabled")
 		} else if r.FormValue("password") != a.config.AdminPassword {
-			log.Printf("Admin login failed: invalid password %v", r.FormValue("password"))
+			log.Printf("Admin login failed: invalid password")
 		} else {
 			session.Values["loggedIn"] = true
 			session.Save(r, w)
@@ -68,8 +68,10 @@ func (a *admin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if loggedIn, ok := session.Values["loggedIn"]; !ok || !loggedIn.(bool) {
-		http.Redirect(w, r, basePath(r)+"/admin/login", http.StatusSeeOther)
+	if !a.config.AdminWithoutPassword {
+		if loggedIn, ok := session.Values["loggedIn"]; !ok || !loggedIn.(bool) {
+			http.Redirect(w, r, basePath(r)+"/admin/login", http.StatusSeeOther)
+		}
 	}
 
 	executeTemplate(w, r, "admin.html", fmt.Sprintf("%#v", r.URL))
