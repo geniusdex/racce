@@ -5,8 +5,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/geniusdex/racce/accresults"
 	"github.com/geniusdex/racce/qogs"
@@ -22,9 +20,10 @@ type Configuration struct {
 	AdminPassword string `json:"adminPassword"`
 }
 
-var (
-	accdb *accresults.Database
-)
+type frontend struct {
+	config *Configuration
+	db     *accresults.Database
+}
 
 func addTemplateFunctions(t *template.Template, basePath string) *template.Template {
 	t.Funcs(template.FuncMap(qogs.TemplateFuncs()))
@@ -79,136 +78,18 @@ func executeTemplate(w http.ResponseWriter, r *http.Request, name string, data i
 	}
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	if len(strings.Trim(r.URL.Path, "/")) > 0 {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	accdb.Mutex.RLock()
-	defer accdb.Mutex.RUnlock()
-
-	executeTemplate(w, r, "index.html", accdb)
-}
-
-func eventHandler(w http.ResponseWriter, r *http.Request) {
-	pathComponents := strings.Split(r.URL.Path, "/")
-	if len(pathComponents) != 3 {
-		log.Printf("Not enough components in path '%s', components: %v, len: %v", r.URL.Path, pathComponents, len(pathComponents))
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	accdb.Mutex.RLock()
-	defer accdb.Mutex.RUnlock()
-
-	eventId := pathComponents[2]
-	event, ok := accdb.Events[eventId]
-	if !ok {
-		log.Printf("Event '%s' not found in database", eventId)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	executeTemplate(w, r, "event.html", event)
-}
-
-type playerPage struct {
-	Database *accresults.Database
-	Player   *accresults.Player
-}
-
-func playerHandler(w http.ResponseWriter, r *http.Request) {
-	pathComponents := strings.Split(r.URL.Path, "/")
-	if len(pathComponents) != 3 {
-		log.Printf("Not enough components in path '%s', components: %v, len: %v", r.URL.Path, pathComponents, len(pathComponents))
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	accdb.Mutex.RLock()
-	defer accdb.Mutex.RUnlock()
-
-	playerId := pathComponents[2]
-	player, ok := accdb.Players[playerId]
-	if !ok {
-		log.Printf("Player '%s' not found in database", playerId)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	executeTemplate(w, r, "player.html", &playerPage{accdb, player})
-}
-
-func sessionHandler(w http.ResponseWriter, r *http.Request) {
-	pathComponents := strings.Split(r.URL.Path, "/")
-	if len(pathComponents) != 3 {
-		log.Printf("Not enough components in path '%s', components: %v, len: %v", r.URL.Path, pathComponents, len(pathComponents))
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	accdb.Mutex.RLock()
-	defer accdb.Mutex.RUnlock()
-
-	sessionName := pathComponents[2]
-	session, ok := accdb.Sessions[sessionName]
-	if !ok {
-		log.Printf("Session '%s' not found in database", sessionName)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	executeTemplate(w, r, "session.html", session)
-}
-
-type sessionCarPage struct {
-	Session *accresults.Session
-	Car     *accresults.Car
-}
-
-func sessionCarHandler(w http.ResponseWriter, r *http.Request) {
-	pathComponents := strings.Split(r.URL.Path, "/")
-	if len(pathComponents) != 4 {
-		log.Printf("Not enough components in path '%s', components: %v, len: %v", r.URL.Path, pathComponents, len(pathComponents))
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	accdb.Mutex.RLock()
-	defer accdb.Mutex.RUnlock()
-
-	sessionName := pathComponents[2]
-	session, ok := accdb.Sessions[sessionName]
-	if !ok {
-		log.Printf("Session '%s' not found in database", sessionName)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	carId, err := strconv.Atoi(pathComponents[3])
-	if err != nil {
-		log.Printf("Car ID '%s' is not numeric", carId)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	car := session.FindCarById(carId)
-	if car == nil {
-		log.Printf("Car ID '%d' not present in session", carId)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	executeTemplate(w, r, "sessioncar.html", &sessionCarPage{session, car})
-}
-
 // Run runs the frontend with the given configuration and database
 func Run(config *Configuration, database *accresults.Database) error {
-	accdb = database
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/event/", eventHandler)
-	http.HandleFunc("/player/", playerHandler)
-	http.HandleFunc("/session/", sessionHandler)
-	http.HandleFunc("/sessioncar/", sessionCarHandler)
+	f := &frontend{
+		config,
+		database,
+	}
+
+	http.HandleFunc("/", f.indexHandler)
+	http.HandleFunc("/event/", f.eventHandler)
+	http.HandleFunc("/player/", f.playerHandler)
+	http.HandleFunc("/session/", f.sessionHandler)
+	http.HandleFunc("/sessioncar/", f.sessionCarHandler)
 
 	admin := newAdmin(config)
 	http.Handle("/admin/", admin)
