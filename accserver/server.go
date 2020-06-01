@@ -93,6 +93,8 @@ type Server struct {
 	Config *Configuration
 	// Cfg contains the configuration used by the accServer instance itself.
 	Cfg *ServerConfiguration
+	// Instance contains the running instance of the accServer, or nil if its not running
+	Instance *Instance
 }
 
 func isUtf16(data []byte) bool {
@@ -140,7 +142,7 @@ func parseCfg(installationPath string) (*ServerConfiguration, error) {
 
 // NewServer creates a new Server based on the given configuration.
 func NewServer(config *Configuration) (*Server, error) {
-	if _, err := os.Stat(config.installationDir() + "accServer.exe"); err != nil {
+	if _, err := os.Stat(config.executable()); err != nil {
 		return nil, fmt.Errorf("Could not locate accServer.exe: %v", err)
 	}
 
@@ -152,5 +154,41 @@ func NewServer(config *Configuration) (*Server, error) {
 	return &Server{
 		config,
 		cfg,
+		nil,
 	}, nil
+}
+
+// Start launches an instance of the server
+func (s *Server) Start() error {
+	if s.Instance.State() != Stopped {
+		return fmt.Errorf("server is already running")
+	}
+
+	instance, err := newInstance(s.Config.executable())
+	if err != nil {
+		return err
+	}
+
+	s.Instance = instance
+	return nil
+}
+
+// Stop stops a running instance of the server
+func (s *Server) Stop() error {
+	return s.Instance.stop()
+}
+
+// IsRunning returns if the instance is running (State() == Running)
+func (s *Server) IsRunning() bool {
+	return s.Instance.State() == Running
+}
+
+// IsStopped returns if the instance is stopped (State() == Stopped)
+func (s *Server) IsStopped() bool {
+	return s.Instance.State() == Stopped
+}
+
+// IsStopping returns if the instance is stopping (State() == Stopping)
+func (s *Server) IsStopping() bool {
+	return s.Instance.State() == Stopping
 }

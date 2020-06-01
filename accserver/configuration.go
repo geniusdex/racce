@@ -14,6 +14,11 @@ func (c *Configuration) installationDir() string {
 	return strings.TrimRight(c.InstallationDir, "/") + "/"
 }
 
+// executable returns the path of accServer.exe
+func (c *Configuration) executable() string {
+	return c.installationDir() + "accServer.exe"
+}
+
 // ResolveResultsDir returns the directory containing the session result files
 func (c *Configuration) ResolveResultsDir() string {
 	if c.ResultsDir != "" {

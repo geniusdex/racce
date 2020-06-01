@@ -6,9 +6,37 @@
             <h2 class="mdl-card__title-text mdl-typography--title">{{.Cfg.Settings.ServerName}}</h2>
         </div>
         <div class="mdl-card__supporting-text">
+            <ul class="mdl-list server_status">
+                <li class="mdl-list__item">
+{{if .Instance.IsRunning}}
+                    <i class="material-icons mdl-list__item-icon server_running">play_arrow</i>
+                    Running
+{{else if .Instance.IsStopping}}
+                    <i class="material-icons mdl-list__item-icon server_stopping">stop</i>
+                    Stopping
+{{else}}
+                    <i class="material-icons mdl-list__item-icon server_stopped">stop</i>
+                    Stopped
+{{end}}
+                </li>
+            </ul>
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+{{if .Instance.IsRunning}}
+            <form method="POST" action="{{basePath}}/admin/server/stop">
+                <button type="submit" name="start" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Stop Server
+                </button>
+            </form>
+{{else}}
+            <form method="POST" action="{{basePath}}/admin/server/start">
+                <button type="submit" name="start" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Start Server
+                </button>
+            </form>
+{{end}}
         </div>
     </div>
 </div>
-
 
 {{template "footer.inc.html"}}

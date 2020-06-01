@@ -44,3 +44,24 @@ body {
 .admin_login_error {
     color: red;
 }
+
+.server_status {
+    margin: 0;
+    padding: 0;
+}
+
+.server_status i {
+    margin-right: 0.5em;
+}
+
+.server_status .server_running {
+    color: rgb(0, 224, 0);
+}
+
+.server_status .server_stopping {
+    color: rgb(224, 224, 0);
+}
+
+.server_status .server_stopped {
+    color: rgb(224, 0, 0);
+}

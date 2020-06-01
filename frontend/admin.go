@@ -24,8 +24,10 @@ func newAdmin(config *Configuration, accServer *accserver.Server) *admin {
 		accServer,
 	}
 
-	admin.serveMux.HandleFunc("/admin/server", admin.serverHandler)
 	admin.serveMux.HandleFunc("/admin", admin.indexHandler)
+	admin.serveMux.HandleFunc("/admin/server", admin.serverHandler)
+	admin.serveMux.HandleFunc("/admin/server/start", admin.serverStartHandler)
+	admin.serveMux.HandleFunc("/admin/server/stop", admin.serverStopHandler)
 
 	return admin
 }
@@ -65,6 +67,32 @@ type adminIndexPage struct {
 
 func (a *admin) indexHandler(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(w, r, "admin.html", &adminIndexPage{a.server})
+}
+
+func (a *admin) serverStartHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := a.server.Start(); err != nil {
+		log.Panicf("Failed to start server: %v", err)
+	}
+
+	http.Redirect(w, r, basePath(r)+"/admin/server", http.StatusSeeOther)
+}
+
+func (a *admin) serverStopHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := a.server.Stop(); err != nil {
+		log.Panicf("Failed to stop server: %v", err)
+	}
+
+	http.Redirect(w, r, basePath(r)+"/admin/server", http.StatusSeeOther)
 }
 
 func (a *admin) serverHandler(w http.ResponseWriter, r *http.Request) {
