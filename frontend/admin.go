@@ -28,6 +28,8 @@ func newAdmin(config *Configuration, accServer *accserver.Server) *admin {
 	admin.serveMux.HandleFunc("/admin/server", admin.serverHandler)
 	admin.serveMux.HandleFunc("/admin/server/start", admin.serverStartHandler)
 	admin.serveMux.HandleFunc("/admin/server/stop", admin.serverStopHandler)
+	admin.serveMux.HandleFunc("/admin/server/cfg/global", admin.cfgGlobalHandler)
+	admin.serveMux.HandleFunc("/admin/server/cfg/event", admin.cfgEventHandler)
 
 	return admin
 }
@@ -69,6 +71,10 @@ func (a *admin) indexHandler(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(w, r, "admin.html", &adminIndexPage{a.server})
 }
 
+func (a *admin) serverHandler(w http.ResponseWriter, r *http.Request) {
+	executeTemplate(w, r, "admin-server.html", a.server)
+}
+
 func (a *admin) serverStartHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -95,8 +101,12 @@ func (a *admin) serverStopHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, basePath(r)+"/admin/server", http.StatusSeeOther)
 }
 
-func (a *admin) serverHandler(w http.ResponseWriter, r *http.Request) {
-	executeTemplate(w, r, "admin-server.html", a.server)
+func (a *admin) cfgGlobalHandler(w http.ResponseWriter, r *http.Request) {
+	executeTemplate(w, r, "admin-server-cfg-global.html", a.server)
+}
+
+func (a *admin) cfgEventHandler(w http.ResponseWriter, r *http.Request) {
+	executeTemplate(w, r, "admin-server-cfg-event.html", a.server)
 }
 
 func (a *admin) ServeHTTP(w http.ResponseWriter, r *http.Request) {

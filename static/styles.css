@@ -45,6 +45,10 @@ body {
     color: red;
 }
 
+.admin_back {
+    text-align: right;
+}
+
 .server_title {
     display: block;
 }
@@ -114,4 +118,12 @@ ul.server_settings_action > li {
 
 .server_settings_summary .server_event_session ~ .server_event_session::before {
     content: " / ";
+}
+
+.card_actions {
+    display: flex;
+}
+
+.card_actions_spacer {
+    flex-grow: 1;
 }
