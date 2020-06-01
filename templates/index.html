@@ -20,7 +20,7 @@
 {{range reverse (sortOn $db.Events ".EndTime")}}
         <tr>
           <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/event/{{.EventId}}">{{.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
-          <td class="mdl-data-table__cell--non-numeric">{{.TrackName}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{(track .TrackName).Name}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{range .Sessions}}{{if ne .SessionIndex 0}}, {{end}}{{.SessionType}}{{end}}</td>
         </tr>
 {{end}}

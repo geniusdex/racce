@@ -1,6 +1,6 @@
 {{$session := .Session}}
 {{$car := .Car}}
-{{template "header.inc.html" (print $session.TrackName " - Car " $car.RaceNumber)}}
+{{template "header.inc.html" (print $session.SessionTypeString " at " (track $session.TrackName).Name " - Car " $car.RaceNumber)}}
 
 <div class="mdl-grid">
 

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/geniusdex/racce/accdata"
 	"github.com/geniusdex/racce/accresults"
 	"github.com/geniusdex/racce/accserver"
 	"github.com/geniusdex/racce/qogs"
@@ -32,6 +33,10 @@ type frontend struct {
 func addTemplateFunctions(t *template.Template, basePath string) *template.Template {
 	t.Funcs(template.FuncMap(qogs.TemplateFuncs()))
 	t.Funcs(template.FuncMap{
+		// Environment
+		"basePath": func() string {
+			return basePath
+		},
 		// Arithmetic
 		"add": func(a, b int) int {
 			return a + b
@@ -54,9 +59,9 @@ func addTemplateFunctions(t *template.Template, basePath string) *template.Templ
 
 			return fmt.Sprintf("%d:%02d.%03d", minutes, seconds, milliseconds)
 		},
-		// Environment
-		"basePath": func() string {
-			return basePath
+		// Data specific for Assetto Corsa Competizione
+		"track": func(name string) *accdata.Track {
+			return accdata.Tracks[name]
 		},
 	})
 	return t

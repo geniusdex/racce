@@ -1,5 +1,5 @@
 {{$session := .}}
-{{template "header.inc.html" .TrackName}}
+{{template "header.inc.html" (print .SessionTypeString " at " (track .TrackName).Name)}}
 
 <div class="mdl-grid">
 

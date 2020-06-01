@@ -2,10 +2,8 @@
 
 <div class="mdl-grid">
     <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--top">
-        <div class="mdl-card__title">
+        <div class="mdl-card__title server_title">
             <h2 class="mdl-card__title-text mdl-typography--title">{{.Cfg.Settings.ServerName}}</h2>
-        </div>
-        <div class="mdl-card__supporting-text">
             <ul class="mdl-list server_status">
                 <li class="mdl-list__item">
 {{if .Instance.IsRunning}}
@@ -21,7 +19,7 @@
                 </li>
             </ul>
         </div>
-        <div class="mdl-card__actions mdl-card--border">
+        <div class="mdl-card__actions server_card_actions">
 {{if .Instance.IsRunning}}
             <form method="POST" action="{{basePath}}/admin/server/stop">
                 <button type="submit" name="start" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
@@ -35,6 +33,44 @@
                 </button>
             </form>
 {{end}}
+        </div>
+        <div class="mdl-card__supporting-text server_card_body">
+            <p class="server_settings_summary">
+{{if or (eq .Cfg.Configuration.RegisterToLobby 0) (ne .Cfg.Settings.Password "")}}
+                Private server
+{{else}}
+                Public server
+{{end}}
+                <span class="server_slots">({{.Cfg.Settings.MaxCarSlots}} slots)</span>
+{{if gt .Cfg.Settings.TrackMedalsRequirement 0}}
+                <span class="server_limit">TM {{.Cfg.Settings.TrackMedalsRequirement}}</span>
+{{end}}
+{{if gt .Cfg.Settings.SafetyRatingRequirement -1}}
+                <span class="server_limit">SA {{.Cfg.Settings.SafetyRatingRequirement}}</span>
+{{end}}
+{{if gt .Cfg.Settings.RacecraftRatingRequirement -1}}
+                <span class="server_limit">RC {{.Cfg.Settings.RacecraftRatingRequirement}}</span>
+{{end}}
+            </p>
+            <ul class="mdl-list server_settings_action">
+                <li class="mdl-list__item">
+                    <a href="{{basePath}}/admin/server/cfg/global">Global server settings</a>
+                </li>
+            </ul>
+            <p class="server_settings_summary">
+                {{(track .Cfg.Event.Track).Name}} ({{(track .Cfg.Event.Track).Competition.Year}})
+{{range .Cfg.Event.Sessions}}
+                <span class="server_event_session">
+                    <span class="server_event_session_type">{{.SessionType}}</span>
+                    <span class="server_event_session_duration">{{.SessionDurationMinutes}}'</span>
+                </span>
+{{end}}
+            </p>
+            <ul class="mdl-list server_settings_action">
+                <li class="mdl-list__item">
+                    <a href="{{basePath}}/admin/server/cfg/event">Event settings</a>
+                </li>
+            </ul>
         </div>
     </div>
 </div>

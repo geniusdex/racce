@@ -1,4 +1,4 @@
-{{template "header.inc.html" (print "Event at " .TrackName)}}
+{{template "header.inc.html" (print "Event at " (track .TrackName).Name)}}
 
 <div class="mdl-grid">
 <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
@@ -11,7 +11,6 @@
         <tr>
           <th class="mdl-data-table__cell--non-numeric">Name</th>
           <th class="mdl-data-table__cell--non-numeric">Date / Time</th>
-          <th class="mdl-data-table__cell--non-numeric">Track</th>
           <th class="mdl-data-table__cell--non-numeric">Session Type</th>
         </tr>
       </thead>
@@ -20,7 +19,6 @@
         <tr>
           <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/session/{{.SessionName}}">{{.SessionName}}</a></td>
           <td class="mdl-data-table__cell--non-numeric">{{.EndTime.Format "2006-01-02 15:04:05"}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{.TrackName}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{.SessionTypeString}}</td>
         </tr>
 {{end}}
