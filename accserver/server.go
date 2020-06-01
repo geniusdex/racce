@@ -48,7 +48,7 @@ type CfgEventSession struct {
 // CfgEvent contains the configuration of the race event hosted by the server.
 type CfgEvent struct {
 	Track                     string             `json:"track"`
-	PreRaceWiatingTimeSeconds int                `json:"preRaceWaitingTimeSeconds"`
+	PreRaceWaitingTimeSeconds int                `json:"preRaceWaitingTimeSeconds"`
 	SessionOverTimeSeconds    int                `json:"sessionOverTimeSeconds"`
 	AmbientTemp               int                `json:"ambientTemp"`
 	CloudLevel                float32            `json:"cloudLevel"`

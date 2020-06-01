@@ -61,7 +61,10 @@ func addTemplateFunctions(t *template.Template, basePath string) *template.Templ
 		},
 		// Data specific for Assetto Corsa Competizione
 		"track": func(name string) *accdata.Track {
-			return accdata.Tracks[name]
+			return accdata.TrackByLabel(name)
+		},
+		"tracks": func() []*accdata.Track {
+			return accdata.Tracks
 		},
 	})
 	return t

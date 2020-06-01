@@ -1,3 +1,4 @@
+{{$server := .}}
 {{template "header.inc.html" (print "Admin - " .Cfg.Settings.ServerName)}}
 
 <div class="mdl-grid">
@@ -7,6 +8,67 @@
                 <h2 class="mdl-card__title-text mdl-typography--title">{{.Cfg.Settings.ServerName}} - Event Settings</h2>
             </div>
             <div class="mdl-card__supporting-text server_card_body">
+                <section>
+                    <h5>Track</h5>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <select id="track" name="track" class="mdl-textfield__input">
+{{$lastcomp_series := ""}}
+{{$lastcomp_year := 0}}
+{{range tracks}}
+    {{if or (ne .Competition.Series $lastcomp_series) (ne .Competition.Year $lastcomp_year)}}
+        {{if ne $lastcomp_year 0}}
+                            </optgroup>
+        {{end}}
+                            <optgroup label="{{.Competition.Series}} ({{.Competition.Year}})">
+        {{$lastcomp_series = .Competition.Series}}
+        {{$lastcomp_year = .Competition.Year}}
+    {{end}}
+                                <option {{if eq .Label $server.Cfg.Event.Track}}selected{{end}} value="{{.Label}}">{{.Name}} ({{.Competition.Year}})</option>
+{{end}}
+                            </optgroup>
+                        </select>
+                        <label class="mdl-textfield__label" for="track">Track</label>
+                    </div>
+                </section>
+                <section>
+                    <h5>Delays</h5>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input type="text" id="preRaceWaitingTimeSeconds" name="preRaceWaitingTimeSeconds" value="{{.Cfg.Event.PreRaceWaitingTimeSeconds}}" pattern="[0-9]+" class="mdl-textfield__input">
+                        <label for="preRaceWaitingTimeSeconds" class="mdl-textfield__label">Pre-Race Waiting Time (seconds)</label>
+                        <span class="mdl-textfield__error">Please enter a whole number of seconds</span>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input type="text" id="sessionOverTimeSeconds" name="sessionOverTimeSeconds" value="{{.Cfg.Event.SessionOverTimeSeconds}}" pattern="[0-9]+" class="mdl-textfield__input">
+                        <label for="sessionOverTimeSeconds" class="mdl-textfield__label">Session Over Time (seconds)</label>
+                        <span class="mdl-textfield__error">Please enter a whole number of seconds</span>
+                    </div>
+                    <!-- PostQualySeconds -->
+                    <!-- PostRaceSeconds -->
+                </section>
+                <section>
+                    <h5>Weather</h5>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input type="text" id="ambientTemp" name="ambientTemp" value="{{.Cfg.Event.AmbientTemp}}" pattern="[0-9]+" class="mdl-textfield__input">
+                        <label for="ambientTemp" class="mdl-textfield__label">Ambient Temperature (&deg;C)</label>
+                        <span class="mdl-textfield__error">Please enter a whole number of degrees</span>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input type="text" id="cloudLevel" name="cloudLevel" value="{{.Cfg.Event.CloudLevel}}" pattern="1\.0|0(.[0-9])?" class="mdl-textfield__input">
+                        <!-- <input type="range" id="cloudLevel" name="cloudLevel" value="{{.Cfg.Event.CloudLevel}}" min="0" max="1" step="0.1" class="mdl-slider mdl-js-slider"> -->
+                        <label for="cloudLevel" class="mdl-textfield__label">Cloud Level</label>
+                        <span class="mdl-textfield__error">Please enter a value between 0 and 1</span>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input type="text" id="rain" name="rain" value="{{.Cfg.Event.Rain}}" pattern="1\.0|0(.[0-9])?" class="mdl-textfield__input">
+                        <label for="rain" class="mdl-textfield__label">Rain</label>
+                        <span class="mdl-textfield__error">Please enter a value between 0 and 1</span>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input type="text" id="weatherRandomness" name="weatherRandomness" value="{{.Cfg.Event.WeatherRandomness}}" pattern="[0-7]" class="mdl-textfield__input">
+                        <label for="weatherRandomness" class="mdl-textfield__label">Weather Randomness</label>
+                        <span class="mdl-textfield__error">Please enter a whole number between 0 and 7</span>
+                    </div>
+                </section>
             </div>
             <div class="mdl-card__actions mdl-card--border card_actions">
                 <div class="card_actions_left">

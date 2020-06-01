@@ -87,6 +87,7 @@ body {
 
 .server_card_body {
     padding-bottom: 0;
+    width: calc(100% - 32px);
 }
 
 p.server_settings_summary {
@@ -126,4 +127,30 @@ ul.server_settings_action > li {
 
 .card_actions_spacer {
     flex-grow: 1;
+}
+
+section h5 {
+    margin: 0 0 8px;
+    overflow: hidden;
+}
+
+section h5:before, section h5:after {
+    background-color: rgba(0,0,0,.1);
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+}
+
+section h5:before {
+    right: 0.5em;
+    width: 0px;
+    margin-left: 0px;
+}
+
+section h5:after {
+    left: 0.5em;
+    width: 100%;
+    margin-right: -100%;
 }

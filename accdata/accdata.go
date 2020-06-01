@@ -18,6 +18,8 @@ type Competition struct {
 
 // Track represents a single track in the game
 type Track struct {
+	// Label is the label used for the track in server configuration or results
+	Label string
 	// Name is the properly formatted name for this track
 	Name string
 	// Competition indicates to which competition this track belongs
@@ -31,32 +33,46 @@ type Track struct {
 
 var (
 	// Tracks contains information on all supported tracks
-	Tracks = map[string]*Track{
-		"monza":               &Track{"Monza", Competition{GTWorldChallenge, 2018}, 29, 60},
-		"zolder":              &Track{"Zolder", Competition{GTWorldChallenge, 2018}, 34, 50},
-		"brands_hatch":        &Track{"Brands Hatch", Competition{GTWorldChallenge, 2018}, 32, 50},
-		"silverstone":         &Track{"Silverstone", Competition{GTWorldChallenge, 2018}, 36, 50},
-		"paul_ricard":         &Track{"Paul Ricard", Competition{GTWorldChallenge, 2018}, 33, 60},
-		"misano":              &Track{"Misano", Competition{GTWorldChallenge, 2018}, 30, 50},
-		"spa":                 &Track{"Spa-Francorchamps", Competition{GTWorldChallenge, 2018}, 82, 82},
-		"nurburgring":         &Track{"Nurburgring", Competition{GTWorldChallenge, 2018}, 30, 50},
-		"barcelona":           &Track{"Barcelona", Competition{GTWorldChallenge, 2018}, 29, 50},
-		"hungaroring":         &Track{"Hungaroring", Competition{GTWorldChallenge, 2018}, 27, 50},
-		"zandvoort":           &Track{"Zandvoort", Competition{GTWorldChallenge, 2018}, 25, 50},
-		"monza_2019":          &Track{"Monza", Competition{GTWorldChallenge, 2019}, 29, 60},
-		"zolder_2019":         &Track{"Zolder", Competition{GTWorldChallenge, 2019}, 34, 50},
-		"brands_hatch_2019":   &Track{"Brands Hatch", Competition{GTWorldChallenge, 2019}, 32, 50},
-		"silverstone_2019":    &Track{"Silverstone", Competition{GTWorldChallenge, 2019}, 36, 50},
-		"paul_ricard_2019":    &Track{"Paul Ricard", Competition{GTWorldChallenge, 2019}, 33, 60},
-		"misano_2019":         &Track{"Misano", Competition{GTWorldChallenge, 2019}, 30, 50},
-		"spa_2019":            &Track{"Spa-Francorchamps", Competition{GTWorldChallenge, 2019}, 82, 82},
-		"nuburgring_2019":     &Track{"Nurburgring", Competition{GTWorldChallenge, 2019}, 30, 50},
-		"barcelona_2019":      &Track{"Barcelona", Competition{GTWorldChallenge, 2019}, 29, 50},
-		"hungaroring_2019":    &Track{"Hungaroring", Competition{GTWorldChallenge, 2019}, 27, 50},
-		"zandvoort_2019":      &Track{"Zandvoort", Competition{GTWorldChallenge, 2019}, 25, 50},
-		"kyalami_2019":        &Track{"Kyalami", Competition{IntercontinentalGTChallenge, 2019}, 40, 50},
-		"mount_panorama_2019": &Track{"Mount Panorama", Competition{IntercontinentalGTChallenge, 2019}, 36, 50},
-		"suzuka_2019":         &Track{"Suzuka", Competition{IntercontinentalGTChallenge, 2019}, 51, 105},
-		"laguna_seca_2019":    &Track{"Laguna Seca", Competition{IntercontinentalGTChallenge, 2019}, 30, 50},
+	Tracks = []*Track{
+		&Track{"monza", "Monza", Competition{GTWorldChallenge, 2018}, 29, 60},
+		&Track{"zolder", "Zolder", Competition{GTWorldChallenge, 2018}, 34, 50},
+		&Track{"brands_hatch", "Brands Hatch", Competition{GTWorldChallenge, 2018}, 32, 50},
+		&Track{"silverstone", "Silverstone", Competition{GTWorldChallenge, 2018}, 36, 50},
+		&Track{"paul_ricard", "Paul Ricard", Competition{GTWorldChallenge, 2018}, 33, 60},
+		&Track{"misano", "Misano", Competition{GTWorldChallenge, 2018}, 30, 50},
+		&Track{"spa", "Spa", Competition{GTWorldChallenge, 2018}, 82, 82},
+		&Track{"nurburgring", "Nurburgring", Competition{GTWorldChallenge, 2018}, 30, 50},
+		&Track{"barcelona", "Barcelona", Competition{GTWorldChallenge, 2018}, 29, 50},
+		&Track{"hungaroring", "Hungaroring", Competition{GTWorldChallenge, 2018}, 27, 50},
+		&Track{"zandvoort", "Zandvoort", Competition{GTWorldChallenge, 2018}, 25, 50},
+		&Track{"monza_2019", "Monza", Competition{GTWorldChallenge, 2019}, 29, 60},
+		&Track{"zolder_2019", "Zolder", Competition{GTWorldChallenge, 2019}, 34, 50},
+		&Track{"brands_hatch_2019", "Brands Hatch", Competition{GTWorldChallenge, 2019}, 32, 50},
+		&Track{"silverstone_2019", "Silverstone", Competition{GTWorldChallenge, 2019}, 36, 50},
+		&Track{"paul_ricard_2019", "Paul Ricard", Competition{GTWorldChallenge, 2019}, 33, 60},
+		&Track{"misano_2019", "Misano", Competition{GTWorldChallenge, 2019}, 30, 50},
+		&Track{"spa_2019", "Spa", Competition{GTWorldChallenge, 2019}, 82, 82},
+		&Track{"nuburgring_2019", "Nurburgring", Competition{GTWorldChallenge, 2019}, 30, 50},
+		&Track{"barcelona_2019", "Barcelona", Competition{GTWorldChallenge, 2019}, 29, 50},
+		&Track{"hungaroring_2019", "Hungaroring", Competition{GTWorldChallenge, 2019}, 27, 50},
+		&Track{"zandvoort_2019", "Zandvoort", Competition{GTWorldChallenge, 2019}, 25, 50},
+		&Track{"kyalami_2019", "Kyalami", Competition{IntercontinentalGTChallenge, 2019}, 40, 50},
+		&Track{"mount_panorama_2019", "Mount Panorama", Competition{IntercontinentalGTChallenge, 2019}, 36, 50},
+		&Track{"suzuka_2019", "Suzuka", Competition{IntercontinentalGTChallenge, 2019}, 51, 105},
+		&Track{"laguna_seca_2019", "Laguna Seca", Competition{IntercontinentalGTChallenge, 2019}, 30, 50},
 	}
+
+	// tracksByLabel is a cache for TrackByLabel
+	tracksByLabel map[string]*Track
 )
+
+// TrackByLabel returns the track for a given label
+func TrackByLabel(label string) *Track {
+	if tracksByLabel == nil {
+		tracksByLabel = make(map[string]*Track)
+		for _, track := range Tracks {
+			tracksByLabel[track.Label] = track
+		}
+	}
+	return tracksByLabel[label]
+}
