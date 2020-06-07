@@ -131,9 +131,35 @@ ul.server_settings_action > li {
     margin: 8px;
 }
 
+.server_settings_event {
+    margin: 16px 0;
+    padding-left: 16px;
+    border-left: 5px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: height 0.2s ease-out, margin 0.2s ease-out;
+}
+
+.server_settings_event.collapsed {
+    margin: 0;
+    border-left: 0;
+    padding-left: 21px;
+}
+
+.server_settings_event_menu {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+}
+
 .slider_value {
     float: right;
     width: 32px;
+}
+
+.slider_value_time {
+    float: right;
+    width: 48px;
 }
 
 .slider_container {

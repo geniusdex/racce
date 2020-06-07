@@ -33,6 +33,60 @@
                             <label class="mdl-textfield__label" for="track">Track</label>
                         </div>
                     </section>
+                    <section id="sessions">
+                        <h5>Sessions</h5>
+{{range $index, $session := .Cfg.Event.Sessions}}
+                        <div class="server_settings_event" id="sessions[{{$index}}]">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <select id="sessions[{{$index}}].sessionType" name="sessions[{{$index}}].sessionType" class="mdl-textfield__input">
+                                    <option {{if eq .SessionType "P"}}selected{{end}} value="P">Free Practice</option>
+                                    <option {{if eq .SessionType "Q"}}selected{{end}} value="Q">Qualification</option>
+                                    <option {{if eq .SessionType "R"}}selected{{end}} value="R">Race</option>
+                                </select>
+                                <label class="mdl-textfield__label" for="sessions[{{$index}}].sessionType">Session Type</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input type="text" id="sessions[{{$index}}].sessionDurationMinutes" name="sessions[{{$index}}].sessionDurationMinutes" value="{{.SessionDurationMinutes}}" pattern="[0-9]+" class="mdl-textfield__input">
+                                <label for="sessions[{{$index}}].sessionDurationMinutes" class="mdl-textfield__label">Session Duration (minutes)</label>
+                                <span class="mdl-textfield__error">Please enter a whole number of minutes</span>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <select id="sessions[{{$index}}].dayOfWeekend" name="sessions[{{$index}}].dayOfWeekend" class="mdl-textfield__input">
+                                    <option {{if eq .DayOfWeekend 1}}selected{{end}} value="1">Friday</option>
+                                    <option {{if eq .DayOfWeekend 2}}selected{{end}} value="2">Saturday</option>
+                                    <option {{if eq .DayOfWeekend 3}}selected{{end}} value="3">Sunday</option>
+                                </select>
+                                <label class="mdl-textfield__label" for="sessions[{{$index}}].dayOfWeekend">Day of Weekend</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+                                <div class="slider_with_value">
+                                    <div class="slider_value_time" id="sessions[{{$index}}].hourOfDay_value">{{.HourOfDay}}</div>
+                                    <div class="slider_container">
+                                        <input type="range" id="sessions[{{$index}}].hourOfDay" name="sessions[{{$index}}].hourOfDay" value="{{.HourOfDay}}" min="0" max="23" step="1" class="mdl-slider mdl-js-slider">
+                                    </div>
+                                </div>
+                                <label for="sessions[{{$index}}].hourOfDay" class="mdl-textfield__label">Hour of Day</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+                                <div class="slider_with_value">
+                                    <div class="slider_value" id="sessions[{{$index}}].timeMultiplier_value">{{.TimeMultiplier}}</div>
+                                    <div class="slider_container">
+                                        <input type="range" id="sessions[{{$index}}].timeMultiplier" name="sessions[{{$index}}].timeMultiplier" value="{{.TimeMultiplier}}" min="0" max="24" step="1" class="mdl-slider mdl-js-slider">
+                                    </div>
+                                </div>
+                                <label for="sessions[{{$index}}].timeMultiplier" class="mdl-textfield__label">Time Multiplier</label>
+                            </div>
+                            <div class="server_settings_event_menu">
+                                <button type="button" onclick="removeSession({{$index}})" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                    <i class="material-icons">clear</i>
+                                </button>
+                            </div>
+                        </div>
+{{end}}
+                    </section>
+                    <button type="button" onclick="addSession()" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                        Add Session
+                    </button>
                 </div>
                 <div class="mdl-cell--6-col server_settings_column">
                     <section>
@@ -119,12 +173,14 @@ function linkSliderToValue(slider_id, value_id, formatter = null)
 {
     let slider = document.getElementById(slider_id);
     let value = document.getElementById(value_id);
-    slider.addEventListener("input", function(e) {
+    let update = function() {
         newValue = slider.value;
         if (formatter != null)
             newValue = formatter(newValue);
         value.innerHTML = newValue;
-    });
+    };
+    slider.addEventListener("input", update);
+    update();
 }
 
 function formatSingleDigit(value)
@@ -132,9 +188,102 @@ function formatSingleDigit(value)
     return Number.parseFloat(value).toFixed(1);
 }
 
+function formatHour(value)
+{
+    return Number.parseInt(value).toString().padStart(2, '0') + ':00';
+}
+
+function formatMultiplier(value)
+{
+    return Number.parseInt(value).toString() + 'x';
+}
+
 linkSliderToValue('cloudLevel', 'cloudLevel_value', formatSingleDigit);
 linkSliderToValue('rain', 'rain_value', formatSingleDigit);
 linkSliderToValue('weatherRandomness', 'weatherRandomness_value');
+{{range $index, $session := .Cfg.Event.Sessions}}
+    linkSliderToValue('sessions[{{$index}}].hourOfDay', 'sessions[{{$index}}].hourOfDay_value', formatHour);
+    linkSliderToValue('sessions[{{$index}}].timeMultiplier', 'sessions[{{$index}}].timeMultiplier_value', formatMultiplier);
+{{end}}
+
+function removeSession(index)
+{
+    let el = document.getElementById("sessions[" + index + "]");
+
+    var sectionHeight = el.scrollHeight;
+    var elementTransition = el.style.transition;
+    el.style.transition = '';
+    requestAnimationFrame(function() {
+        el.style.height = sectionHeight + 'px';
+        el.style.transition = elementTransition;
+        requestAnimationFrame(function() {
+            el.style.height = 0 + 'px';
+            el.classList.add("collapsed");
+
+            el.addEventListener('transitionend', function() {
+                el.remove();
+            });
+        });
+    });
+}
+
+var nextSessionId = {{len .Cfg.Event.Sessions}};
+
+function addSession() {
+    let index = nextSessionId;
+    nextSessionId++;
+    let container = document.getElementById("sessions");
+    container.innerHTML += `
+                        <div class="server_settings_event" id="sessions[${index}]">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <select id="sessions[${index}].sessionType" name="sessions[${index}].sessionType" class="mdl-textfield__input">
+                                    <option selected value="P">Free Practice</option>
+                                    <option value="Q">Qualification</option>
+                                    <option value="R">Race</option>
+                                </select>
+                                <label class="mdl-textfield__label" for="sessions[${index}].sessionType">Session Type</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input type="text" id="sessions[${index}].sessionDurationMinutes" name="sessions[${index}].sessionDurationMinutes" value="20" pattern="[0-9]+" class="mdl-textfield__input">
+                                <label for="sessions[${index}].sessionDurationMinutes" class="mdl-textfield__label">Session Duration (minutes)</label>
+                                <span class="mdl-textfield__error">Please enter a whole number of minutes</span>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <select id="sessions[${index}].dayOfWeekend" name="sessions[${index}].dayOfWeekend" class="mdl-textfield__input">
+                                    <option selected value="1">Friday</option>
+                                    <option value="2">Saturday</option>
+                                    <option value="3">Sunday</option>
+                                </select>
+                                <label class="mdl-textfield__label" for="sessions[${index}].dayOfWeekend">Day of Weekend</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+                                <div class="slider_with_value">
+                                    <div class="slider_value_time" id="sessions[${index}].hourOfDay_value">13</div>
+                                    <div class="slider_container">
+                                        <input type="range" id="sessions[${index}].hourOfDay" name="sessions[${index}].hourOfDay" value="13" min="0" max="23" step="1" class="mdl-slider mdl-js-slider">
+                                    </div>
+                                </div>
+                                <label for="sessions[${index}].hourOfDay" class="mdl-textfield__label">Hour of Day</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+                                <div class="slider_with_value">
+                                    <div class="slider_value" id="sessions[${index}].timeMultiplier_value">1</div>
+                                    <div class="slider_container">
+                                        <input type="range" id="sessions[${index}].timeMultiplier" name="sessions[${index}].timeMultiplier" value="1" min="0" max="24" step="1" class="mdl-slider mdl-js-slider">
+                                    </div>
+                                </div>
+                                <label for="sessions[${index}].timeMultiplier" class="mdl-textfield__label">Time Multiplier</label>
+                            </div>
+                            <div class="server_settings_event_menu">
+                                <button type="button" onclick="removeSession(${index})" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                    <i class="material-icons">clear</i>
+                                </button>
+                            </div>
+                        </div>
+    `;
+    linkSliderToValue(`sessions[${index}].hourOfDay`, `sessions[${index}].hourOfDay_value`, formatHour);
+    componentHandler.upgradeDom();
+}
 </script>
 
 {{template "footer.inc.html"}}
