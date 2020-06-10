@@ -52,7 +52,7 @@ var (
 		&Track{"paul_ricard_2019", "Paul Ricard", Competition{GTWorldChallenge, 2019}, 33, 60},
 		&Track{"misano_2019", "Misano", Competition{GTWorldChallenge, 2019}, 30, 50},
 		&Track{"spa_2019", "Spa", Competition{GTWorldChallenge, 2019}, 82, 82},
-		&Track{"nuburgring_2019", "Nurburgring", Competition{GTWorldChallenge, 2019}, 30, 50},
+		&Track{"nurburgring_2019", "Nurburgring", Competition{GTWorldChallenge, 2019}, 30, 50},
 		&Track{"barcelona_2019", "Barcelona", Competition{GTWorldChallenge, 2019}, 29, 50},
 		&Track{"hungaroring_2019", "Hungaroring", Competition{GTWorldChallenge, 2019}, 27, 50},
 		&Track{"zandvoort_2019", "Zandvoort", Competition{GTWorldChallenge, 2019}, 25, 50},
