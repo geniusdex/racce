@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-// elemValueFromValue is Elem but accpts and returns reflection values instead.
+// elemValueFromValue is Elem but accepts and returns reflection values instead.
 func elemValueFromValue(value reflect.Value) reflect.Value {
 	if value.Kind() == reflect.Ptr {
 		return value.Elem()

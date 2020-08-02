@@ -1,11 +1,14 @@
-{{$server := .}}
-{{template "header.inc.html" (print "Admin - " .Cfg.Settings.ServerName)}}
+{{$server := .Server}}
+{{template "header.inc.html" (print "Admin - " $server.Cfg.Settings.ServerName)}}
 
 <div class="mdl-grid">
     <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--top">
         <form method="POST">
             <div class="mdl-card__title mdl-card--border">
-                <h2 class="mdl-card__title-text mdl-typography--title">{{.Cfg.Settings.ServerName}} - Event Settings</h2>
+                <h2 class="mdl-card__title-text mdl-typography--title">{{$server.Cfg.Settings.ServerName}} - Event Settings</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+                {{.Message}}
             </div>
             <div class="mdl-card__supporting-text mdl-grid server_settings_body_with_columns">
                 <div class="mdl-cell--6-col server_settings_column">
@@ -35,7 +38,7 @@
                     </section>
                     <section id="sessions">
                         <h5>Sessions</h5>
-{{range $index, $session := .Cfg.Event.Sessions}}
+{{range $index, $session := $server.Cfg.Event.Sessions}}
                         <div class="server_settings_event" id="sessions[{{$index}}]">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <select id="sessions[{{$index}}].sessionType" name="sessions[{{$index}}].sessionType" class="mdl-textfield__input">
@@ -92,22 +95,22 @@
                     <section>
                         <h5>Delays</h5>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input type="text" id="preRaceWaitingTimeSeconds" name="preRaceWaitingTimeSeconds" value="{{.Cfg.Event.PreRaceWaitingTimeSeconds}}" pattern="[0-9]+" class="mdl-textfield__input">
+                            <input type="text" id="preRaceWaitingTimeSeconds" name="preRaceWaitingTimeSeconds" value="{{$server.Cfg.Event.PreRaceWaitingTimeSeconds}}" pattern="[0-9]+" class="mdl-textfield__input">
                             <label for="preRaceWaitingTimeSeconds" class="mdl-textfield__label">Pre-Race Waiting Time (seconds)</label>
                             <span class="mdl-textfield__error">Please enter a whole number of seconds</span>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input type="text" id="sessionOverTimeSeconds" name="sessionOverTimeSeconds" value="{{.Cfg.Event.SessionOverTimeSeconds}}" pattern="[0-9]+" class="mdl-textfield__input">
+                            <input type="text" id="sessionOverTimeSeconds" name="sessionOverTimeSeconds" value="{{$server.Cfg.Event.SessionOverTimeSeconds}}" pattern="[0-9]+" class="mdl-textfield__input">
                             <label for="sessionOverTimeSeconds" class="mdl-textfield__label">Session Over Time (seconds)</label>
                             <span class="mdl-textfield__error">Please enter a whole number of seconds</span>
                         </div>
                         <!-- <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input type="text" id="postQualySeconds" name="postQualySeconds" value=".Cfg.Event.PostQualySeconds" pattern="[0-9]+" class="mdl-textfield__input">
+                            <input type="text" id="postQualySeconds" name="postQualySeconds" value="$server.Cfg.Event.PostQualySeconds" pattern="[0-9]+" class="mdl-textfield__input">
                             <label for="postQualySeconds" class="mdl-textfield__label">Post Qualification Time (seconds)</label>
                             <span class="mdl-textfield__error">Please enter a whole number of seconds</span>
                         </div> -->
                         <!-- <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input type="text" id="sessionOverTimeSeconds" name="postRaceSeconds" value=".Cfg.Event.PostRaceSeconds" pattern="[0-9]+" class="mdl-textfield__input">
+                            <input type="text" id="sessionOverTimeSeconds" name="postRaceSeconds" value="$server.Cfg.Event.PostRaceSeconds" pattern="[0-9]+" class="mdl-textfield__input">
                             <label for="postRaceSeconds" class="mdl-textfield__label">Post Race Time (seconds)</label>
                             <span class="mdl-textfield__error">Please enter a whole number of seconds</span>
                         </div> -->
@@ -115,24 +118,24 @@
                     <section>
                         <h5>Weather</h5>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input type="text" id="ambientTemp" name="ambientTemp" value="{{.Cfg.Event.AmbientTemp}}" pattern="[0-9]+" class="mdl-textfield__input">
+                            <input type="text" id="ambientTemp" name="ambientTemp" value="{{$server.Cfg.Event.AmbientTemp}}" pattern="[0-9]+" class="mdl-textfield__input">
                             <label for="ambientTemp" class="mdl-textfield__label">Ambient Temperature (&deg;C)</label>
                             <span class="mdl-textfield__error">Please enter a whole number of degrees</span>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
                             <div class="slider_with_value">
-                                <div class="slider_value" id="cloudLevel_value">{{.Cfg.Event.CloudLevel}}</div>
+                                <div class="slider_value" id="cloudLevel_value">{{$server.Cfg.Event.CloudLevel}}</div>
                                 <div class="slider_container">
-                                    <input type="range" id="cloudLevel" name="cloudLevel" value="{{.Cfg.Event.CloudLevel}}" min="0" max="1" step="0.1" class="mdl-slider mdl-js-slider">
+                                    <input type="range" id="cloudLevel" name="cloudLevel" value="{{$server.Cfg.Event.CloudLevel}}" min="0" max="1" step="0.1" class="mdl-slider mdl-js-slider">
                                 </div>
                             </div>
                             <label for="cloudLevel" class="mdl-textfield__label">Cloud Level</label>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
                             <div class="slider_with_value">
-                                <div class="slider_value" id="rain_value">{{.Cfg.Event.Rain}}</div>
+                                <div class="slider_value" id="rain_value">{{$server.Cfg.Event.Rain}}</div>
                                 <div class="slider_container">
-                                    <input type="range" id="rain" name="rain" value="{{.Cfg.Event.Rain}}" min="0" max="1" step="0.1" class="mdl-slider mdl-js-slider">
+                                    <input type="range" id="rain" name="rain" value="{{$server.Cfg.Event.Rain}}" min="0" max="1" step="0.1" class="mdl-slider mdl-js-slider">
                                 </div>
                             </div>
                             <label for="rain" class="mdl-textfield__label">Rain</label>
@@ -140,9 +143,9 @@
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
                             <div class="slider_with_value">
-                                <div class="slider_value" id="weatherRandomness_value">{{.Cfg.Event.WeatherRandomness}}</div>
+                                <div class="slider_value" id="weatherRandomness_value">{{$server.Cfg.Event.WeatherRandomness}}</div>
                                 <div class="slider_container">
-                                    <input type="range" id="weatherRandomness" name="weatherRandomness" value="{{.Cfg.Event.WeatherRandomness}}" min="0" max="7" step="1" class="mdl-slider mdl-js-slider">
+                                    <input type="range" id="weatherRandomness" name="weatherRandomness" value="{{$server.Cfg.Event.WeatherRandomness}}" min="0" max="7" step="1" class="mdl-slider mdl-js-slider">
                                 </div>
                             </div>
                             <label for="weatherRandomness" class="mdl-textfield__label">Weather Randomness</label>
@@ -153,7 +156,7 @@
             </div>
             <div class="mdl-card__actions mdl-card--border card_actions">
                 <div class="card_actions_left">
-                    <button type="submit" name="save" disabled class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                    <button type="submit" name="save" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
                     Save
                     </button>
                 </div>
@@ -201,7 +204,7 @@ function formatMultiplier(value)
 linkSliderToValue('cloudLevel', 'cloudLevel_value', formatSingleDigit);
 linkSliderToValue('rain', 'rain_value', formatSingleDigit);
 linkSliderToValue('weatherRandomness', 'weatherRandomness_value');
-{{range $index, $session := .Cfg.Event.Sessions}}
+{{range $index, $session := $server.Cfg.Event.Sessions}}
     linkSliderToValue('sessions[{{$index}}].hourOfDay', 'sessions[{{$index}}].hourOfDay_value', formatHour);
     linkSliderToValue('sessions[{{$index}}].timeMultiplier', 'sessions[{{$index}}].timeMultiplier_value', formatMultiplier);
 {{end}}
@@ -227,7 +230,7 @@ function removeSession(index)
     });
 }
 
-var nextSessionId = {{len .Cfg.Event.Sessions}};
+var nextSessionId = {{len $server.Cfg.Event.Sessions}};
 
 function addSession() {
     let index = nextSessionId;

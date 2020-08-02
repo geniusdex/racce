@@ -118,6 +118,15 @@ func parseCfgFile(path string, target interface{}) error {
 	return json.Unmarshal(data, target)
 }
 
+func writeCfgFile(path string, source interface{}) error {
+	encoded, err := json.MarshalIndent(source, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(path, encoded, 0644)
+}
+
 func parseCfg(installationPath string) (*ServerConfiguration, error) {
 	cfg := &ServerConfiguration{
 		&CfgConfiguration{},
@@ -191,4 +200,13 @@ func (s *Server) IsStopped() bool {
 // IsStopping returns if the instance is stopping (State() == Stopping)
 func (s *Server) IsStopping() bool {
 	return s.Instance.State() == Stopping
+}
+
+// SaveConfiguration saves the current in-memory configuration to disk
+func (s *Server) SaveConfiguration() error {
+	cfgDir := s.Config.installationDir() + "/cfg/"
+	if err := writeCfgFile(cfgDir+"event.json", s.Cfg.Event); err != nil {
+		return fmt.Errorf("Cannot write cfg/event.json: %w", err)
+	}
+	return nil
 }

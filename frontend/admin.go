@@ -3,6 +3,7 @@ package frontend
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/geniusdex/racce/accserver"
 	"github.com/gorilla/securecookie"
@@ -105,8 +106,35 @@ func (a *admin) cfgGlobalHandler(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(w, r, "admin-server-cfg-global.html", a.server)
 }
 
+type adminServerCfgEventPage struct {
+	Message string
+	Server  *accserver.Server
+}
+
 func (a *admin) cfgEventHandler(w http.ResponseWriter, r *http.Request) {
-	executeTemplate(w, r, "admin-server-cfg-event.html", a.server)
+	var page = &adminServerCfgEventPage{
+		Message: "",
+		Server:  a.server,
+	}
+
+	if r.Method == "POST" {
+		if err := r.ParseForm(); err != nil {
+			log.Panicf("Failed to parse form on admin/server/cfg/event: %v", err)
+		}
+		event, err := a.parseServerCfgEventForm(r.PostForm)
+		if err != nil {
+			page.Message = strings.ReplaceAll(err.Error(), "\n", "<br>")
+		} else {
+			a.server.Cfg.Event = event
+			if err := a.server.SaveConfiguration(); err != nil {
+				log.Panic(err.Error())
+			}
+			http.Redirect(w, r, basePath(r)+"/admin/server", http.StatusSeeOther)
+			return
+		}
+	}
+
+	executeTemplate(w, r, "admin-server-cfg-event.html", page)
 }
 
 func (a *admin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
