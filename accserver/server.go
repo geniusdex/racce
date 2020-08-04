@@ -16,6 +16,9 @@ type SessionType string
 // DayOfWeekend represent a specific day in a race weekend
 type DayOfWeekend int
 
+// CarGroup defines the allowed car group in the server
+type CarGroup string
+
 const (
 	Practice   SessionType = "P"
 	Qualifying             = "Q"
@@ -24,6 +27,12 @@ const (
 	Friday   DayOfWeekend = 1
 	Saturday              = 2
 	Sunday                = 3
+
+	FreeForAll  CarGroup = "FreeForAll"
+	GT3                  = "GT3"
+	GT4                  = "GT4"
+	PorscheCup           = "Cup"
+	Supertrofeo          = "ST"
 )
 
 // CfgConfiguration contains the main server connectivity configuration.
@@ -31,7 +40,7 @@ type CfgConfiguration struct {
 	UDPPort         int `json:"udpPort"`
 	TCPPort         int `json:"tcpPort"`
 	MaxConnections  int `json:"maxConnections"`
-	LanDiscover     int `json:"lanDiscover"`
+	LanDiscovery    int `json:"lanDiscovery"`
 	RegisterToLobby int `json:"registerToLobby"`
 	ConfigVersion   int `json:"configVersion"`
 }
@@ -61,20 +70,24 @@ type CfgEvent struct {
 
 // CfgSettings contains generic server settings.
 type CfgSettings struct {
-	ServerName                 string `json:"serverName"`
-	AdminPassword              string `json:"adminPassword"`
-	TrackMedalsRequirement     int    `json:"trackMedalsRequirement"`
-	SafetyRatingRequirement    int    `json:"safetyRatingRequirement"`
-	RacecraftRatingRequirement int    `json:"racecraftRatingRequirement"`
-	Password                   string `json:"password"`
-	MaxCarSlots                int    `json:"maxCarSlots"`
-	SpectatorPassword          string `json:"spectatorPassword"`
-	DumpLeaderbords            int    `json:"dumpLeaderboards"`
-	IsRaceLocked               int    `json:"isRaceLocked"`
-	RandomizeTrackWhenEmpty    int    `json:"randomizeTrackWhenEmpty"`
-	AllowAutoDQ                int    `json:"allowAutoDQ"`
-	ShortFormationLap          int    `json:"shortFormationLap"`
-	ConfigVersion              int    `json:"configVersion"`
+	ServerName                 string   `json:"serverName"`
+	AdminPassword              string   `json:"adminPassword"`
+	CarGroup                   CarGroup `json:"carGroup"`
+	TrackMedalsRequirement     int      `json:"trackMedalsRequirement"`
+	SafetyRatingRequirement    int      `json:"safetyRatingRequirement"`
+	RacecraftRatingRequirement int      `json:"racecraftRatingRequirement"`
+	Password                   string   `json:"password"`
+	SpectatorPassword          string   `json:"spectatorPassword"`
+	MaxCarSlots                int      `json:"maxCarSlots"`
+	DumpLeaderbords            int      `json:"dumpLeaderboards"`
+	IsRaceLocked               int      `json:"isRaceLocked"`
+	RandomizeTrackWhenEmpty    int      `json:"randomizeTrackWhenEmpty"`
+	CentralEntryListPath       string   `json:"centralEntryListPath"`
+	AllowAutoDQ                int      `json:"allowAutoDQ"`
+	ShortFormationLap          int      `json:"shortFormationLap"`
+	DumpEntryList              int      `json:"dumpEntryList"`
+	FormationLapType           int      `json:"formationLapType"`
+	ConfigVersion              int      `json:"configVersion"`
 }
 
 // ServerConfiguration contains the parameters used by the accServer.

@@ -1,3 +1,4 @@
+{{$server := .}}
 {{template "header.inc.html" (print "Admin - " .Cfg.Settings.ServerName)}}
 
 <div class="mdl-grid">
@@ -7,6 +8,135 @@
                 <h2 class="mdl-card__title-text mdl-typography--title">{{.Cfg.Settings.ServerName}} - Global Settings</h2>
             </div>
             <div class="mdl-card__supporting-text server_card_body">
+            </div>
+            <div class="mdl-card__supporting-text mdl-grid server_settings_body_with_columns">
+                <div class="mdl-cell--6-col server_settings_column">
+                    <section>
+                        <h5>Configuration</h5>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="number" id="udpPort" name="udpPort" value="{{$server.Cfg.Configuration.UDPPort}}" step="1" min="1" max="65535" class="mdl-textfield__input">
+                            <label for="udpPort" class="mdl-textfield__label">UDP Port</label>
+                            <span class="mdl-textfield__error">Please enter a valid port number</span>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="number" id="tcpPort" name="tcpPort" value="{{$server.Cfg.Configuration.TCPPort}}" step="1" min="1" max="65535" class="mdl-textfield__input">
+                            <label for="tcpPort" class="mdl-textfield__label">TCP Port</label>
+                            <span class="mdl-textfield__error">Please enter a valid port number</span>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="number" id="maxConnections" name="maxConnections" value="{{$server.Cfg.Configuration.MaxConnections}}" step="1" min="1" max="1000" class="mdl-textfield__input">
+                            <label for="maxConnections" class="mdl-textfield__label">Maximum Number of Connections</label>
+                            <span class="mdl-textfield__error">Please enter a positive integer number</span>
+                        </div>
+                        <label for="registerToLobby" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="registerToLobby" class="mdl-switch__input" {{if $server.Cfg.Configuration.RegisterToLobby}}checked{{end}}>
+                            <span class="mdl-switch__label">Register to Lobby</span>
+                        </label>
+                        <label for="lanDiscovery" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="lanDiscovery" class="mdl-switch__input" {{if $server.Cfg.Configuration.LanDiscovery}}checked{{end}}>
+                            <span class="mdl-switch__label">LAN Discovery</span>
+                        </label>
+                    </section>
+                </div>
+                <div class="mdl-cell--6-col server_settings_column">
+                    <section>
+                        <h5>Settings</h5>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="text" id="serverName" name="serverName" value="{{$server.Cfg.Settings.ServerName}}" class="mdl-textfield__input">
+                            <label for="serverName" class="mdl-textfield__label">Server Name</label>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="password" id="adminPassword" name="adminPassword" value="{{$server.Cfg.Settings.AdminPassword}}" class="mdl-textfield__input">
+                            <label for="adminPassword" class="mdl-textfield__label">Admin Password</label>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <select id="carGroup" name="carGroup" class="mdl-textfield__input">
+                                <option value="FreeForAll" {{if eq $server.Cfg.Settings.CarGroup "FreeForAll"}}selected{{end}}>Free For All</option>
+                                <option value="GT3" {{if eq $server.Cfg.Settings.CarGroup "GT3"}}selected{{end}}>GT3</option>
+                                <option value="GT4" {{if eq $server.Cfg.Settings.CarGroup "GT4"}}selected{{end}}>GT4</option>
+                                <option value="Cup" {{if eq $server.Cfg.Settings.CarGroup "Cup"}}selected{{end}}>Porsche Cup</option>
+                                <option value="ST" {{if eq $server.Cfg.Settings.CarGroup "ST"}}selected{{end}}>Lamorghini Supertrofeo</option>
+                            </select>
+                            <label class="mdl-textfield__label" for="carGroup">Car Group</label>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+                            <div class="slider_with_value">
+                                <div class="slider_value" id="trackMedalsRequirement_value">{{$server.Cfg.Settings.TrackMedalsRequirement}}</div>
+                                <div class="slider_container">
+                                    <input type="range" id="trackMedalsRequirement" name="trackMedalsRequirement" value="{{$server.Cfg.Settings.TrackMedalsRequirement}}" min="0" max="3" step="1" class="mdl-slider mdl-js-slider">
+                                </div>
+                            </div>
+                            <label for="trackMedalsRequirement" class="mdl-textfield__label">Track Medals Requirement</label>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+                            <div class="slider_with_value">
+                                <div class="slider_value" id="safetyRatingRequirement_value">{{$server.Cfg.Settings.SafetyRatingRequirement}}</div>
+                                <div class="slider_container">
+                                    <input type="range" id="safetyRatingRequirement" name="safetyRatingRequirement" value="{{$server.Cfg.Settings.SafetyRatingRequirement}}" min="-1" max="99" step="1" class="mdl-slider mdl-js-slider">
+                                </div>
+                            </div>
+                            <label for="safetyRatingRequirement" class="mdl-textfield__label">Safety Rating Requirement</label>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+                            <div class="slider_with_value">
+                                <div class="slider_value" id="racecraftRatingRequirement_value">{{$server.Cfg.Settings.RacecraftRatingRequirement}}</div>
+                                <div class="slider_container">
+                                    <input type="range" id="racecraftRatingRequirement" name="racecraftRatingRequirement" value="{{$server.Cfg.Settings.RacecraftRatingRequirement}}" min="-1" max="99" step="1" class="mdl-slider mdl-js-slider">
+                                </div>
+                            </div>
+                            <label for="racecraftRatingRequirement" class="mdl-textfield__label">Racecraft Rating Requirement</label>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="password" id="password" name="password" value="{{$server.Cfg.Settings.Password}}" class="mdl-textfield__input">
+                            <label for="password" class="mdl-textfield__label">Password</label>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="password" id="spectatorPassword" name="passspectatorPasswordword" value="{{$server.Cfg.Settings.SpectatorPassword}}" class="mdl-textfield__input">
+                            <label for="spectatorPassword" class="mdl-textfield__label">Spectator Password</label>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="number" id="maxCarSlots" name="maxCarSlots" value="{{$server.Cfg.Settings.MaxCarSlots}}" step="1" min="1" max="1000" class="mdl-textfield__input">
+                            <label for="maxCarSlots" class="mdl-textfield__label">Maximum Number of Car Slots</label>
+                            <span class="mdl-textfield__error">Please enter a positive integer number</span>
+                        </div>
+                        <label for="dumpLeaderbords" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="dumpLeaderbords" class="mdl-switch__input" disabled {{if eq $server.Cfg.Settings.DumpLeaderbords 1}}checked{{end}}>
+                            <span class="mdl-switch__label">Dump Leaderbords</span>
+                        </label>
+                        <label for="isRaceLocked" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="isRaceLocked" class="mdl-switch__input" {{if $server.Cfg.Settings.IsRaceLocked}}checked{{end}}>
+                            <span class="mdl-switch__label">Race Locked</span>
+                        </label>
+                        <label for="randomizeTrackWhenEmpty" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="randomizeTrackWhenEmpty" class="mdl-switch__input" {{if $server.Cfg.Settings.RandomizeTrackWhenEmpty}}checked{{end}}>
+                            <span class="mdl-switch__label">Randomize Track When Empty</span>
+                        </label>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="text" id="centralEntryListPath" name="centralEntryListPath" value="{{$server.Cfg.Settings.CentralEntryListPath}}" class="mdl-textfield__input">
+                            <label for="centralEntryListPath" class="mdl-textfield__label">Central Entry List Path</label>
+                        </div>
+                        <label for="allowAutoDQ" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="allowAutoDQ" class="mdl-switch__input" {{if $server.Cfg.Settings.AllowAutoDQ}}checked{{end}}>
+                            <span class="mdl-switch__label">Allow Automatic Disqualification</span>
+                        </label>
+                        <label for="shortFormationLap" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="shortFormationLap" class="mdl-switch__input" {{if $server.Cfg.Settings.ShortFormationLap}}checked{{end}}>
+                            <span class="mdl-switch__label">Short Formation Lap</span>
+                        </label>
+                        <label for="dumpEntryList" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="dumpEntryList" class="mdl-switch__input" {{if eq $server.Cfg.Settings.DumpEntryList 1}}checked{{end}}>
+                            <span class="mdl-switch__label">Dump Entry List</span>
+                        </label>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <select id="formationLapType" name="formationLapType" class="mdl-textfield__input">
+                                <option value="3" {{if eq $server.Cfg.Settings.FormationLapType 3}}selected{{end}}>Default</option>
+                                <option value="0" {{if eq $server.Cfg.Settings.FormationLapType 0}}selected{{end}}>Old Limiter Lap</option>
+                                <option value="1" {{if eq $server.Cfg.Settings.FormationLapType 1}}selected{{end}}>Free</option>
+                            </select>
+                            <label class="mdl-textfield__label" for="formationLapType">Formation Lap Type</label>
+                        </div>
+                </section>
+                </div>
             </div>
             <div class="mdl-card__actions mdl-card--border card_actions">
                 <div class="card_actions_left">
@@ -24,5 +154,30 @@
         </form>
     </div>
 </div>
+
+<script type="text/javascript">
+    function linkSliderToValue(slider_id, value_id, formatter = null)
+    {
+        let slider = document.getElementById(slider_id);
+        let value = document.getElementById(value_id);
+        let update = function() {
+            newValue = slider.value;
+            if (formatter != null)
+                newValue = formatter(newValue);
+            value.innerHTML = newValue;
+        };
+        slider.addEventListener("input", update);
+        update();
+    }
+    
+    function formatInteger(value)
+    {
+        return Number.parseInt(value).toString();
+    }
+    
+    linkSliderToValue('trackMedalsRequirement', 'trackMedalsRequirement_value', formatInteger);
+    linkSliderToValue('safetyRatingRequirement', 'safetyRatingRequirement_value', formatInteger);
+    linkSliderToValue('racecraftRatingRequirement', 'racecraftRatingRequirement_value', formatInteger);
+</script>
 
 {{template "footer.inc.html"}}
