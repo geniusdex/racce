@@ -102,8 +102,36 @@ func (a *admin) serverStopHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, basePath(r)+"/admin/server", http.StatusSeeOther)
 }
 
+type adminServerCfgGlobalPage struct {
+	Message string
+	Server  *accserver.Server
+}
+
 func (a *admin) cfgGlobalHandler(w http.ResponseWriter, r *http.Request) {
-	executeTemplate(w, r, "admin-server-cfg-global.html", a.server)
+	var page = &adminServerCfgGlobalPage{
+		Message: "",
+		Server:  a.server,
+	}
+
+	if r.Method == "POST" {
+		if err := r.ParseForm(); err != nil {
+			log.Panicf("Failed to parse form on admin/server/cfg/global: %v", err)
+		}
+		configuration, settings, err := a.parseServerCfgGlobalForm(r.PostForm)
+		if err != nil {
+			page.Message = strings.ReplaceAll(err.Error(), "\n", "<br>")
+		} else {
+			a.server.Cfg.Configuration = configuration
+			a.server.Cfg.Settings = settings
+			if err := a.server.SaveConfiguration(); err != nil {
+				log.Panic(err.Error())
+			}
+			http.Redirect(w, r, basePath(r)+"/admin/server", http.StatusSeeOther)
+			return
+		}
+	}
+
+	executeTemplate(w, r, "admin-server-cfg-global.html", page)
 }
 
 type adminServerCfgEventPage struct {

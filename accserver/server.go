@@ -79,7 +79,7 @@ type CfgSettings struct {
 	Password                   string   `json:"password"`
 	SpectatorPassword          string   `json:"spectatorPassword"`
 	MaxCarSlots                int      `json:"maxCarSlots"`
-	DumpLeaderbords            int      `json:"dumpLeaderboards"`
+	DumpLeaderboards           int      `json:"dumpLeaderboards"`
 	IsRaceLocked               int      `json:"isRaceLocked"`
 	RandomizeTrackWhenEmpty    int      `json:"randomizeTrackWhenEmpty"`
 	CentralEntryListPath       string   `json:"centralEntryListPath"`

@@ -85,6 +85,15 @@ func (p *formParser) Float32(field string) float32 {
 	}
 }
 
+func (p *formParser) BoolInt(field string) int {
+	values, ok := p.form[field]
+	if ok && len(values) > 0 {
+		return 1
+	} else {
+		return 0
+	}
+}
+
 // parseServerCfgEventFormSessions parses the sessions in the given event configuration form
 func (a *admin) parseServerCfgEventFormSessions(form url.Values) ([]*accserver.CfgEventSession, error) {
 	// Figure out all session indices
@@ -155,4 +164,41 @@ func (a *admin) parseServerCfgEventForm(form url.Values) (*accserver.CfgEvent, e
 	errors.Add(err)
 
 	return event, errors.Error()
+}
+
+// parseServerCfgGlobalForm parses the given global server configuration form and returns new configuration and settings objects
+func (a *admin) parseServerCfgGlobalForm(form url.Values) (*accserver.CfgConfiguration, *accserver.CfgSettings, error) {
+	parser := newFormParser(form)
+
+	configuration := &accserver.CfgConfiguration{
+		UDPPort:         parser.Int("udpPort"),
+		TCPPort:         parser.Int("tcpPort"),
+		MaxConnections:  parser.Int("maxConnections"),
+		LanDiscovery:    parser.BoolInt("lanDiscovery"),
+		RegisterToLobby: parser.BoolInt("registerToLobby"),
+		ConfigVersion:   1,
+	}
+
+	settings := &accserver.CfgSettings{
+		ServerName:                 parser.String("serverName"),
+		AdminPassword:              parser.String("adminPassword"),
+		CarGroup:                   accserver.CarGroup(parser.String("carGroup")),
+		TrackMedalsRequirement:     parser.Int("trackMedalsRequirement"),
+		SafetyRatingRequirement:    parser.Int("safetyRatingRequirement"),
+		RacecraftRatingRequirement: parser.Int("racecraftRatingRequirement"),
+		Password:                   parser.String("password"),
+		SpectatorPassword:          parser.String("spectatorPassword"),
+		MaxCarSlots:                parser.Int("maxCarSlots"),
+		DumpLeaderboards:           parser.BoolInt("dumpLeaderboards"),
+		IsRaceLocked:               parser.BoolInt("isRaceLocked"),
+		RandomizeTrackWhenEmpty:    parser.BoolInt("randomizeTrackWhenEmpty"),
+		CentralEntryListPath:       parser.String("centralEntryListPath"),
+		AllowAutoDQ:                parser.BoolInt("allowAutoDQ"),
+		ShortFormationLap:          parser.BoolInt("shortFormationLap"),
+		DumpEntryList:              parser.BoolInt("dumpEntryList"),
+		FormationLapType:           parser.Int("formationLapType"),
+		ConfigVersion:              1,
+	}
+
+	return configuration, settings, parser.Error()
 }

@@ -1,13 +1,14 @@
-{{$server := .}}
-{{template "header.inc.html" (print "Admin - " .Cfg.Settings.ServerName)}}
+{{$server := .Server}}
+{{template "header.inc.html" (print "Admin - " $server.Cfg.Settings.ServerName)}}
 
 <div class="mdl-grid">
     <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--top">
         <form method="POST">
             <div class="mdl-card__title mdl-card--border">
-                <h2 class="mdl-card__title-text mdl-typography--title">{{.Cfg.Settings.ServerName}} - Global Settings</h2>
+                <h2 class="mdl-card__title-text mdl-typography--title">{{$server.Cfg.Settings.ServerName}} - Global Settings</h2>
             </div>
-            <div class="mdl-card__supporting-text server_card_body">
+            <div class="mdl-card__supporting-text">
+                {{.Message}}
             </div>
             <div class="mdl-card__supporting-text mdl-grid server_settings_body_with_columns">
                 <div class="mdl-cell--6-col server_settings_column">
@@ -29,11 +30,11 @@
                             <span class="mdl-textfield__error">Please enter a positive integer number</span>
                         </div>
                         <label for="registerToLobby" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-                            <input type="checkbox" id="registerToLobby" class="mdl-switch__input" {{if $server.Cfg.Configuration.RegisterToLobby}}checked{{end}}>
+                            <input type="checkbox" id="registerToLobby" name="registerToLobby" class="mdl-switch__input" {{if $server.Cfg.Configuration.RegisterToLobby}}checked{{end}}>
                             <span class="mdl-switch__label">Register to Lobby</span>
                         </label>
                         <label for="lanDiscovery" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-                            <input type="checkbox" id="lanDiscovery" class="mdl-switch__input" {{if $server.Cfg.Configuration.LanDiscovery}}checked{{end}}>
+                            <input type="checkbox" id="lanDiscovery" name="lanDiscovery" class="mdl-switch__input" {{if $server.Cfg.Configuration.LanDiscovery}}checked{{end}}>
                             <span class="mdl-switch__label">LAN Discovery</span>
                         </label>
                     </section>
@@ -91,7 +92,7 @@
                             <label for="password" class="mdl-textfield__label">Password</label>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input type="password" id="spectatorPassword" name="passspectatorPasswordword" value="{{$server.Cfg.Settings.SpectatorPassword}}" class="mdl-textfield__input">
+                            <input type="password" id="spectatorPassword" name="spectatorPassword" value="{{$server.Cfg.Settings.SpectatorPassword}}" class="mdl-textfield__input">
                             <label for="spectatorPassword" class="mdl-textfield__label">Spectator Password</label>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -99,16 +100,16 @@
                             <label for="maxCarSlots" class="mdl-textfield__label">Maximum Number of Car Slots</label>
                             <span class="mdl-textfield__error">Please enter a positive integer number</span>
                         </div>
-                        <label for="dumpLeaderbords" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-                            <input type="checkbox" id="dumpLeaderbords" class="mdl-switch__input" disabled {{if eq $server.Cfg.Settings.DumpLeaderbords 1}}checked{{end}}>
+                        <label for="dumpLeaderboards" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="dumpLeaderboards" name="dumpLeaderboards" class="mdl-switch__input" {{if eq $server.Cfg.Settings.DumpLeaderboards 1}}checked{{end}}>
                             <span class="mdl-switch__label">Dump Leaderbords</span>
                         </label>
                         <label for="isRaceLocked" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-                            <input type="checkbox" id="isRaceLocked" class="mdl-switch__input" {{if $server.Cfg.Settings.IsRaceLocked}}checked{{end}}>
+                            <input type="checkbox" id="isRaceLocked" name="isRaceLocked" class="mdl-switch__input" {{if $server.Cfg.Settings.IsRaceLocked}}checked{{end}}>
                             <span class="mdl-switch__label">Race Locked</span>
                         </label>
                         <label for="randomizeTrackWhenEmpty" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-                            <input type="checkbox" id="randomizeTrackWhenEmpty" class="mdl-switch__input" {{if $server.Cfg.Settings.RandomizeTrackWhenEmpty}}checked{{end}}>
+                            <input type="checkbox" id="randomizeTrackWhenEmpty" name="randomizeTrackWhenEmpty" class="mdl-switch__input" {{if $server.Cfg.Settings.RandomizeTrackWhenEmpty}}checked{{end}}>
                             <span class="mdl-switch__label">Randomize Track When Empty</span>
                         </label>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -116,15 +117,15 @@
                             <label for="centralEntryListPath" class="mdl-textfield__label">Central Entry List Path</label>
                         </div>
                         <label for="allowAutoDQ" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-                            <input type="checkbox" id="allowAutoDQ" class="mdl-switch__input" {{if $server.Cfg.Settings.AllowAutoDQ}}checked{{end}}>
+                            <input type="checkbox" id="allowAutoDQ" name="allowAutoDQ" class="mdl-switch__input" {{if $server.Cfg.Settings.AllowAutoDQ}}checked{{end}}>
                             <span class="mdl-switch__label">Allow Automatic Disqualification</span>
                         </label>
                         <label for="shortFormationLap" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-                            <input type="checkbox" id="shortFormationLap" class="mdl-switch__input" {{if $server.Cfg.Settings.ShortFormationLap}}checked{{end}}>
+                            <input type="checkbox" id="shortFormationLap" name="shortFormationLap" class="mdl-switch__input" {{if $server.Cfg.Settings.ShortFormationLap}}checked{{end}}>
                             <span class="mdl-switch__label">Short Formation Lap</span>
                         </label>
                         <label for="dumpEntryList" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-                            <input type="checkbox" id="dumpEntryList" class="mdl-switch__input" {{if eq $server.Cfg.Settings.DumpEntryList 1}}checked{{end}}>
+                            <input type="checkbox" id="dumpEntryList" name="dumpEntryList" class="mdl-switch__input" {{if eq $server.Cfg.Settings.DumpEntryList 1}}checked{{end}}>
                             <span class="mdl-switch__label">Dump Entry List</span>
                         </label>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -140,7 +141,7 @@
             </div>
             <div class="mdl-card__actions mdl-card--border card_actions">
                 <div class="card_actions_left">
-                    <button type="submit" name="save" disabled class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                    <button type="submit" name="save" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
                     Save
                     </button>
                 </div>
