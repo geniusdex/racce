@@ -2,6 +2,7 @@ package accresults
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"time"
 
@@ -61,6 +62,21 @@ type LeaderBoardLine struct {
 	DriverTotalTimes []float64 `json:"driverTotalTimes"`
 }
 
+// Verify checks if the leaderboard line is fully filled
+func (l *LeaderBoardLine) Verify() error {
+	if l.Car == nil {
+		return fmt.Errorf("Car is not available")
+	}
+	if l.CurrentDriver == nil {
+		return fmt.Errorf("CurrentDriver is not available")
+	}
+	if l.Timing == nil {
+		return fmt.Errorf("Timing is not available")
+	}
+
+	return nil
+}
+
 type SessionResult struct {
 	//    BestLap *time.Duration `json:"bestLap"`
 	BestLap int `json:"bestLap"`
@@ -111,6 +127,21 @@ type Session struct {
 	SessionTypeString string
 }
 
+// Verify checks if the session is fully filled
+func (session *Session) Verify() error {
+	if session.SessionResult == nil {
+		return fmt.Errorf("SessionResult is not available")
+	}
+
+	for _, line := range session.SessionResult.LeaderBoardLines {
+		if err := line.Verify(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (session *Session) calculateCarPositionsPerLap() {
 	carPositionsPerLap := make(map[int][]int)
 	carsPerLap := make(map[int]int)
@@ -153,6 +184,10 @@ func LoadSessionFromFile(filename string, endTime time.Time) (*Session, error) {
 	err = json.Unmarshal(fileContents, &session)
 	if err != nil {
 		return nil, err
+	}
+
+	if err := session.Verify(); err != nil {
+		return &session, err
 	}
 
 	session.EndTime = endTime

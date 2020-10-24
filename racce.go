@@ -40,7 +40,7 @@ func main() {
 	log.Printf("Reading configuration...")
 	config, err := loadConfiguration("configuration.json")
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	server, err := accserver.NewServer(config.Server)
@@ -51,9 +51,9 @@ func main() {
 	log.Printf("Populating database...")
 	db, err := accresults.LoadDatabase(config.makeDatabaseConfiguration())
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	log.Printf("Starting frontend...")
-	log.Fatal(frontend.Run(config.Frontend, db, server))
+	log.Panic(frontend.Run(config.Frontend, db, server))
 }

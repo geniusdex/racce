@@ -91,6 +91,12 @@ func (db *Database) addSession(sessionName string, session *Session) {
 	db.resolvePlayersInSession(sessionName, session, event)
 }
 
+func isSessionFile(fileName string) bool {
+	return strings.HasSuffix(fileName, "_FP.json") ||
+		strings.HasSuffix(fileName, "_Q.json") ||
+		strings.HasSuffix(fileName, "_R.json")
+}
+
 func parseTimeFromSessionName(name string) time.Time {
 	result, err := time.ParseInLocation("060102_150405", strings.TrimRight(name, "_FPQR"), time.Local)
 	if err != nil {
@@ -105,7 +111,7 @@ func (db *Database) loadSessionFile(resultsPath string, fileName string) {
 	sessionTime := parseTimeFromSessionName(sessionName)
 	session, err := LoadSessionFromFile(resultsPath+fileName, sessionTime)
 	if err != nil {
-		log.Print(err)
+		log.Printf("Error loading session results file '%v': %v", fileName, err)
 		return
 	}
 
@@ -143,8 +149,12 @@ func (db *Database) monitorResultsDir(config *Configuration) {
 			fileName := filepath.Base(event.Name)
 			if event.Op&fsnotify.Create == fsnotify.Create {
 				time.AfterFunc(time.Duration(config.NewFileDelay)*time.Second, func() {
-					log.Printf("Loading new session file '%s'", fileName)
-					db.loadSessionFile(config.resultsDir(), fileName)
+					if isSessionFile(fileName) {
+						log.Printf("Loading new session file '%s'", fileName)
+						db.loadSessionFile(config.resultsDir(), fileName)
+					} else {
+						log.Printf("Ignoring file '%s' because it is not a session results file", fileName)
+					}
 				})
 			}
 		case err, ok := <-watcher.Errors:
@@ -177,7 +187,11 @@ func LoadDatabase(config *Configuration) (*Database, error) {
 
 	for _, f := range files {
 		fileName := f.Name()
-		db.loadSessionFile(config.resultsDir(), fileName)
+		if isSessionFile(fileName) {
+			db.loadSessionFile(config.resultsDir(), fileName)
+		} else {
+			log.Printf("Ignoring file '%s' because it is not a session results file", fileName)
+		}
 	}
 
 	go db.monitorResultsDir(config)
