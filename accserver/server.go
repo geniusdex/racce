@@ -32,7 +32,7 @@ const (
 	GT3                  = "GT3"
 	GT4                  = "GT4"
 	PorscheCup           = "Cup"
-	Supertrofeo          = "ST"
+	SuperTrofeo          = "ST"
 )
 
 // CfgConfiguration contains the main server connectivity configuration.
