@@ -55,7 +55,7 @@ var (
 		&CarModel{13, "reiter_engineering", "Reiter Engineering", "R-EX GT3", 2017, GT3},
 
 		&CarModel{50, "alpine", "Alpine", "A110 GT4", 2018, GT4},
-		&CarModel{51, "aston martin", "Aston Martin", "Vantage GT4", 2018, GT4},
+		&CarModel{51, "aston_martin", "Aston Martin", "Vantage GT4", 2018, GT4},
 		&CarModel{52, "audi", "Audi", "R8 LMS GT4", 2018, GT4},
 		&CarModel{53, "bmw", "BMW", "M4 GT4", 2018, GT4},
 		&CarModel{55, "chevrolet", "Chevrolet", "Camaro GT4.R", 2017, GT4},
