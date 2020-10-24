@@ -21,8 +21,34 @@ body {
     max-width: 500px;
 }
 
+.car_card {
+    min-height: 0em;
+}
+
+.car_card .carlogo {
+    display: block;
+    float: left;
+    height: 64px;
+    margin-right: 18px
+}
+
+.car_card .carmodel {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.car_card .cargroup {
+    margin-bottom: 0;
+}
+
 .drivers_card {
     min-height: 0em;
+}
+
+.drivers_card .mdl-card__list {
+    /* position: absolute;
+    top: 50%;
+    transform: translateY(-50%); */
 }
 
 .laptimes_chart_container {
@@ -219,4 +245,12 @@ section h5:after {
 
 .mdl-switch {
     margin-bottom: 16px;
+}
+
+.mdl-mini-footer {
+    background-color: #f0f0f0;
+}
+
+.mdl-mini-footer--link-list a {
+    text-decoration: underline;
 }
