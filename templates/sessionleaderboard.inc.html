@@ -1,9 +1,9 @@
 {{$session := .}}
-<table class="mdl-data-table mdl-js-data-table">
+<table class="mdl-data-table mdl-js-data-table sessionleaderboard">
   <thead>
     <tr>
       <th>Pos</th>
-      <th>Car</th>
+      <th colspan="2">Car</th>
       <th class="mdl-data-table__cell--non-numeric">Driver</th>
       <th>Laps</th>
       <th>Total time</th>
@@ -17,7 +17,10 @@
 {{range $index, $line := .SessionResult.LeaderBoardLines}}
     <tr>
       <td>{{add $index 1}}.</td>
-      <td><a href="{{basePath}}/sessioncar/{{$session.SessionName}}/{{.Car.CarId}}">{{.Car.RaceNumber}}</a></td>
+      {{$cupcat := cupcategory .Car.CupCategory}}
+      {{$carmodel := carmodel .Car.CarModel}}
+      <td class="carlogo"><img src="{{basePath}}/static/carlogo/{{$carmodel.ManufacturerLabel}}.png" title="{{$carmodel.Manufacturer}} {{$carmodel.Model}}"></td>
+      <td class="racenumber" style="background-color: {{color $cupcat.Color}};"><a href="{{basePath}}/sessioncar/{{$session.SessionName}}/{{.Car.CarId}}" style="color: {{color $cupcat.TextColor}};">{{.Car.RaceNumber}}</a></td>
       <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/player/{{.CurrentDriver.PlayerId}}">{{.CurrentDriver.FirstName}} {{.CurrentDriver.LastName}}</a></td>
       <td>{{.Timing.LapCount}}</td>
       <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.TotalTime}}{{else}}-{{end}}</td>

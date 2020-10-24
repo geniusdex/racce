@@ -3,6 +3,7 @@ package frontend
 import (
 	"fmt"
 	"html/template"
+	"image/color"
 	"log"
 	"net/http"
 
@@ -59,6 +60,9 @@ func addTemplateFunctions(t *template.Template, basePath string) *template.Templ
 
 			return fmt.Sprintf("%d:%02d.%03d", minutes, seconds, milliseconds)
 		},
+		"color": func(color color.RGBA) template.CSS {
+			return template.CSS(fmt.Sprintf("rgba(%d, %d, %d, %g)", color.R, color.G, color.B, float32(color.A)/255.0))
+		},
 		// Data specific for Assetto Corsa Competizione
 		"track": func(name string) *accdata.Track {
 			if track := accdata.TrackByLabel(name); track != nil {
@@ -68,6 +72,33 @@ func addTemplateFunctions(t *template.Template, basePath string) *template.Templ
 		},
 		"tracks": func() []*accdata.Track {
 			return accdata.Tracks
+		},
+		"carmodel": func(id int) *accdata.CarModel {
+			if model := accdata.CarModelByID(id); model != nil {
+				return model
+			}
+			return &accdata.CarModel{0, "-", "-", "-", 0, accdata.GT3}
+		},
+		"carmodels": func() []*accdata.CarModel {
+			return accdata.CarModels
+		},
+		"drivercategory": func(id int) *accdata.DriverCategory {
+			if category := accdata.DriverCategoryByID(id); category != nil {
+				return category
+			}
+			return &accdata.DriverCategory{0, "-"}
+		},
+		"cupcategories": func() []*accdata.DriverCategory {
+			return accdata.DriverCategories
+		},
+		"cupcategory": func(id int) *accdata.CupCategory {
+			if category := accdata.CupCategoryByID(id); category != nil {
+				return category
+			}
+			return &accdata.CupCategory{0, "-", color.RGBA{}, color.RGBA{}}
+		},
+		"drivercategories": func() []*accdata.CupCategory {
+			return accdata.CupCategories
 		},
 	})
 	return t
