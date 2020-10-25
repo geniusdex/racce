@@ -84,6 +84,126 @@ body {
     width: 36px;
 }
 
+.sessionleaderboard .racenumber.Overall a {
+    color: black;
+}
+
+.sessionleaderboard .racenumber.GT3.Overall {
+    background: white; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.GT4.Overall {
+    background: linear-gradient(to bottom right,transparent 50%,#25265F 0) bottom right/18px 18px no-repeat, white; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.Cup.Overall {
+    background: linear-gradient(to bottom right,transparent 50%,#457C45 0) bottom right/18px 18px no-repeat, white; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.ST.Overall {
+    background: linear-gradient(to bottom right,transparent 50%,#CBB901 0) bottom right/18px 18px no-repeat, white; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.ProAm a {
+    color: black;
+}
+
+.sessionleaderboard .racenumber.GT3.ProAm {
+    background: grey; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.GT4.ProAm {
+    background: linear-gradient(to bottom right,transparent 50%,#25265F 0) bottom right/18px 18px no-repeat, grey; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.Cup.ProAm {
+    background: linear-gradient(to bottom right,transparent 50%,#457C45 0) bottom right/18px 18px no-repeat, grey; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.ST.ProAm {
+    background: linear-gradient(to bottom right,transparent 50%,#CBB901 0) bottom right/18px 18px no-repeat, grey; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.Am a {
+    color: black;
+}
+
+.sessionleaderboard .racenumber.GT3.Am {
+    background: red; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.GT4.Am {
+    background: linear-gradient(to bottom right,transparent 50%,#25265F 0) bottom right/18px 18px no-repeat, red; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.Cup.Am {
+    background: linear-gradient(to bottom right,transparent 50%,#457C45 0) bottom right/18px 18px no-repeat, red; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.ST.Am {
+    background: linear-gradient(to bottom right,transparent 50%,#CBB901 0) bottom right/18px 18px no-repeat, red; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.Silver a {
+    color: black;
+}
+
+.sessionleaderboard .racenumber.GT3.Silver {
+    background: grey; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.GT4.Silver {
+    background: linear-gradient(to bottom right,transparent 50%,#25265F 0) bottom right/18px 18px no-repeat, grey; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.Cup.Silver {
+    background: linear-gradient(to bottom right,transparent 50%,#457C45 0) bottom right/18px 18px no-repeat, grey; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.ST.Silver {
+    background: linear-gradient(to bottom right,transparent 50%,#CBB901 0) bottom right/18px 18px no-repeat, grey; 
+    color: black;
+}
+
+.sessionleaderboard .racenumber.National a {
+    color: white;
+}
+
+.sessionleaderboard .racenumber.GT3.National {
+    background: black; 
+    color: white;
+}
+
+.sessionleaderboard .racenumber.GT4.National {
+    background: linear-gradient(to bottom right,transparent 50%,#25265F 0) bottom right/18px 18px no-repeat, black; 
+    color: white;
+}
+
+.sessionleaderboard .racenumber.Cup.National {
+    background: linear-gradient(to bottom right,transparent 50%,#457C45 0) bottom right/18px 18px no-repeat, black; 
+    color: white;
+}
+
+.sessionleaderboard .racenumber.ST.National {
+    background: linear-gradient(to bottom right,transparent 50%,#CBB901 0) bottom right/18px 18px no-repeat, black; 
+    color: white;
+}
+
 .admin_back {
     text-align: right;
 }
