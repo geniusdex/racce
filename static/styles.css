@@ -363,6 +363,19 @@ section h5:after {
     margin-right: -100%;
 }
 
+.server_log_line {
+    margin: 0;
+    padding: 0;
+}
+
+.server_log_line_type_error {
+    color: red;
+}
+
+.server_log_timestamp {
+    padding-right: 16px;
+}
+
 .mdl-switch {
     margin-bottom: 16px;
 }

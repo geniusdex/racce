@@ -21,6 +21,7 @@ const (
 type Instance struct {
 	cmd       *exec.Cmd
 	hasKilled bool
+	log       *serverLog
 }
 
 func makeCmd(accServer string) *exec.Cmd {
@@ -38,9 +39,16 @@ func cmdString(cmd *exec.Cmd) string {
 }
 
 func newInstance(executable string) (*Instance, error) {
+	cmd := makeCmd(executable)
+	serverLog, err := newServerLog(cmd)
+	if err != nil {
+		return nil, err
+	}
+
 	i := &Instance{
-		cmd:       makeCmd(executable),
+		cmd:       cmd,
 		hasKilled: false,
+		log:       serverLog,
 	}
 
 	log.Printf("Starting %s...", cmdString(i.cmd))
@@ -50,6 +58,8 @@ func newInstance(executable string) (*Instance, error) {
 	}
 
 	go i.wait()
+
+	go i.printLog(i.NewLogChannel())
 
 	return i, nil
 }
@@ -93,9 +103,27 @@ func (i *Instance) stop() error {
 
 // wait for the process to terminate and then update the state accordingly
 func (i *Instance) wait() {
+	i.log.Wait()
 	if err := i.cmd.Wait(); err != nil {
 		log.Printf("Error waiting for accServer process to exit: %v", err)
 	} else {
 		log.Printf("The accServer process has exited normally")
+	}
+}
+
+// NewLogChannel creates a new channel over which all log will be sent, starting from the beginning of the server start
+//
+// Sending all log messages since server start guarantees that clients always receive all log messages
+// and therefore can have a complete overview of everything that happened on the server.
+//
+// The channel will be closed when the server shuts down.
+func (i *Instance) NewLogChannel() <-chan LogMessage {
+	return i.log.NewChannel()
+}
+
+// printLog prints the server log to standard output
+func (i *Instance) printLog(logChannel <-chan LogMessage) {
+	for msg := range logChannel {
+		log.Printf(" >>>  %s", msg.Message)
 	}
 }

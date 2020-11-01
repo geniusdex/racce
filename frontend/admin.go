@@ -31,6 +31,8 @@ func newAdmin(config *Configuration, accServer *accserver.Server) *admin {
 	admin.serveMux.HandleFunc("/admin/server/stop", admin.serverStopHandler)
 	admin.serveMux.HandleFunc("/admin/server/cfg/global", admin.cfgGlobalHandler)
 	admin.serveMux.HandleFunc("/admin/server/cfg/event", admin.cfgEventHandler)
+	admin.serveMux.HandleFunc("/admin/server/log", admin.serverLogHandler)
+	admin.serveMux.HandleFunc("/admin/server/log/ws", admin.serverLogWebSocketHandler)
 
 	return admin
 }

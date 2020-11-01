@@ -17,6 +17,12 @@
                     Stopped
 {{end}}
                 </li>
+{{if .Instance.IsRunning}}
+                <li class="mdl-list__item">
+                    <i class="material-icons mdl-list__item-icon server_log">notes</i>
+                    <a href="{{basePath}}/admin/server/log">Show log</a>
+                </li>
+{{end}}
             </ul>
         </div>
         <div class="mdl-card__actions server_card_actions">

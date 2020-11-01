@@ -1,0 +1,110 @@
+{{$server := .Server}}
+{{template "header.inc.html" (print "Admin - Server Log (" $server.Cfg.Settings.ServerName ")")}}
+
+<div class="mdl-grid">
+    <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--top">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text mdl-typography--title">Server Log ({{$server.Cfg.Settings.ServerName}})</h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+            <div id="server_log"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+function webSocketEndpoint()
+{
+    var protocol = ((window.location.protocol === "https:") ? "wss:" : "ws:");
+    return protocol + "//" + window.location.host + window.location.pathname + "/ws";
+}
+
+var logElement = document.getElementById("server_log");
+if (logElement === null)
+{
+    console.error("Log target element not found");
+}
+var scrollElement = document.getElementsByTagName("main");
+if (scrollElement.length != 1)
+{
+    console.warn("Unique scrolling element not found");
+}
+scrollElement = scrollElement[0];
+
+function formatDate(timestamp)
+{
+    var year = timestamp.getFullYear().toString().padStart(4, "0");
+    var month = timestamp.getMonth().toString().padStart(2, "0");
+    var day = timestamp.getDate().toString().padStart(2, "0");
+    var hours = timestamp.getHours().toString().padStart(2, "0");
+    var minutes = timestamp.getMinutes().toString().padStart(2, "0");
+    var seconds = timestamp.getSeconds().toString().padStart(2, "0");
+
+    return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+}
+
+// https://stackoverflow.com/a/21067431
+function isScrolledToBottom(element)
+{
+    return element.scrollHeight - element.clientHeight <= element.scrollTop + 1;
+}
+function scrollToBottom(element)
+{
+    element.scrollTop = element.scrollHeight - element.clientHeight
+}
+
+function addLogMessage(type, timestamp, message)
+{
+    var lineElement = document.createElement("p");
+    lineElement.classList.add("server_log_line");
+    lineElement.classList.add("server_log_line_type_" + type);
+
+    var timeElement = document.createElement("span");
+    timeElement.appendChild(document.createTextNode(formatDate(timestamp)));
+    timeElement.classList.add("server_log_timestamp");
+
+    var messageElement = document.createElement("span");
+    messageElement.appendChild(document.createTextNode(message));
+    messageElement.classList.add("server_log_message");
+
+    lineElement.appendChild(timeElement);
+    lineElement.appendChild(messageElement);
+
+    var wasScrolledToBottom = isScrolledToBottom(scrollElement);
+
+    logElement.appendChild(lineElement);
+
+    if (wasScrolledToBottom)
+    {
+        scrollToBottom(scrollElement);
+    }
+}
+
+var webSocket = new WebSocket(webSocketEndpoint());
+
+webSocket.addEventListener('error', function(event)
+{
+    console.log(event);
+});
+
+webSocket.addEventListener('close', function(event)
+{
+    console.log(event);
+    addLogMessage("error", new Date(), "Log closed: " + event.reason)
+});
+
+webSocket.addEventListener('message', function(event)
+{
+    var messages = event.data.split('\n');
+    for (var i = 0; i < messages.length; i++)
+    {
+        if (messages[i].length > 0)
+        {
+            var msg = JSON.parse(messages[i]);
+            addLogMessage("message", new Date(msg.Time), msg.Message)
+        }
+    }
+});
+</script>
+
+{{template "footer.inc.html"}}
