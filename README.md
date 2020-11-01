@@ -40,11 +40,18 @@ The accServer that is being used can be used for the results only, or it can als
 
 The HTTP server in racce is a basic application server and support for more advanced features like SSL are not exposed. You can use a more complete HTTP server, such as nginx, to handle these and forward the requests to the racce webserver.
 
-To allow racce to generate proper links when forwarded from a subdirectory, specify the `X-Forwarded-Prefix` header. Consider the following example for nginx, which forwards the subdirectory `/acc` to a racce server running on localhost:
+To allow racce to generate proper links when forwarded from a subdirectory, specify the `X-Forwarded-Prefix` header. Websocket connections also need to be forwarded correctly to allow live monitoring of the server log. Consider the following example for nginx, which forwards the subdirectory `/acc` to a racce server running on localhost:
 
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        '' close;
+    }
     location /acc/ {
+        proxy_pass http://localhost:8099/;
+        proxy_http_version 1.1;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $http_host;
         proxy_set_header X-Forwarded-Prefix /acc;
-        proxy_pass http://localhost:8099/;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
     }
