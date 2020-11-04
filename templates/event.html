@@ -16,7 +16,7 @@
       </thead>
       <tbody>
 {{range .Sessions}}
-        <tr>
+        <tr data-href="{{basePath}}/session/{{.SessionName}}">
           <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/session/{{.SessionName}}">{{.SessionName}}</a></td>
           <td class="mdl-data-table__cell--non-numeric">{{.EndTime.Format "2006-01-02 15:04:05"}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{.SessionTypeString}}</td>
