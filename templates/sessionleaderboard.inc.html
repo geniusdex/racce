@@ -15,7 +15,7 @@
   </thead>
   <tbody>
 {{range $index, $line := .SessionResult.LeaderBoardLines}}
-    <tr>
+    <tr data-href="{{basePath}}/sessioncar/{{$session.SessionName}}/{{.Car.CarId}}">
       <td>{{add $index 1}}.</td>
       {{$cupcat := cupcategory .Car.CupCategory}}
       {{$carmodel := carmodel .Car.CarModel}}

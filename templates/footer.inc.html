@@ -9,4 +9,13 @@
   </main>
 </div>
 </body>
+
+<script type="text/javascript">
+document.querySelectorAll('[data-href]').forEach(function(element) {
+  element.addEventListener('click', function() {
+    window.location.href = element.dataset.href;
+  })
+});
+</script>
+
 </html>
