@@ -13,6 +13,7 @@ The configuration is read during startup from a JSON file called `configuration.
 | Name     | Description                                        |
 |----------|----------------------------------------------------|
 | frontend | Configuration for the web frontend                 |
+| results  | Configuration for the results database             |
 | server   | Configuration for the accServer that is being used |
 
 ## Frontend
@@ -23,6 +24,15 @@ The frontend can be configured with the following settings:
 |---------------|----------|-------------------------------------------------------------------------------------------------|
 | listen        | yes      | IP and port to listen on in the format "ip:port". Leave the IP out to listen on all interfaces. |
 | adminPassword | no       | The password required to access the admin pages. Leave empty to disable the admin pages.        |
+
+## Results
+
+The results database can be configured with the following settings
+
+| Name                      | Required | Description                                                                                                             |
+|---------------------------|----------|-------------------------------------------------------------------------------------------------------------------------|
+| filterCarsWithoutLaps     | no       | Filter out cars without any completed lap. Defaults to `false` if not specified.                                        |
+| filterSessionsWithoutCars | no       | Filter out sessions without any cars. Not useful without `filterCarsWithoutLaps`. Defaults to `false` if not specified. |
 
 ## Server
 

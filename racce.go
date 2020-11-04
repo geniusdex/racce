@@ -11,14 +11,16 @@ import (
 )
 
 type configuration struct {
-	Frontend *frontend.Configuration  `json:"frontend"`
-	Server   *accserver.Configuration `json:"server"`
+	Frontend frontend.Configuration  `json:"frontend"`
+	Results  accresults.Options      `json:"results"`
+	Server   accserver.Configuration `json:"server"`
 }
 
 func (c *configuration) makeDatabaseConfiguration() *accresults.Configuration {
 	return &accresults.Configuration{
 		ResultsDir:   c.Server.ResolveResultsDir(),
 		NewFileDelay: c.Server.NewResultsDelay,
+		Options:      c.Results,
 	}
 }
 
@@ -43,7 +45,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	server, err := accserver.NewServer(config.Server)
+	server, err := accserver.NewServer(&config.Server)
 	if err != nil {
 		log.Printf("Server cannot be managed: %v", err)
 	}
@@ -55,5 +57,5 @@ func main() {
 	}
 
 	log.Printf("Starting frontend...")
-	log.Panic(frontend.Run(config.Frontend, db, server))
+	log.Panic(frontend.Run(&config.Frontend, db, server))
 }

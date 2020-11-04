@@ -163,6 +163,16 @@ func (session *Session) FindCarById(carId int) *Car {
 	return nil
 }
 
+func (session *Session) filterCarsWithoutLaps() {
+	filteredLines := make([]*LeaderBoardLine, 0)
+	for _, line := range session.SessionResult.LeaderBoardLines {
+		if line.Timing.LapCount > 0 {
+			filteredLines = append(filteredLines, line)
+		}
+	}
+	session.SessionResult.LeaderBoardLines = filteredLines
+}
+
 func readUtf16File(filename string) ([]byte, error) {
 	fileContents, err := ioutil.ReadFile(filename)
 	if err != nil {

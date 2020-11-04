@@ -20,12 +20,22 @@ var (
 	}
 )
 
+// Options contains the options which influence result parsing and interpretation
+type Options struct {
+	// FilterCarsWithoutLaps enables filtering out cars without any completed lap
+	FilterCarsWithoutLaps bool `json:"filterCarsWithoutLaps"`
+	// filterSessionsWithoutCars enables filteing out sessions without any cars
+	FilterSessionsWithoutCars bool `json:"filterSessionsWithoutCars"`
+}
+
 // Configuration contains the configuration options for the database
 type Configuration struct {
 	// ResultsDir is the directory which contains the results files
-	ResultsDir string `json:"resultsDir"`
+	ResultsDir string
 	// NewFileDelay is the number of seconds to wait after a new file appears before reading it
-	NewFileDelay int `json:"newFileDelay"`
+	NewFileDelay int
+	// Options contains the options which influence result parsing and interpretation
+	Options Options
 }
 
 // resultsDir returns the ResultsDir with a single slash at the end
@@ -33,6 +43,7 @@ func (c *Configuration) resultsDir() string {
 	return strings.TrimRight(c.ResultsDir, "/") + "/"
 }
 
+// Event identifies an event consisting of one or more sessions
 type Event struct {
 	EventId   string
 	TrackName string
@@ -40,14 +51,23 @@ type Event struct {
 	Sessions  []*Session
 }
 
+// Database contains the results and derived data as obtained from parsing the result files
 type Database struct {
+	// options contains the options which influence result parsing and interpretation
+	options Options
+
+	// Mutex must be locked whenever data is read from the database, to avoid database updates interfering with the read
 	Mutex *sync.RWMutex
 
+	// Sessions contains all individual sessions keyed on the session ID
 	Sessions map[string]*Session
 
+	// Players contains all the players which took part in a raw keyed on player ID
 	Players map[string]*Player
 
-	Events    map[string]*Event
+	// Events contains all events keyed on event ID
+	Events map[string]*Event
+	// lastEvent is the last event that was added to the database
 	lastEvent *Event
 }
 
@@ -115,9 +135,22 @@ func (db *Database) loadSessionFile(resultsPath string, fileName string) {
 		return
 	}
 
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
-	db.addSession(sessionName, session)
+	db.applyFiltersToSession(session)
+	if !db.isSessionFiltered(session) {
+		db.Mutex.Lock()
+		defer db.Mutex.Unlock()
+		db.addSession(sessionName, session)
+	}
+}
+
+func (db *Database) applyFiltersToSession(session *Session) {
+	if db.options.FilterCarsWithoutLaps {
+		session.filterCarsWithoutLaps()
+	}
+}
+
+func (db *Database) isSessionFiltered(session *Session) bool {
+	return len(session.SessionResult.LeaderBoardLines) == 0
 }
 
 func (db *Database) monitorResultsDir(config *Configuration) {
@@ -169,6 +202,7 @@ func (db *Database) monitorResultsDir(config *Configuration) {
 // LoadDatabase loads a database from disk and starts monitoring it
 func LoadDatabase(config *Configuration) (*Database, error) {
 	var db = &Database{
+		config.Options,
 		&sync.RWMutex{},
 		make(map[string]*Session),
 		make(map[string]*Player),
