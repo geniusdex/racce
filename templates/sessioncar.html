@@ -59,9 +59,10 @@
 {{range $lap := $session.Laps}}
     {{if eq .CarId $car.CarId}}
         {{$lapnr = add $lapnr 1}}
+        {{$driver := index $car.Drivers .DriverIndex}}
         <tr>
           <td>{{$lapnr}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{(index $car.Drivers .DriverIndex).ShortName}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{$driver.FirstName}} {{$driver.LastName}}</td>
           <td{{if eq .Laptime $session.SessionResult.BestLap}} class="laptimes_sessionbest"{{else if eq .Laptime $timing.BestLap}} class="laptimes_personalbest"{{end}}>
               {{laptime .Laptime}}
           </td>
