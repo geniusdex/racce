@@ -63,6 +63,10 @@ body {
     color: rgb(192, 0, 192);
 }
 
+.sessiontype_practice .invalidlap, .sessiontype_qualifying .invalidlap {
+    color: rgb(192, 192, 192);
+}
+
 .laptimes_sessionbest {
     color: rgb(192, 0, 192);
 }

@@ -13,7 +13,7 @@ import (
 type SessionType string
 
 const (
-	Practice   SessionType = "P"
+	Practice   SessionType = "FP"
 	Qualifying             = "Q"
 	Race                   = "R"
 )

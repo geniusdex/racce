@@ -36,12 +36,20 @@
 
 <!-- <div class="mdl-cell mdl-cell--8-col"></div> -->
 
+{{$sessiontype_class := "sessiontype_unknown"}}
+{{if eq $session.SessionType "FP"}}
+  {{$sessiontype_class = "sessiontype_practice"}}
+{{else if eq $session.SessionType "Q"}}
+  {{$sessiontype_class = "sessiontype_qualifying"}}
+{{else if eq $session.SessionType "R"}}
+  {{$sessiontype_class = "sessiontype_race"}}
+{{end}}
 <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
   <div class="mdl-card__title mdl-card--table__header">
     <h2 class="mdl-card__title-text mdl-typography--title">Lap times</h2>
   </div>
   <div class="mdl-card__table">
-    <table class="mdl-data-table mdl-js-data-table">
+    <table class="mdl-data-table mdl-js-data-table laptimes {{$sessiontype_class}}">
       <thead>
         <tr>
           <th>Lap</th>
@@ -50,7 +58,7 @@
           <th>Sector 1</th>
           <th>Sector 2</th>
           <th>Sector 3</th>
-          <th class="mdl-data-table__cell--non-numeric">Valid</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -60,22 +68,28 @@
     {{if eq .CarId $car.CarId}}
         {{$lapnr = add $lapnr 1}}
         {{$driver := index $car.Drivers .DriverIndex}}
-        <tr>
+        <tr class="{{if .IsValidForBest}}validlap{{else}}invalidlap{{end}}">
           <td>{{$lapnr}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{$driver.FirstName}} {{$driver.LastName}}</td>
-          <td{{if eq .Laptime $session.SessionResult.BestLap}} class="laptimes_sessionbest"{{else if eq .Laptime $timing.BestLap}} class="laptimes_personalbest"{{end}}>
+          <td{{if and .IsValidForBest (eq .Laptime $session.SessionResult.BestLap)}} class="laptimes_sessionbest"{{else if and .IsValidForBest (eq .Laptime $timing.BestLap)}} class="laptimes_personalbest"{{end}}>
               {{laptime .Laptime}}
           </td>
-          <td{{if eq (index .Splits 0) (index $session.SessionResult.BestSplits 0)}} class="laptimes_sessionbest"{{else if eq (index .Splits 0) (index $timing.BestSplits 0)}} class="laptimes_personalbest"{{end}}>
+          <td{{if and .IsValidForBest (eq (index .Splits 0) (index $session.SessionResult.BestSplits 0))}} class="laptimes_sessionbest"{{else if and .IsValidForBest (eq (index .Splits 0) (index $timing.BestSplits 0))}} class="laptimes_personalbest"{{end}}>
               {{laptime (index .Splits 0)}}
           </td>
-          <td{{if eq (index .Splits 1) (index $session.SessionResult.BestSplits 1)}} class="laptimes_sessionbest"{{else if eq (index .Splits 1) (index $timing.BestSplits 1)}} class="laptimes_personalbest"{{end}}>
+          <td{{if and .IsValidForBest (eq (index .Splits 1) (index $session.SessionResult.BestSplits 1))}} class="laptimes_sessionbest"{{else if and .IsValidForBest (eq (index .Splits 1) (index $timing.BestSplits 1))}} class="laptimes_personalbest"{{end}}>
               {{laptime (index .Splits 1)}}
           </td>
-          <td{{if eq (index .Splits 2) (index $session.SessionResult.BestSplits 2)}} class="laptimes_sessionbest"{{else if eq (index .Splits 2) (index $timing.BestSplits 2)}} class="laptimes_personalbest"{{end}}>
+          <td{{if and .IsValidForBest (eq (index .Splits 2) (index $session.SessionResult.BestSplits 2))}} class="laptimes_sessionbest"{{else if and .IsValidForBest (eq (index .Splits 2) (index $timing.BestSplits 2))}} class="laptimes_personalbest"{{end}}>
               {{laptime (index .Splits 2)}}
           </td>
-          <td class="mdl-data-table__cell--non-numeric">{{if .IsValidForBest}}true{{else}}false{{end}}</td>
+          <td>
+            {{if eq $session.SessionType "R"}}
+              {{if not .IsValidForBest}}<i class="material-icons mdl-list__item-icon invalidlap" title="Pit entry/exit">handyman</i>{{else}}{{end}}
+            {{else}}
+              {{if not .IsValidForBest}}<i class="material-icons mdl-list__item-icon invalidlap" title="Invalid lap">error</i>{{else}}{{end}}
+            {{end}}
+          </td>
         </tr>
     {{end}}
 {{end}}
