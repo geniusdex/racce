@@ -82,6 +82,7 @@ func (sl *serverLog) monitor() {
 		log.Printf("Error while reading server console: %v", err)
 	}
 	sl.isDone = true
+	sl.condMessagesAvailable.Broadcast()
 	close(sl.doneChannel)
 	// "the source-monitor error, participants might misattribute"
 }
