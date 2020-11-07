@@ -1,0 +1,38 @@
+{{$server := .Server}}
+{{$state := $server.LiveState}}
+
+{{template "header.inc.html" "Live"}}
+
+<div class="mdl-grid">
+<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--top">
+    <div class="mdl-card__title mdl-card--table__header">
+        <h2 class="mdl-card__title-text mdl-typography--title">{{$server.Cfg.Settings.ServerName}}</h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+        <ul class="mdl-list server_status">
+            <li class="mdl-list__item">
+{{if eq $state.ServerState "online"}}
+                <i class="material-icons mdl-list__item-icon server_running">play_arrow</i>
+                Online
+{{else if eq $state.ServerState "not_registered"}}
+                <i class="material-icons mdl-list__item-icon server_not_registered">play_arrow</i>
+                Not Registered
+{{else if eq $state.ServerState "starting"}}
+                <i class="material-icons mdl-list__item-icon server_starting">fast_forward</i>
+                Starting
+{{else}}
+                <i class="material-icons mdl-list__item-icon server_stopped">stop</i>
+                Offline
+{{end}}
+            </li>
+{{if $state.IsRunning}}
+                <li class="mdl-list__item">
+                    <i class="material-icons mdl-list__item-icon server_log">people</i>
+                    {{$state.NrClients}} client{{if ne 1 $state.NrClients}}s{{end}} online
+            </li>
+{{end}}
+        </ul>
+    </div>
+</div>
+
+{{template "footer.inc.html"}}

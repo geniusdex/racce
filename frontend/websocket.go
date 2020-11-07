@@ -110,7 +110,7 @@ func (ws *writeOnlyWebSocket) writeMessageOnSocket(messageType int, data []byte)
 	ws.connection.SetWriteDeadline(time.Now().Add(writeWait))
 	err := ws.connection.WriteMessage(messageType, data)
 
-	if !isExpectedWebSocketCloseError(err) {
+	if err != nil && !isExpectedWebSocketCloseError(err) {
 		log.Printf("Websocket %v write error: %v", ws.Name(), err)
 	}
 
@@ -177,5 +177,5 @@ func isExpectedWebSocketCloseError(v interface{}) bool {
 		err = errors.Unwrap(err)
 		return !websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived, websocket.CloseAbnormalClosure)
 	}
-	return true
+	return false
 }

@@ -1,7 +1,8 @@
 {
     "frontend": {
         "listen": ":8099",
-        "adminPassword": ""
+        "adminPassword": "",
+        "live": true
     },
     "results": {
         "filterCarsWithoutLaps": true,

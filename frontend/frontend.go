@@ -24,14 +24,17 @@ type Configuration struct {
 	// AdminWithoutPassword allows logging in without specifying a password at all. Use
 	// with care! This is primarily meant for development.
 	AdminWithoutPassword bool `json:"adminWithoutPassword"`
+	// Live indicates the live server status page should be enabled.
+	Live bool `json:"live"`
 }
 
 type frontend struct {
 	config *Configuration
 	db     *accresults.Database
+	server *accserver.Server
 }
 
-func addTemplateFunctions(t *template.Template, basePath string) *template.Template {
+func (f *frontend) addTemplateFunctions(t *template.Template, basePath string) *template.Template {
 	t.Funcs(template.FuncMap(qogs.TemplateFuncs()))
 	t.Funcs(template.FuncMap{
 		// Environment
@@ -100,6 +103,10 @@ func addTemplateFunctions(t *template.Template, basePath string) *template.Templ
 		"drivercategories": func() []*accdata.CupCategory {
 			return accdata.CupCategories
 		},
+		// Information about racce instance
+		"isLiveStateEnabled": func() bool {
+			return f.config.Live
+		},
 	})
 	return t
 }
@@ -108,10 +115,10 @@ func basePath(r *http.Request) string {
 	return r.Header.Get("X-Forwarded-Prefix")
 }
 
-func executeTemplate(w http.ResponseWriter, r *http.Request, name string, data interface{}) {
+func (f *frontend) executeTemplate(w http.ResponseWriter, r *http.Request, name string, data interface{}) {
 	sessions.Save(r, w)
 
-	t, err := addTemplateFunctions(template.New("templates"), basePath(r)).ParseGlob("templates/*.html")
+	t, err := f.addTemplateFunctions(template.New("templates"), basePath(r)).ParseGlob("templates/*.html")
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -126,9 +133,15 @@ func executeTemplate(w http.ResponseWriter, r *http.Request, name string, data i
 
 // Run runs the frontend with the given configuration and database
 func Run(config *Configuration, database *accresults.Database, server *accserver.Server) error {
+	if config.Live && server == nil {
+		log.Printf("Live server state in frontend is enabled in configuration, but server is not managed; disabling live page")
+		config.Live = false
+	}
+
 	f := &frontend{
 		config,
 		database,
+		server,
 	}
 
 	http.HandleFunc("/", f.indexHandler)
@@ -136,8 +149,11 @@ func Run(config *Configuration, database *accresults.Database, server *accserver
 	http.HandleFunc("/player/", f.playerHandler)
 	http.HandleFunc("/session/", f.sessionHandler)
 	http.HandleFunc("/sessioncar/", f.sessionCarHandler)
+	if config.Live {
+		http.HandleFunc("/live/", f.liveHandler)
+	}
 
-	admin := newAdmin(config, server)
+	admin := newAdmin(config, server, f)
 	http.Handle("/admin/", admin)
 	http.Handle("/admin", admin)
 

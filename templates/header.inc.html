@@ -31,6 +31,9 @@
     <span class="mdl-layout-title">ACC Results</span>
     <nav class="mdl-navigation">
       <a class="mdl-navigation__link" href="{{basePath}}/">Index</a>
+{{if isLiveStateEnabled}}
+      <a class="mdl-navigation__link" href="{{basePath}}/live/">Live</a>
+{{end}}
     </nav>
   </div>
   <main class="mdl-layout__content">

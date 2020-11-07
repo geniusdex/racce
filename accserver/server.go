@@ -108,6 +108,8 @@ type Server struct {
 	Cfg *ServerConfiguration
 	// Instance contains the running instance of the accServer, or nil if its not running
 	Instance *Instance
+	// LiveState contains the live state monitoring of the accServer; always available, even before first start
+	LiveState *LiveState
 }
 
 func isUtf16(data []byte) bool {
@@ -177,6 +179,7 @@ func NewServer(config *Configuration) (*Server, error) {
 		config,
 		cfg,
 		nil,
+		newLiveState(),
 	}, nil
 }
 
@@ -192,6 +195,10 @@ func (s *Server) Start() error {
 	}
 
 	s.Instance = instance
+
+	logParser := newLogParser(instance.NewLogChannel())
+	s.LiveState.newInstance(logParser.Events)
+
 	return nil
 }
 

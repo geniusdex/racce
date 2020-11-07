@@ -20,10 +20,11 @@ The configuration is read during startup from a JSON file called `configuration.
 
 The frontend can be configured with the following settings:
 
-| Name          | Required | Description                                                                                     |
-|---------------|----------|-------------------------------------------------------------------------------------------------|
-| listen        | yes      | IP and port to listen on in the format "ip:port". Leave the IP out to listen on all interfaces. |
-| adminPassword | no       | The password required to access the admin pages. Leave empty to disable the admin pages.        |
+| Name          | Required | Description                                                                                        |
+|---------------|----------|----------------------------------------------------------------------------------------------------|
+| listen        | yes      | IP and port to listen on in the format "ip:port". Leave the IP out to listen on all interfaces.    |
+| adminPassword | no       | The password required to access the admin pages. Leave empty to disable the admin pages.           |
+| live          | no       | If present and true, and accServer management is enabled, show live status on the public frontend. |
 
 ## Results
 

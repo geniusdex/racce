@@ -18,7 +18,7 @@ func (f *frontend) indexHandler(w http.ResponseWriter, r *http.Request) {
 	f.db.Mutex.RLock()
 	defer f.db.Mutex.RUnlock()
 
-	executeTemplate(w, r, "index.html", f.db)
+	f.executeTemplate(w, r, "index.html", f.db)
 }
 
 func (f *frontend) eventHandler(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +40,7 @@ func (f *frontend) eventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	executeTemplate(w, r, "event.html", event)
+	f.executeTemplate(w, r, "event.html", event)
 }
 
 type playerPage struct {
@@ -67,7 +67,7 @@ func (f *frontend) playerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	executeTemplate(w, r, "player.html", &playerPage{f.db, player})
+	f.executeTemplate(w, r, "player.html", &playerPage{f.db, player})
 }
 
 func (f *frontend) sessionHandler(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +89,7 @@ func (f *frontend) sessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	executeTemplate(w, r, "session.html", session)
+	f.executeTemplate(w, r, "session.html", session)
 }
 
 type sessionCarPage struct {
@@ -128,5 +128,5 @@ func (f *frontend) sessionCarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	executeTemplate(w, r, "sessioncar.html", &sessionCarPage{session, car})
+	f.executeTemplate(w, r, "sessioncar.html", &sessionCarPage{session, car})
 }

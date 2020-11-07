@@ -14,7 +14,7 @@ type adminServerLogPage struct {
 }
 
 func (a *admin) serverLogHandler(w http.ResponseWriter, r *http.Request) {
-	executeTemplate(w, r, "admin-server-log.html", &adminServerLogPage{a.server})
+	a.executeTemplate(w, r, "admin-server-log.html", &adminServerLogPage{a.server})
 }
 
 func (a *admin) serverLogWebSocketHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +41,7 @@ func writeLogMessageToWebSocket(msg accserver.LogMessage, ws *writeOnlyWebSocket
 }
 
 func writeServerLogToWebSocket(logChannel <-chan accserver.LogMessage, ws *writeOnlyWebSocket) {
-	log.Printf("Sending server log to websocket connection %v", ws.Name())
+	log.Printf("Sending server log on websocket connection %v", ws.Name())
 
 	for {
 		msg, ok := <-logChannel

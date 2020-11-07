@@ -15,14 +15,16 @@ type admin struct {
 	store    sessions.Store
 	serveMux *http.ServeMux
 	server   *accserver.Server
+	frontend *frontend
 }
 
-func newAdmin(config *Configuration, accServer *accserver.Server) *admin {
+func newAdmin(config *Configuration, accServer *accserver.Server, frontend *frontend) *admin {
 	admin := &admin{
 		config,
 		sessions.NewCookieStore(securecookie.GenerateRandomKey(32)),
 		http.NewServeMux(),
 		accServer,
+		frontend,
 	}
 
 	admin.serveMux.HandleFunc("/admin", admin.indexHandler)
@@ -35,6 +37,10 @@ func newAdmin(config *Configuration, accServer *accserver.Server) *admin {
 	admin.serveMux.HandleFunc("/admin/server/log/ws", admin.serverLogWebSocketHandler)
 
 	return admin
+}
+
+func (a *admin) executeTemplate(w http.ResponseWriter, r *http.Request, name string, data interface{}) {
+	a.frontend.executeTemplate(w, r, name, data)
 }
 
 type adminLoginPage struct {
@@ -63,7 +69,7 @@ func (a *admin) loginHandler(w http.ResponseWriter, r *http.Request, session *se
 		page.InvalidPassword = true
 	}
 
-	executeTemplate(w, r, "admin-login.html", page)
+	a.executeTemplate(w, r, "admin-login.html", page)
 }
 
 type adminIndexPage struct {
@@ -71,11 +77,11 @@ type adminIndexPage struct {
 }
 
 func (a *admin) indexHandler(w http.ResponseWriter, r *http.Request) {
-	executeTemplate(w, r, "admin.html", &adminIndexPage{a.server})
+	a.executeTemplate(w, r, "admin.html", &adminIndexPage{a.server})
 }
 
 func (a *admin) serverHandler(w http.ResponseWriter, r *http.Request) {
-	executeTemplate(w, r, "admin-server.html", a.server)
+	a.executeTemplate(w, r, "admin-server.html", a.server)
 }
 
 func (a *admin) serverStartHandler(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +139,7 @@ func (a *admin) cfgGlobalHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	executeTemplate(w, r, "admin-server-cfg-global.html", page)
+	a.executeTemplate(w, r, "admin-server-cfg-global.html", page)
 }
 
 type adminServerCfgEventPage struct {
@@ -164,7 +170,7 @@ func (a *admin) cfgEventHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	executeTemplate(w, r, "admin-server-cfg-event.html", page)
+	a.executeTemplate(w, r, "admin-server-cfg-event.html", page)
 }
 
 func (a *admin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
