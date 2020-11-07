@@ -60,6 +60,12 @@ func (f *frontend) sendLiveStateUpdates(ws *writeOnlyWebSocket) {
 				return
 			}
 			writeMessageToWebSocket(ws, "nrClients", nrClients)
+
+		case track, ok := <-events.Track:
+			if !ok {
+				return
+			}
+			writeMessageToWebSocket(ws, "track", track)
 		}
 	}
 }

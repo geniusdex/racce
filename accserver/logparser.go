@@ -20,6 +20,10 @@ type logEventNrClientsOnline struct {
 	NrClients int
 }
 
+type logEventTrack struct {
+	Track string
+}
+
 type logMatcher struct {
 	matcher *regexp.Regexp
 	handler func([]string) interface{}
@@ -61,6 +65,9 @@ func makeLogMatchers() (ret []*logMatcher) {
 		newLogMatcher(
 			`^([0-9]+) client\(s\) online$`,
 			func(matches []string) interface{} { return logEventNrClientsOnline{intOrPanic(matches[1])} }),
+		newLogMatcher(
+			`^Track ([a-zA-Z0-9_]+) was set and updated$`,
+			func(matches []string) interface{} { return logEventTrack{matches[1]} }),
 	}
 }
 

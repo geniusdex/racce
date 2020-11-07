@@ -403,3 +403,12 @@ section h5:after {
 .mdl-mini-footer--link-list a {
     text-decoration: underline;
 }
+
+.live_socket_disconnected {
+    color: #b0b0b0;
+}
+
+.live_socket_disconnected:after {
+    margin-left: 16px;
+    content: "(live state unavailable)";
+}

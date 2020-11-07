@@ -1,6 +1,10 @@
 package accserver
 
-import "log"
+import (
+	"log"
+
+	"github.com/geniusdex/racce/accdata"
+)
 
 // ServerState represents the current state of the server instance
 type ServerState string
@@ -21,6 +25,7 @@ const (
 type LiveStateEvents struct {
 	ServerState chan ServerState
 	NrClients   chan int
+	Track       chan *accdata.Track
 }
 
 // Flush reads all remaining events on all channels until they are closed.
@@ -39,6 +44,9 @@ type LiveState struct {
 	// NrClients is the number of clients currently connected to the server
 	NrClients int
 
+	// Track is the current track on the server; will never be nil
+	Track *accdata.Track
+
 	// eventListeners contains all active event listeners
 	eventListeners []*LiveStateEvents
 
@@ -50,6 +58,7 @@ func newLiveState() *LiveState {
 	return &LiveState{
 		ServerState: ServerStateOffline,
 		NrClients:   0,
+		Track:       accdata.Tracks[0],
 	}
 }
 
@@ -58,6 +67,7 @@ func (ls *LiveState) NewEventChannels() *LiveStateEvents {
 	events := &LiveStateEvents{
 		ServerState: make(chan ServerState),
 		NrClients:   make(chan int),
+		Track:       make(chan *accdata.Track),
 	}
 
 	ls.eventListeners = append(ls.eventListeners, events)
@@ -85,6 +95,13 @@ func (ls *LiveState) setNrClients(value int) {
 	ls.NrClients = value
 	for _, listener := range ls.eventListeners {
 		listener.NrClients <- value
+	}
+}
+
+func (ls *LiveState) setTrack(track *accdata.Track) {
+	ls.Track = track
+	for _, listener := range ls.eventListeners {
+		listener.Track <- track
 	}
 }
 
@@ -139,6 +156,8 @@ func (ls *LiveState) handleLogEvent(event interface{}) {
 		ls.handleLobbyConnectionFailed(e)
 	} else if e, ok := event.(logEventNrClientsOnline); ok {
 		ls.handleNrClientsOnline(e)
+	} else if e, ok := event.(logEventTrack); ok {
+		ls.handleTrack(e)
 	}
 }
 
@@ -156,4 +175,11 @@ func (ls *LiveState) handleLobbyConnectionFailed(event logEventLobbyConnectionFa
 
 func (ls *LiveState) handleNrClientsOnline(event logEventNrClientsOnline) {
 	ls.setNrClients(event.NrClients)
+}
+
+func (ls *LiveState) handleTrack(event logEventTrack) {
+	track := accdata.TrackByLabel(event.Track)
+	if track != nil {
+		ls.setTrack(track)
+	}
 }

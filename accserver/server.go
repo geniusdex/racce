@@ -225,8 +225,18 @@ func (s *Server) IsStopping() bool {
 // SaveConfiguration saves the current in-memory configuration to disk
 func (s *Server) SaveConfiguration() error {
 	cfgDir := s.Config.installationDir() + "/cfg/"
+
+	if err := writeCfgFile(cfgDir+"configuration.json", s.Cfg.Configuration); err != nil {
+		return fmt.Errorf("Cannot write cfg/configuration.json: %w", err)
+	}
+
+	if err := writeCfgFile(cfgDir+"settings.json", s.Cfg.Settings); err != nil {
+		return fmt.Errorf("Cannot write cfg/settings.json: %w", err)
+	}
+
 	if err := writeCfgFile(cfgDir+"event.json", s.Cfg.Event); err != nil {
 		return fmt.Errorf("Cannot write cfg/event.json: %w", err)
 	}
+
 	return nil
 }

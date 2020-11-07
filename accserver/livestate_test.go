@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/geniusdex/racce/accdata"
+
 	"net/http"
 	_ "net/http/pprof"
 
@@ -120,4 +122,13 @@ func TestLiveState_NrClients(t *testing.T) {
 	f.logEvents <- logEventNrClientsOnline{0}
 	assert.Equal(t, 0, <-f.events.NrClients)
 	assert.Equal(t, 0, f.state.NrClients)
+}
+
+//--- Track ---//
+func TestLiveState_Track(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventTrack{"brands_hatch"}
+	assert.Equal(t, accdata.TrackByLabel("brands_hatch"), <-f.events.Track)
+	assert.Equal(t, accdata.TrackByLabel("brands_hatch"), f.state.Track)
 }
