@@ -1,42 +1,42 @@
 {{template "header.inc.html" (print "Event at " (track .TrackName).Name)}}
 
 <div class="mdl-grid">
-<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
-  <div class="mdl-card__title mdl-card--table__header">
-    <h2 class="mdl-card__title-text mdl-typography--title">Sessions</h2>
-  </div>
-  <div class="mdl-card__table">
-    <table class="mdl-data-table mdl-js-data-table">
-      <thead>
-        <tr>
-          <th class="mdl-data-table__cell--non-numeric">Name</th>
-          <th class="mdl-data-table__cell--non-numeric">Date / Time</th>
-          <th class="mdl-data-table__cell--non-numeric">Session Type</th>
-        </tr>
-      </thead>
-      <tbody>
+    <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
+        <div class="mdl-card__title mdl-card--table__header">
+            <h2 class="mdl-card__title-text mdl-typography--title">Sessions</h2>
+        </div>
+        <div class="mdl-card__table">
+            <table class="mdl-data-table mdl-js-data-table">
+                <thead>
+                    <tr>
+                        <th class="mdl-data-table__cell--non-numeric">Name</th>
+                        <th class="mdl-data-table__cell--non-numeric">Date / Time</th>
+                        <th class="mdl-data-table__cell--non-numeric">Session Type</th>
+                    </tr>
+                </thead>
+                <tbody>
 {{range .Sessions}}
-        <tr data-href="{{basePath}}/session/{{.SessionName}}">
-          <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/session/{{.SessionName}}">{{.SessionName}}</a></td>
-          <td class="mdl-data-table__cell--non-numeric">{{.EndTime.Format "2006-01-02 15:04:05"}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{.SessionTypeString}}</td>
-        </tr>
+                    <tr data-href="{{basePath}}/session/{{.SessionName}}">
+                        <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/session/{{.SessionName}}">{{.SessionName}}</a></td>
+                        <td class="mdl-data-table__cell--non-numeric">{{.EndTime.Format "2006-01-02 15:04:05"}}</td>
+                        <td class="mdl-data-table__cell--non-numeric">{{.SessionTypeString}}</td>
+                    </tr>
 {{end}}
-      </tbody>
-    </table>
-  </div>
-</div>
-<div class="mdl-cell mdl-cell--6-col"></div>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mdl-cell mdl-cell--6-col"></div>
 
 {{range $session := .Sessions}}
 <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
-  <div class="mdl-card__title mdl-card--table__header">
-    <h2 class="mdl-card__title-text mdl-typography--title">{{.SessionTypeString}}</h2>
-  </div>
-  <div class="mdl-card__table">
-    {{template "sessionleaderboard.inc.html" .}}
-  </div>
-</div>
+        <div class="mdl-card__title mdl-card--table__header">
+            <h2 class="mdl-card__title-text mdl-typography--title">{{.SessionTypeString}}</h2>
+        </div>
+        <div class="mdl-card__table">
+            {{template "sessionleaderboard.inc.html" .}}
+        </div>
+    </div>
 {{end}}
 
 </div>

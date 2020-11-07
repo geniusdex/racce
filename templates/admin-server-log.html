@@ -89,7 +89,6 @@ webSocket.addEventListener('error', function(event)
 
 webSocket.addEventListener('close', function(event)
 {
-    console.log(event);
     addLogMessage("error", new Date(), "Log closed: " + event.reason)
 });
 

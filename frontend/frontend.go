@@ -151,6 +151,7 @@ func Run(config *Configuration, database *accresults.Database, server *accserver
 	http.HandleFunc("/sessioncar/", f.sessionCarHandler)
 	if config.Live {
 		http.HandleFunc("/live/", f.liveHandler)
+		http.HandleFunc("/live/ws", f.liveWebSocketHandler)
 	}
 
 	admin := newAdmin(config, server, f)

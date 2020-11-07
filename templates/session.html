@@ -3,23 +3,23 @@
 
 <div class="mdl-grid">
 
-<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
-  <div class="mdl-card__title mdl-card--table__header">
-    <h2 class="mdl-card__title-text mdl-typography--title">Leader Board</h2>
+  <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+    <div class="mdl-card__title mdl-card--table__header">
+      <h2 class="mdl-card__title-text mdl-typography--title">Leader Board</h2>
+    </div>
+    <div class="mdl-card__table">
+      {{template "sessionleaderboard.inc.html" .}}
+    </div>
   </div>
-  <div class="mdl-card__table">
-    {{template "sessionleaderboard.inc.html" .}}
-  </div>
-</div>
 
-<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
-  <div class="mdl-card__title mdl-card--table__header">
-    <h2 class="mdl-card__title-text mdl-typography--title">Car positions per lap</h2>
+  <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+    <div class="mdl-card__title mdl-card--table__header">
+      <h2 class="mdl-card__title-text mdl-typography--title">Car positions per lap</h2>
+    </div>
+    <div class="mdl-card__supporting-text laptimes_chart_container">
+      <canvas id="carPositionsPerLapChart" width="400" height="{{add 50 (mul 10 (len .SessionResult.CarPositionsPerLap))}}"></canvas>
+    </div>
   </div>
-  <div class="mdl-card__supporting-text laptimes_chart_container">
-    <canvas id="carPositionsPerLapChart" width="400" height="{{add 50 (mul 10 (len .SessionResult.CarPositionsPerLap))}}"></canvas>
-  </div>
-</div>
 
 <script>
 function generate(base) {
@@ -94,40 +94,40 @@ var myChart = new Chart(ctx, {
 });
 </script>
 
-<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
-  <div class="mdl-card__title mdl-card--table__header">
-    <h2 class="mdl-card__title-text mdl-typography--title">Penalties</h2>
-  </div>
-  <div class="mdl-card__table">
-    <table class="mdl-data-table mdl-js-data-table">
-      <thead>
-        <tr>
-          <th>Car</th>
-          <th class="mdl-data-table__cell--non-numeric">Driver</th>
-          <th class="mdl-data-table__cell--non-numeric">Violation</th>
-          <th>In lap</th>
-          <th class="mdl-data-table__cell--non-numeric">Penalty</th>
-          <th>Cleared in lap</th>
-        </tr>
-      </thead>
-      <tbody>
+  <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
+    <div class="mdl-card__title mdl-card--table__header">
+      <h2 class="mdl-card__title-text mdl-typography--title">Penalties</h2>
+    </div>
+    <div class="mdl-card__table">
+      <table class="mdl-data-table mdl-js-data-table">
+        <thead>
+          <tr>
+            <th>Car</th>
+            <th class="mdl-data-table__cell--non-numeric">Driver</th>
+            <th class="mdl-data-table__cell--non-numeric">Violation</th>
+            <th>In lap</th>
+            <th class="mdl-data-table__cell--non-numeric">Penalty</th>
+            <th>Cleared in lap</th>
+          </tr>
+        </thead>
+        <tbody>
 {{range .Penalties}}
     {{$car := $session.FindCarById .CarId}}
     {{$driver := index $car.Drivers .DriverIndex}}
-        <tr>
-          <td>{{$car.RaceNumber}}</td>
-          <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/player/{{$driver.PlayerId}}">{{$driver.FirstName}} {{$driver.LastName}}</a></td>
-          <td class="mdl-data-table__cell--non-numeric">{{.Reason}}</td>
-          <td>{{.ViolationInLap}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{.Penalty}}</td>
-          <td>{{.ClearedInLap}}</td>
-        </tr>
+          <tr>
+            <td>{{$car.RaceNumber}}</td>
+            <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/player/{{$driver.PlayerId}}">{{$driver.FirstName}} {{$driver.LastName}}</a></td>
+            <td class="mdl-data-table__cell--non-numeric">{{.Reason}}</td>
+            <td>{{.ViolationInLap}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{.Penalty}}</td>
+            <td>{{.ClearedInLap}}</td>
+          </tr>
 {{end}}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
-<div class="mdl-cell mdl-cell--6-col"></div>
+  <div class="mdl-cell mdl-cell--6-col"></div>
 
 </div>
 
