@@ -28,6 +28,7 @@ func newAdmin(config *Configuration, accServer *accserver.Server, frontend *fron
 	}
 
 	admin.serveMux.HandleFunc("/admin", admin.indexHandler)
+	admin.serveMux.HandleFunc("/admin/", admin.indexHandler)
 	admin.serveMux.HandleFunc("/admin/server", admin.serverHandler)
 	admin.serveMux.HandleFunc("/admin/server/start", admin.serverStartHandler)
 	admin.serveMux.HandleFunc("/admin/server/stop", admin.serverStopHandler)
