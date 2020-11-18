@@ -60,6 +60,18 @@ var (
 		&Track{"mount_panorama_2019", "Mount Panorama", Competition{IntercontinentalGTChallenge, 2019}, 36, 50},
 		&Track{"suzuka_2019", "Suzuka", Competition{IntercontinentalGTChallenge, 2019}, 51, 105},
 		&Track{"laguna_seca_2019", "Laguna Seca", Competition{IntercontinentalGTChallenge, 2019}, 30, 50},
+		&Track{"monza_2020", "Monza", Competition{GTWorldChallenge, 2020}, 29, 60},
+		&Track{"zolder_2020", "Zolder", Competition{GTWorldChallenge, 2020}, 34, 50},
+		&Track{"brands_hatch_2020", "Brands Hatch", Competition{GTWorldChallenge, 2020}, 32, 50},
+		&Track{"silverstone_2020", "Silverstone", Competition{GTWorldChallenge, 2020}, 36, 50},
+		&Track{"paul_ricard_2020", "Paul Ricard", Competition{GTWorldChallenge, 2020}, 33, 60},
+		&Track{"misano_2020", "Misano", Competition{GTWorldChallenge, 2020}, 30, 50},
+		&Track{"spa_2020", "Spa", Competition{GTWorldChallenge, 2020}, 82, 82},
+		&Track{"nurburgring_2020", "Nurburgring", Competition{GTWorldChallenge, 2020}, 30, 50},
+		&Track{"barcelona_2020", "Barcelona", Competition{GTWorldChallenge, 2020}, 29, 50},
+		&Track{"hungaroring_2020", "Hungaroring", Competition{GTWorldChallenge, 2020}, 27, 50},
+		&Track{"zandvoort_2020", "Zandvoort", Competition{GTWorldChallenge, 2020}, 25, 50},
+		&Track{"imola_2020", "Imola", Competition{GTWorldChallenge, 2020}, 30, 50},
 	}
 
 	// tracksByLabel is a cache for TrackByLabel
