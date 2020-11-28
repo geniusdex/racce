@@ -189,7 +189,7 @@ func (s *Server) Start() error {
 		return fmt.Errorf("server is already running")
 	}
 
-	instance, err := newInstance(s.Config.executable())
+	instance, err := newInstance(s.Config.executable(), s.Config.exeWrapper())
 	if err != nil {
 		return err
 	}

@@ -24,10 +24,10 @@ type Instance struct {
 	log       *serverLog
 }
 
-func makeCmd(accServer string) *exec.Cmd {
+func makeCmd(accServer string, exeWrapper string) *exec.Cmd {
 	cmd := exec.Command(accServer)
-	if wine, err := exec.LookPath("wine"); err == nil {
-		cmd = exec.Command(wine, accServer)
+	if exeWrapper != "" {
+		cmd = exec.Command(exeWrapper, accServer)
 	}
 	cmd.Dir = filepath.Dir(accServer)
 	return cmd
@@ -38,8 +38,8 @@ func cmdString(cmd *exec.Cmd) string {
 	return "'" + strings.Join(cmd.Args, "' '") + "'"
 }
 
-func newInstance(executable string) (*Instance, error) {
-	cmd := makeCmd(executable)
+func newInstance(executable string, exeWrapper string) (*Instance, error) {
+	cmd := makeCmd(executable, exeWrapper)
 	serverLog, err := newServerLog(cmd)
 	if err != nil {
 		return nil, err

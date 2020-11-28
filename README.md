@@ -44,6 +44,7 @@ The accServer that is being used can be used for the results only, or it can als
 | installationDir | no*      | The path to the acc server directory where the accServer is installed. The path must contain forwarded slashes, even on Windows. If the `installationDir` is present and contains a valid accServer, the server can be managed via the admin pages. |
 | resultsDir      | no*      | The path where the JSON results files are stored by the accServer. This defaults to the `results/` subdirectory of the `installationDir` if not given. |
 | newResultsDelay | yes      | Number of seconds to wait after a new results file was written before it is read. This should not be 0 to avoid reading files which are still being written. The default of 5 should be fine in nearly all circumstances. |
+| exeWrapper      | no       | If present and the accServer is managed, launching accServer will be done via this executable. It will be called with the path to `accServer.exe` as the first argument. It defaults to wine on systems where wine is installed (e.g. Linux). If no wrapper is available, accServer will be launched directly. |
 
 (*) At least one of `installationDir` or `resultsDir` must be specified.
 

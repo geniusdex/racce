@@ -16,7 +16,8 @@
 function webSocketEndpoint()
 {
     var protocol = ((window.location.protocol === "https:") ? "wss:" : "ws:");
-    return protocol + "//" + window.location.host + window.location.pathname + "/ws";
+    var wsslash = (window.location.pathname.substr(-1) == "/") ? "" : "/";
+    return protocol + "//" + window.location.host + window.location.pathname + wsslash + "ws";
 }
 
 var logElement = document.getElementById("server_log");

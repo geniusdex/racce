@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"os/exec"
+	"strings"
 	"sync"
 	"time"
 )
@@ -76,7 +77,7 @@ func (sl *serverLog) Wait() {
 // monitor watches the server log for new messages and handles them
 func (sl *serverLog) monitor() {
 	for sl.scanner.Scan() {
-		sl.handleLine(sl.scanner.Text())
+		sl.handleLine(strings.TrimSpace(sl.scanner.Text()))
 	}
 	if err := sl.scanner.Err(); err != nil {
 		log.Printf("Error while reading server console: %v", err)
