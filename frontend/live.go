@@ -66,6 +66,18 @@ func (f *frontend) sendLiveStateUpdates(ws *writeOnlyWebSocket) {
 				return
 			}
 			writeMessageToWebSocket(ws, "track", track)
+
+		case carState, ok := <-events.CarState:
+			if !ok {
+				return
+			}
+			writeMessageToWebSocket(ws, "carState", carState)
+
+		case carID, ok := <-events.CarPurged:
+			if !ok {
+				return
+			}
+			writeMessageToWebSocket(ws, "carPurged", carID)
 		}
 	}
 }

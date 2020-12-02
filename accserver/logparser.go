@@ -6,22 +6,57 @@ import (
 	"strconv"
 )
 
+// logEventServerStarting is the first event on server startup
 type logEventServerStarting struct {
 	Version int
 }
 
+// logEventLobbyConnectionFailed indicates the connection to the lobby server failed
 type logEventLobbyConnectionFailed struct {
 }
 
+// logEventLobbyConnectionSucceeded indicates the connection to the lobby server succeeded
 type logEventLobbyConnectionSucceeded struct {
 }
 
+// logEventNrClientsOnline contains updates to the number of online clients (drivers + spectators)
 type logEventNrClientsOnline struct {
 	NrClients int
 }
 
+// logEventTrack indicates which track is currently being used
 type logEventTrack struct {
 	Track string
+}
+
+// logEventNewConnectionRequest is sent whenever a new driver connection is made
+type logEventNewConnectionRequest struct {
+	ConnectionID int
+	PlayerName   string
+	SteamID      string
+	CarModelID   int
+}
+
+// logEventNewCarConnection indicates the car for a new connection
+type logEventNewCarConnection struct {
+	CarID      int
+	CarModelID int
+	RaceNumber int
+}
+
+// logEventDeadConnection is sent when a connection with a client is dead
+type logEventDeadConnection struct {
+	ConnectionID int
+}
+
+// logEventCarRemoved is sent when there are no more drivers connected for a car (it is no longer physically present)
+type logEventCarRemoved struct {
+	CarID int
+}
+
+// logEventCarPurged is sent when a car ID is being retired, i.e. when resetting the race weekend and no driver is connected for the car
+type logEventCarPurged struct {
+	CarID int
 }
 
 type logMatcher struct {
@@ -68,6 +103,25 @@ func makeLogMatchers() (ret []*logMatcher) {
 		newLogMatcher(
 			`^Track ([a-zA-Z0-9_]+) was set and updated$`,
 			func(matches []string) interface{} { return logEventTrack{matches[1]} }),
+		newLogMatcher(
+			`^New connection request: id (\d+) (.+) (S\d+) on car model (\d+)$`,
+			func(matches []string) interface{} {
+				return logEventNewConnectionRequest{intOrPanic(matches[1]), matches[2], matches[3], intOrPanic(matches[4])}
+			}),
+		newLogMatcher(
+			`^Creating new car connection: carId (\d+), carModel (\d+), raceNumber #(\d+)$`,
+			func(matches []string) interface{} {
+				return logEventNewCarConnection{intOrPanic(matches[1]), intOrPanic(matches[2]), intOrPanic(matches[3])}
+			}),
+		newLogMatcher(
+			`Removing dead connection (\d+)`,
+			func(matches []string) interface{} { return logEventDeadConnection{intOrPanic(matches[1])} }),
+		newLogMatcher(
+			`^car (\d+) has no driving connection anymore, will remove it$`,
+			func(matches []string) interface{} { return logEventCarRemoved{intOrPanic(matches[1])} }),
+		newLogMatcher(
+			`^Purging car_id (\d+)$`,
+			func(matches []string) interface{} { return logEventCarPurged{intOrPanic(matches[1])} }),
 	}
 }
 

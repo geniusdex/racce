@@ -412,3 +412,7 @@ section h5:after {
     margin-left: 16px;
     content: "(live state unavailable)";
 }
+
+.live_leaderboard .car_without_current_drivers td {
+    color: #b0b0b0;
+}

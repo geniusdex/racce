@@ -38,8 +38,13 @@ func newTestLiveStateFixture(t *testing.T) *testLiveStateFixture {
 	}
 
 	f.state.newInstance(f.logEvents)
+	// Eat initial events always sent out
 	<-f.events.ServerState
 	<-f.events.NrClients
+
+	// Do some lookups to avoid cache building during first use
+	accdata.TrackByLabel("zandvoort")
+	accdata.CarModelByID(58)
 
 	return f
 }
@@ -131,4 +136,56 @@ func TestLiveState_Track(t *testing.T) {
 	f.logEvents <- logEventTrack{"brands_hatch"}
 	assert.Equal(t, accdata.TrackByLabel("brands_hatch"), <-f.events.Track)
 	assert.Equal(t, accdata.TrackByLabel("brands_hatch"), f.state.Track)
+}
+
+//--- Car Updates ---//
+func TestLiveState_NewCar(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventNewConnectionRequest{5, "Driver One", "S76543210987654321", 1}
+	f.logEvents <- logEventNewCarConnection{1001, 1, 404}
+	driver := &Driver{
+		ConnectionID: 5,
+		Name:         "Driver One",
+		PlayerID:     "S76543210987654321",
+	}
+	carState := &CarState{
+		CarID:         1001,
+		RaceNumber:    404,
+		CarModel:      accdata.CarModelByID(1),
+		Drivers:       []*Driver{driver},
+		CurrentDriver: driver,
+		Position:      1,
+	}
+	assert.Equal(t, carState, <-f.events.CarState)
+	assert.Equal(t, carState, f.state.CarState[1001])
+
+	carState.Drivers = []*Driver{}
+	f.logEvents <- logEventDeadConnection{5}
+	assert.Equal(t, carState, <-f.events.CarState)
+	assert.Equal(t, carState, f.state.CarState[1001])
+}
+
+func TestLiveState_CarPurged(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventNewConnectionRequest{6, "Driver One", "S76543210987654321", 5}
+	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
+	assert.NotNil(t, <-f.events.CarState)
+	assert.NotNil(t, f.state.CarState[1002])
+	assert.Equal(t, 1, f.state.CarState[1002].Position)
+
+	f.logEvents <- logEventNewConnectionRequest{7, "Driver Two", "S5", 6}
+	f.logEvents <- logEventNewCarConnection{1004, 6, 37}
+	assert.NotNil(t, <-f.events.CarState)
+	assert.NotNil(t, f.state.CarState[1004])
+	assert.Equal(t, 2, f.state.CarState[1004].Position)
+
+	f.logEvents <- logEventCarPurged{1002}
+	assert.Equal(t, 1002, <-f.events.CarPurged)
+	assert.Nil(t, f.state.CarState[1002])
+	carState := <-f.events.CarState
+	assert.Equal(t, 1004, carState.CarID)
+	assert.Equal(t, 1, carState.Position)
+	assert.Equal(t, carState, f.state.CarState[1004])
 }

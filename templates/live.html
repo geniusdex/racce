@@ -37,6 +37,23 @@
             </ul>
         </div>
     </div>
+    <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--top" data-serverisrunning="true">
+        <div class="mdl-card__title mdl-card--table__header">
+            <h2 class="mdl-card__title-text mdl-typography--title">Leaderboard</h2>
+        </div>
+        <table class="mdl-data-table mdl-js-data-table sessionleaderboard live_leaderboard" id="live_leaderboard">
+            <thead>
+                <tr>
+                    <th>Pos</th>
+                    <th colspan="2">Car</th>
+                    <th class="mdl-data-table__cell--non-numeric">Driver</th>
+                    <th>Interval</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -92,12 +109,81 @@ function setTrack(track)
     document.getElementById('live_track').innerText = `${track.Name} (${track.Competition.Year})`;
 }
 
+var g_leaderboardTable = document.getElementById("live_leaderboard");
+var g_leaderboardCarRows = {};
+
+function getTableEntryForCarID(carID, position)
+{
+    if (g_leaderboardCarRows[carID] === undefined)
+    {
+        var row = g_leaderboardTable.insertRow(position);
+        entry = {
+            row: row,
+            cellPosition: row.insertCell(0),
+            cellCarLogo: row.insertCell(1),
+            cellRaceNumber: row.insertCell(2),
+            cellDriver: row.insertCell(3),
+            cellInterval: row.insertCell(4),
+        };
+        entry.cellCarLogo.classList.add('carlogo');
+        entry.cellRaceNumber.classList.add('racenumber');
+        entry.cellDriver.classList.add('mdl-data-table__cell--non-numeric');
+        g_leaderboardCarRows[carID] = entry
+    }
+    else
+    {
+        var row = g_leaderboardCarRows[carID].row;
+        var tbody = row.parentNode;
+        g_leaderboardTable.deleteRow(row.rowIndex);
+        rowAfter = g_leaderboardTable.rows[position + 1];
+        tbody.insertBefore(row, rowAfter === undefined ? null : rowAfter);
+    }
+    return g_leaderboardCarRows[carID];
+}
+
+function setCarState(carState)
+{
+    var entry = getTableEntryForCarID(carState.CarID, carState.Position);
+
+    if (carState.Drivers.length == 0)
+        entry.row.classList.add('car_without_current_drivers');
+    else
+        entry.row.classList.remove('car_without_current_drivers');
+
+    entry.cellPosition.innerText = `${carState.Position}.`;
+
+    while (entry.cellCarLogo.firstChild)
+        entry.cellCarLogo.removeChild(entry.cellCarLogo.lastChild);
+    var carLogo = document.createElement('img');
+    carLogo.src = {{basePath}} + `/static/carlogo/${carState.CarModel.ManufacturerLabel}.png`;
+    carLogo.title = `${carState.CarModel.Manufacturer} ${carState.CarModel.Model}`;
+    entry.cellCarLogo.appendChild(carLogo);
+    
+    entry.cellRaceNumber.innerText = `${carState.RaceNumber}`;
+    
+    entry.cellDriver.innerText = `${carState.CurrentDriver.Name}`;
+    
+    entry.cellInterval.innerText = '-';
+    // console.log(carState);
+}
+
+function purgeCar(carID)
+{
+    if (g_leaderboardCarRows[carID] !== undefined)
+    {
+        g_leaderboardTable.deleteRow(g_leaderboardCarRows[carID].row.rowIndex);
+        delete g_leaderboardCarRows[carID];
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function()
 {
     setServerState('{{$state.ServerState}}');
     setNrClients({{$state.NrClients}});
     setTrack({{$state.Track}});
+    {{range (sortOn $state.CarState ".Position")}}
+        setCarState({{.}});
+    {{end}}
 }, false);
 
 function webSocketEndpoint()
@@ -107,14 +193,14 @@ function webSocketEndpoint()
     return protocol + "//" + window.location.host + window.location.pathname + wsslash + "ws";
 }
 
-var webSocket = new WebSocket(webSocketEndpoint());
+var g_webSocket = new WebSocket(webSocketEndpoint());
 
-webSocket.addEventListener('error', function(event)
+g_webSocket.addEventListener('error', function(event)
 {
     console.log(event);
 });
 
-webSocket.addEventListener('close', function(event)
+g_webSocket.addEventListener('close', function(event)
 {
     console.log(event);
     document.getElementById("live_title").classList.add("live_socket_disconnected");
@@ -122,7 +208,7 @@ webSocket.addEventListener('close', function(event)
 
 var messageHandlers = {};
 
-webSocket.addEventListener('message', function(event)
+g_webSocket.addEventListener('message', function(event)
 {
     var messages = event.data.split('\n');
     for (var i = 0; i < messages.length; i++)
@@ -150,6 +236,8 @@ function newHandler(type, handler)
 newHandler('serverState', setServerState);
 newHandler('nrClients', setNrClients);
 newHandler('track', setTrack);
+newHandler('carState', setCarState);
+newHandler('carPurged', purgeCar);
 </script>
 
 
