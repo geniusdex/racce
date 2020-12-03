@@ -31,6 +31,8 @@ type serverLog struct {
 	isDone bool
 	// doneChannel is closed whenever the stdout pipe of the process is closed
 	doneChannel chan bool
+	// prefiltering is true if log messages have to be filtered before being stored
+	prefiltering bool
 }
 
 const (
@@ -38,7 +40,7 @@ const (
 )
 
 // newServerLog constructs a new serverLog object for a not-yet running process
-func newServerLog(cmd *exec.Cmd) (*serverLog, error) {
+func newServerLog(cmd *exec.Cmd, prefiltering bool) (*serverLog, error) {
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
@@ -53,6 +55,7 @@ func newServerLog(cmd *exec.Cmd) (*serverLog, error) {
 		history:               make([]LogMessage, 0, initialHistoryCapacity),
 		isDone:                false,
 		doneChannel:           make(chan bool),
+		prefiltering:          prefiltering,
 	}
 
 	go sl.monitor()
@@ -90,6 +93,10 @@ func (sl *serverLog) monitor() {
 
 // handleLine handles a new log line coming in
 func (sl *serverLog) handleLine(line string) {
+	if sl.prefiltering && strings.HasPrefix(line, "Server was running late") {
+		return
+	}
+
 	msg := LogMessage{line, time.Now()}
 
 	sl.mutex.Lock()

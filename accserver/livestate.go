@@ -32,6 +32,7 @@ type CarState struct {
 	Drivers       []*Driver
 	CurrentDriver *Driver
 	Position      int
+	BestLapMS     int
 }
 
 func newCarState() *CarState {
@@ -261,6 +262,8 @@ func (ls *LiveState) handleLogEvent(event interface{}) {
 		ls.handleDeadConnection(e)
 	} else if e, ok := event.(logEventCarPurged); ok {
 		ls.handleCarPurged(e)
+	} else if e, ok := event.(logEventNewLapTime); ok {
+		ls.handleNewLapTime(e)
 	}
 }
 
@@ -340,4 +343,14 @@ func (ls *LiveState) handleDeadConnection(event logEventDeadConnection) {
 func (ls *LiveState) handleCarPurged(event logEventCarPurged) {
 	ls.purgeCar(event.CarID)
 	ls.recalculatePositions()
+}
+
+func (ls *LiveState) handleNewLapTime(event logEventNewLapTime) {
+	if carState := ls.CarState[event.CarID]; carState != nil {
+		if event.Flags == 0 && (carState.BestLapMS <= 0 || event.LapTimeMS < carState.BestLapMS) {
+			carState.BestLapMS = event.LapTimeMS
+			ls.setCarState(carState)
+			ls.recalculatePositions()
+		}
+	}
 }

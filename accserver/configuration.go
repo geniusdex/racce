@@ -11,6 +11,7 @@ type Configuration struct {
 	ResultsDir      string `json:"resultsDir"`
 	NewResultsDelay int    `json:"newResultsDelay"`
 	ExeWrapper      string `json:"exeWrapper"`
+	LogPrefiltering bool   `json:"logPrefiltering"`
 }
 
 // installationDir returns the InstallationDir with a single slash at the end

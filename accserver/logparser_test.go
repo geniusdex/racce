@@ -163,3 +163,17 @@ func TestLogParser_Event_CarPurged(t *testing.T) {
 	f.SendMessage(`Purging car_id 1029`)
 	assert.Equal(t, logEventCarPurged{1029}, f.ReadEvent())
 }
+
+func TestLogParser_Event_NewLapTime(t *testing.T) {
+	f := newTestLogParserFixture(t)
+	defer f.Close()
+
+	f.SendMessage(`New laptime: 142474 for carId 1002 with lapstates: HasCut, IsOutLap, IsInLap,  (raw 13)`)
+	assert.Equal(t, logEventNewLapTime{1002, 142474, 13}, f.ReadEvent())
+
+	f.SendMessage(`New laptime: 107466 for carId 1004 with lapstates: HasCut,  (raw 1)`)
+	assert.Equal(t, logEventNewLapTime{1004, 107466, 1}, f.ReadEvent())
+
+	f.SendMessage(`New laptime: 107142 for carId 1005 with lapstates:  (raw 0)`)
+	assert.Equal(t, logEventNewLapTime{1005, 107142, 0}, f.ReadEvent())
+}

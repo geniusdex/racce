@@ -38,9 +38,9 @@ func cmdString(cmd *exec.Cmd) string {
 	return "'" + strings.Join(cmd.Args, "' '") + "'"
 }
 
-func newInstance(executable string, exeWrapper string) (*Instance, error) {
-	cmd := makeCmd(executable, exeWrapper)
-	serverLog, err := newServerLog(cmd)
+func newInstance(config *Configuration) (*Instance, error) {
+	cmd := makeCmd(config.executable(), config.exeWrapper())
+	serverLog, err := newServerLog(cmd, config.LogPrefiltering)
 	if err != nil {
 		return nil, err
 	}

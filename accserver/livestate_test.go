@@ -189,3 +189,28 @@ func TestLiveState_CarPurged(t *testing.T) {
 	assert.Equal(t, 1, carState.Position)
 	assert.Equal(t, carState, f.state.CarState[1004])
 }
+
+//--- Lap times ---//
+func TestLiveState_NewLapTime(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventNewConnectionRequest{6, "Driver One", "S76543210987654321", 5}
+	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
+	assert.NotNil(t, <-f.events.CarState)
+
+	f.logEvents <- logEventNewLapTime{1002, 123456, 0}
+	carState := <-f.events.CarState
+	assert.Equal(t, 123456, carState.BestLapMS)
+	assert.Equal(t, carState, f.state.CarState[1002])
+
+	f.logEvents <- logEventNewLapTime{1002, 123457, 0}
+	f.logEvents <- logEventNewLapTime{1002, 123000, 1}
+	f.logEvents <- logEventNewLapTime{1002, 123000, 4}
+	f.logEvents <- logEventNewLapTime{1002, 123000, 8}
+	f.logEvents <- logEventNewLapTime{1002, 123000, 13}
+
+	f.logEvents <- logEventNewLapTime{1002, 123400, 0}
+	carState = <-f.events.CarState
+	assert.Equal(t, 123400, carState.BestLapMS)
+	assert.Equal(t, carState, f.state.CarState[1002])
+}

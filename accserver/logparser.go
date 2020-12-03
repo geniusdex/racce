@@ -59,6 +59,20 @@ type logEventCarPurged struct {
 	CarID int
 }
 
+// logEventNewLapTime indicates a lap was completed by a car
+type logEventNewLapTime struct {
+	CarID     int
+	LapTimeMS int
+	// Flags as binary bitfield with 1=HasCut, 4=IsOutLap, 8=IsInLap (flagLap* constants)
+	Flags int
+}
+
+const (
+	flagLapHasCut   = 1
+	flagLapIsOutLap = 4
+	flagLapIsInLap  = 8
+)
+
 type logMatcher struct {
 	matcher *regexp.Regexp
 	handler func([]string) interface{}
@@ -122,6 +136,11 @@ func makeLogMatchers() (ret []*logMatcher) {
 		newLogMatcher(
 			`^Purging car_id (\d+)$`,
 			func(matches []string) interface{} { return logEventCarPurged{intOrPanic(matches[1])} }),
+		newLogMatcher(
+			`^New laptime: (\d+) for carId (\d+) with lapstates: [a-zA-Z, ]* \(raw (\d+)\)$`,
+			func(matches []string) interface{} {
+				return logEventNewLapTime{intOrPanic(matches[2]), intOrPanic(matches[1]), intOrPanic(matches[3])}
+			}),
 	}
 }
 

@@ -50,7 +50,7 @@
                     <th>Interval</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="live_leaderboard_body">
             </tbody>
         </table>
     </div>
@@ -110,14 +110,16 @@ function setTrack(track)
 }
 
 var g_leaderboardTable = document.getElementById("live_leaderboard");
+var g_leaderboardTBody = document.getElementById("live_leaderboard_body");
 var g_leaderboardCarRows = {};
 
-function getTableEntryForCarID(carID, position)
+function getTableEntryForCarID(carID, carState)
 {
     if (g_leaderboardCarRows[carID] === undefined)
     {
-        var row = g_leaderboardTable.insertRow(position);
+        var row = g_leaderboardTable.insertRow(-1);
         entry = {
+            state: carState,
             row: row,
             cellPosition: row.insertCell(0),
             cellCarLogo: row.insertCell(1),
@@ -132,20 +134,51 @@ function getTableEntryForCarID(carID, position)
     }
     else
     {
-        var row = g_leaderboardCarRows[carID].row;
-        var tbody = row.parentNode;
-        g_leaderboardTable.deleteRow(row.rowIndex);
-        rowAfter = g_leaderboardTable.rows[position + 1];
-        tbody.insertBefore(row, rowAfter === undefined ? null : rowAfter);
+        g_leaderboardCarRows[carID].state = carState;
     }
     return g_leaderboardCarRows[carID];
 }
 
+function sortLeaderboardTable()
+{
+    Object.values(g_leaderboardCarRows)
+        .sort(function(a, b)
+        {
+            if (a.state.BestLapMS > 0)
+            {
+                if (b.state.BestLapMS > 0) // Both A and B have lap
+                    return a.state.BestLapMS - b.state.BestLapMS;
+                else // A has lap, B has no lap
+                    return -1;
+            }
+            else if (b.state.BestLapMS > 0) // A has no lap, B has lap
+                return 1
+            else // Neither A nor B has lap
+                return a.state.Position - b.state.Position;
+        })
+        .forEach(function(item, index)
+        {
+            item.cellPosition.innerText = (index + 1).toString() + '.';
+            g_leaderboardTBody.appendChild(item.row)
+        });
+}
+
+function formatLapTime(lapTime_ms)
+{
+    if (lapTime_ms <= 0)
+        return '-';
+    var ms = lapTime_ms % 1000;
+    var lapTime_s = (lapTime_ms - ms) / 1000;
+    var s = lapTime_s % 60;
+    var m = (lapTime_s - s) / 60;
+    return m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0') + '.' + ms.toString().padStart(3, '0');
+}
+
 function setCarState(carState)
 {
-    var entry = getTableEntryForCarID(carState.CarID, carState.Position);
+    var entry = getTableEntryForCarID(carState.CarID, carState);
 
-    if (carState.Drivers.length == 0)
+    if (carState.Drivers === null || carState.Drivers.length == 0)
         entry.row.classList.add('car_without_current_drivers');
     else
         entry.row.classList.remove('car_without_current_drivers');
@@ -161,10 +194,15 @@ function setCarState(carState)
     
     entry.cellRaceNumber.innerText = `${carState.RaceNumber}`;
     
-    entry.cellDriver.innerText = `${carState.CurrentDriver.Name}`;
+    if (carState.CurrentDriver !== null)
+        entry.cellDriver.innerText = `${carState.CurrentDriver.Name}`;
+    else
+        entry.cellDriver.innerText = '-';
     
-    entry.cellInterval.innerText = '-';
+    entry.cellInterval.innerText = formatLapTime(carState.BestLapMS);
     // console.log(carState);
+
+    sortLeaderboardTable();
 }
 
 function purgeCar(carID)
