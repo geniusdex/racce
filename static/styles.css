@@ -392,6 +392,36 @@ section h5:after {
     padding-right: 16px;
 }
 
+@keyframes server_log_open_marker_animation {
+    0% {opacity: 50%;}
+    25% {opacity: 100%;}
+    50%, 100% {opacity: 50%;}
+}
+
+.server_log_open_marker {
+    font-weight: bold;
+    font-size: 1.4em;
+    padding-left: 2px;
+}
+
+.server_log_open_marker span {
+    opacity: 50%;
+    animation-name: server_log_open_marker_animation;
+    animation-duration: 2s;
+    animation-direction: alternate;
+    animation-timing-function: ease;
+    animation-iteration-count: infinite;
+}
+.server_log_open_marker .marker1 {
+    animation-delay: 0s;
+}
+.server_log_open_marker .marker2 {
+    animation-delay: 0.2s;
+}
+.server_log_open_marker .marker3 {
+    animation-delay: 0.4s;
+}
+
 .mdl-switch {
     margin-bottom: 16px;
 }

@@ -23,7 +23,7 @@ func (a *admin) serverLogWebSocketHandler(w http.ResponseWriter, r *http.Request
 		log.Panicf("No running server instance")
 	}
 
-	ws, err := newWriteOnlyWebSocket(w, r)
+	ws, err := newWebSocketMessageMerger(w, r)
 	if err != nil {
 		log.Panicf("Failed to create websocket: %v", err)
 	}
@@ -31,7 +31,7 @@ func (a *admin) serverLogWebSocketHandler(w http.ResponseWriter, r *http.Request
 	go writeServerLogToWebSocket(serverInstance.NewLogChannel(), ws)
 }
 
-func writeLogMessageToWebSocket(msg accserver.LogMessage, ws *writeOnlyWebSocket) error {
+func writeLogMessageToWebSocket(msg accserver.LogMessage, ws webSocketWriter) error {
 	jsonMsg, err := json.Marshal(msg)
 	if err != nil {
 		return fmt.Errorf("cannot marshal message as JSON: %w", err)
@@ -40,7 +40,7 @@ func writeLogMessageToWebSocket(msg accserver.LogMessage, ws *writeOnlyWebSocket
 	return ws.WriteTextMessage(jsonMsg)
 }
 
-func writeServerLogToWebSocket(logChannel <-chan accserver.LogMessage, ws *writeOnlyWebSocket) {
+func writeServerLogToWebSocket(logChannel <-chan accserver.LogMessage, ws webSocketWriter) {
 	log.Printf("Sending server log on websocket connection %v", ws.Name())
 
 	for {

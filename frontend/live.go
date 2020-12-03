@@ -21,7 +21,7 @@ func (f *frontend) liveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (f *frontend) liveWebSocketHandler(w http.ResponseWriter, r *http.Request) {
-	ws, err := newWriteOnlyWebSocket(w, r)
+	ws, err := newWebSocketMessageMerger(w, r)
 	if err != nil {
 		log.Panicf("Failed to create websocket: %v", err)
 	}
@@ -29,7 +29,7 @@ func (f *frontend) liveWebSocketHandler(w http.ResponseWriter, r *http.Request) 
 	go f.sendLiveStateUpdates(ws)
 }
 
-func writeMessageToWebSocket(ws *writeOnlyWebSocket, msgType string, data interface{}) error {
+func writeMessageToWebSocket(ws webSocketWriter, msgType string, data interface{}) error {
 	jsonMsg, err := json.Marshal(map[string]interface{}{"type": msgType, "data": data})
 	if err != nil {
 		log.Printf("cannot marshal message as JSON: %v", err)
@@ -38,7 +38,7 @@ func writeMessageToWebSocket(ws *writeOnlyWebSocket, msgType string, data interf
 	return ws.WriteTextMessage(jsonMsg)
 }
 
-func (f *frontend) sendLiveStateUpdates(ws *writeOnlyWebSocket) {
+func (f *frontend) sendLiveStateUpdates(ws webSocketWriter) {
 	log.Printf("Sending live state updates on websocket connection %v", ws.Name())
 
 	events := f.server.LiveState.NewEventChannels()

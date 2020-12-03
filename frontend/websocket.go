@@ -21,7 +21,7 @@ const (
 	pingPeriod = 30 * time.Second
 
 	// Maximum message size allowed from peer.
-	maxMessageSize = 512
+	wsMaxMessageSize = 512
 )
 
 var (
@@ -30,6 +30,12 @@ var (
 		WriteBufferSize: 1024,
 	}
 )
+
+type webSocketWriter interface {
+	Name() string
+	WriteTextMessage(data []byte) error
+	Close()
+}
 
 type webSocketMessage struct {
 	messageType int
@@ -151,7 +157,7 @@ loop:
 
 // readMessages monitors the incoming channel so pong messages are handled properly
 func (ws *writeOnlyWebSocket) readMessages() {
-	ws.connection.SetReadLimit(maxMessageSize)
+	ws.connection.SetReadLimit(wsMaxMessageSize)
 	ws.connection.SetReadDeadline(time.Now().Add(pongWait))
 	ws.connection.SetPongHandler(func(string) error {
 		ws.connection.SetReadDeadline(time.Now().Add(pongWait))

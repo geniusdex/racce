@@ -8,6 +8,7 @@
         </div>
         <div class="mdl-card__supporting-text">
             <div id="server_log"></div>
+            <div id="server_log_open_marker" class="server_log_open_marker"><span class="marker1">.</span><span class="marker2">.</span><span class="marker3">.</span></div>
         </div>
     </div>
 </div>
@@ -71,14 +72,7 @@ function addLogMessage(type, timestamp, message)
     lineElement.appendChild(timeElement);
     lineElement.appendChild(messageElement);
 
-    var wasScrolledToBottom = isScrolledToBottom(scrollElement);
-
     logElement.appendChild(lineElement);
-
-    if (wasScrolledToBottom)
-    {
-        scrollToBottom(scrollElement);
-    }
 }
 
 var webSocket = new WebSocket(webSocketEndpoint());
@@ -91,18 +85,26 @@ webSocket.addEventListener('error', function(event)
 webSocket.addEventListener('close', function(event)
 {
     addLogMessage("error", new Date(), "Log closed: " + event.reason)
+    document.getElementById("server_log_open_marker").style.display = 'none';
 });
 
 webSocket.addEventListener('message', function(event)
 {
+    var wasScrolledToBottom = isScrolledToBottom(scrollElement);
+
     var messages = event.data.split('\n');
     for (var i = 0; i < messages.length; i++)
     {
         if (messages[i].length > 0)
         {
             var msg = JSON.parse(messages[i]);
-            addLogMessage("message", new Date(msg.Time), msg.Message)
+            addLogMessage("message", new Date(msg.Time), msg.Message);
         }
+    }
+
+    if (wasScrolledToBottom)
+    {
+        scrollToBottom(scrollElement);
     }
 });
 </script>
