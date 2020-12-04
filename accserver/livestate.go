@@ -45,6 +45,7 @@ type CarState struct {
 	Drivers       []*Driver
 	CurrentDriver *Driver
 	Position      int
+	NrLaps        int
 	BestLapMS     int
 }
 
@@ -200,6 +201,13 @@ func (ls *LiveState) purgeCar(carID int) {
 
 //--- Helper functions ---//
 
+func (ls *LiveState) serverOffline() {
+	ls.setServerState(ServerStateOffline)
+	for _, car := range ls.CarState {
+		ls.purgeCar(car.CarID)
+	}
+}
+
 func (ls *LiveState) lookupDriverForNewCarConnection(carEvent logEventNewCarConnection) *Driver {
 	for i, connEvent := range ls.connectionRequests {
 		if connEvent.CarModelID == carEvent.CarModelID {
@@ -253,6 +261,7 @@ func (ls *LiveState) advanceSession() {
 		if len(car.Drivers) == 0 {
 			ls.purgeCar(car.CarID)
 		} else {
+			car.NrLaps = 0
 			car.BestLapMS = 0
 			ls.setCarState(car)
 		}
@@ -283,7 +292,7 @@ func (ls *LiveState) monitorEvents(logEvents <-chan interface{}, stopMonitoring 
 		case event, ok := <-logEvents:
 			if !ok {
 				if stopMonitoring != nil {
-					ls.setServerState(ServerStateOffline)
+					ls.serverOffline()
 				}
 				logEvents = nil
 			} else if stopMonitoring != nil {
@@ -421,11 +430,12 @@ func (ls *LiveState) handleCarPurged(event logEventCarPurged) {
 
 func (ls *LiveState) handleNewLapTime(event logEventNewLapTime) {
 	if carState := ls.CarState[event.CarID]; carState != nil {
+		carState.NrLaps++
 		if event.Flags == 0 && (carState.BestLapMS <= 0 || event.LapTimeMS < carState.BestLapMS) {
 			carState.BestLapMS = event.LapTimeMS
-			ls.setCarState(carState)
-			ls.recalculatePositions()
 		}
+		ls.setCarState(carState)
+		ls.recalculatePositions()
 	}
 }
 

@@ -127,32 +127,25 @@ function setSessionState(state)
     document.getElementById('live_session_phase').innerText = phase;
 }
 
-
-
-function formatLapTime(lapTime_ms)
-{
-    if (lapTime_ms <= 0)
-        return '-';
-    var ms = lapTime_ms % 1000;
-    var lapTime_s = (lapTime_ms - ms) / 1000;
-    var s = lapTime_s % 60;
-    var m = (lapTime_s - s) / 60;
-    return m.toString() + ':' + s.toString().padStart(2, '0') + '.' + ms.toString().padStart(3, '0');
-}
-
 function formatInterval(entry, reference)
 {
-    if ((entry.BestLapMS <= 0) || (reference.BestLapMS <= 0))
+    if (entry.BestLapMS <= 0 || (reference !== null && reference.BestLapMS <= 0))
         return '-';
-    var difference_ms = entry.BestLapMS - reference.BestLapMS;
-    var ms = difference_ms % 1000;
-    var difference_s = (difference_ms - ms) / 1000;
-    var s = difference_s % 60;
-    var m = (difference_s - s) / 60;
-    if (m > 0)
-        return '+ ' + m.toString() + ':' + s.toString().padStart(2, '0') + '.' + ms.toString().padStart(3, '0');
+    var time_ms = entry.BestLapMS;
+    if (reference !== null)
+        time_ms = entry.BestLapMS - reference.BestLapMS;
+
+    var ms = time_ms % 1000;
+    var time_s = (time_ms - ms) / 1000;
+    var s = time_s % 60;
+    var m = (time_s - s) / 60;
+
+    var prefix = (reference === null ? '' : '+ ');
+    if (reference === null || m > 0)
+        prefix += m.toString() + ':' + s.toString().padStart(2, '0');
     else
-        return '+ ' + s.toString() + '.' + ms.toString().padStart(3, '0');
+        prefix += s.toString();
+    return prefix + '.' + ms.toString().padStart(3, '0');
 }
 
 
@@ -213,7 +206,7 @@ function sortLeaderboardTable()
             if (leader === null)
             {
                 leader = item;
-                item.cellInterval.innerText = formatLapTime(item.state.BestLapMS);
+                item.cellInterval.innerText = formatInterval(item.state, null);
             }
             else
             {
@@ -247,7 +240,7 @@ function setCarState(carState)
     else
         entry.cellDriver.innerText = '-';
     
-    entry.cellInterval.innerText = formatLapTime(carState.BestLapMS);
+    entry.cellInterval.innerText = formatInterval(carState, null);
     // console.log(carState);
 
     sortLeaderboardTable();
