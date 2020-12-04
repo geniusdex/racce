@@ -200,6 +200,44 @@ func TestLiveState_CarPurged(t *testing.T) {
 	assert.Equal(t, carState, f.state.CarState[1004])
 }
 
+func TestLiveState_CarsWithoutDriversPurgedWhenSessionTypeChanges(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventSessionPhaseChanged{"Qualifying", "session"}
+	<-f.events.SessionState
+
+	f.logEvents <- logEventNewConnectionRequest{6, "Driver One", "S76543210987654321", 5}
+	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
+	<-f.events.CarState
+
+	f.logEvents <- logEventNewConnectionRequest{7, "Driver Two", "S5", 6}
+	f.logEvents <- logEventNewCarConnection{1004, 6, 37}
+	<-f.events.CarState
+
+	f.logEvents <- logEventDeadConnection{7}
+	<-f.events.CarState
+
+	f.logEvents <- logEventSessionPhaseChanged{"Race", "session"}
+	<-f.events.SessionState
+	go func() { <-f.events.CarState }() // Eat car state update vor 1002
+	assert.Equal(t, 1004, <-f.events.CarPurged)
+	assert.Nil(t, f.state.CarState[1004])
+	assert.NotNil(t, f.state.CarState[1002])
+}
+
+func TestLiveState_GridPosition(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventNewConnectionRequest{6, "Driver One", "S76543210987654321", 5}
+	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
+	assert.NotNil(t, <-f.events.CarState)
+
+	f.logEvents <- logEventGridPosition{1002, 6}
+	carState := <-f.events.CarState
+	assert.Equal(t, 6, carState.Position)
+	assert.Equal(t, 6, f.state.CarState[1002].Position)
+}
+
 //--- Lap times ---//
 func TestLiveState_NewLapTime(t *testing.T) {
 	f := newTestLiveStateFixture(t)
@@ -223,4 +261,25 @@ func TestLiveState_NewLapTime(t *testing.T) {
 	carState = <-f.events.CarState
 	assert.Equal(t, 123400, carState.BestLapMS)
 	assert.Equal(t, carState, f.state.CarState[1002])
+}
+
+func TestLiveState_LapTimesRemovedWhenSessionTypeChanges(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventSessionPhaseChanged{"Qualifying", "session"}
+	<-f.events.SessionState
+
+	f.logEvents <- logEventNewConnectionRequest{6, "Driver One", "S76543210987654321", 5}
+	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
+	assert.NotNil(t, <-f.events.CarState)
+
+	f.logEvents <- logEventNewLapTime{1002, 123456, 0}
+	<-f.events.CarState
+	assert.Equal(t, 123456, f.state.CarState[1002].BestLapMS)
+
+	f.logEvents <- logEventSessionPhaseChanged{"Race", "session"}
+	<-f.events.SessionState
+	carState := <-f.events.CarState
+	assert.Equal(t, 0, carState.BestLapMS)
+	assert.Equal(t, 0, f.state.CarState[1002].BestLapMS)
 }

@@ -29,6 +29,12 @@ type logEventTrack struct {
 	Track string
 }
 
+// logEventSessionPhaseChanged indicates a change to session type or phasse
+type logEventSessionPhaseChanged struct {
+	Type  string
+	Phase string
+}
+
 // logEventNewConnectionRequest is sent whenever a new driver connection is made
 type logEventNewConnectionRequest struct {
 	ConnectionID int
@@ -67,10 +73,10 @@ type logEventNewLapTime struct {
 	Flags int
 }
 
-// logEventSessionPhaseChanged indicates a change to session type or phasse
-type logEventSessionPhaseChanged struct {
-	Type  string
-	Phase string
+// logEventGridPosition is sent at the end of qualifying when the grid positions for the race are known
+type logEventGridPosition struct {
+	CarID    int
+	Position int
 }
 
 const (
@@ -149,6 +155,11 @@ func makeLogMatchers() (ret []*logMatcher) {
 			`^New laptime: (\d+) for carId (\d+) with lapstates: [a-zA-Z, ]* \(raw (\d+)\)$`,
 			func(matches []string) interface{} {
 				return logEventNewLapTime{intOrPanic(matches[2]), intOrPanic(matches[1]), intOrPanic(matches[3])}
+			}),
+		newLogMatcher(
+			`^\s*Car (\d+) Pos (\d+)$`,
+			func(matches []string) interface{} {
+				return logEventGridPosition{intOrPanic(matches[1]), intOrPanic(matches[2])}
 			}),
 	}
 }

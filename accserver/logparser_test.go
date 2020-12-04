@@ -188,3 +188,14 @@ func TestLogParser_Event_NewLapTime(t *testing.T) {
 	f.SendMessage(`New laptime: 107142 for carId 1005 with lapstates:  (raw 0)`)
 	assert.Equal(t, logEventNewLapTime{1005, 107142, 0}, f.ReadEvent())
 }
+
+func TestLogParser_Event_GridPosition(t *testing.T) {
+	f := newTestLogParserFixture(t)
+	defer f.Close()
+
+	f.SendMessage(`   Car 1024 Pos 1`)
+	assert.Equal(t, logEventGridPosition{1024, 1}, f.ReadEvent())
+
+	f.SendMessage(`   Car 1016 Pos 21`)
+	assert.Equal(t, logEventGridPosition{1016, 21}, f.ReadEvent())
+}

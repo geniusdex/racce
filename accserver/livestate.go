@@ -224,7 +224,21 @@ func (ls *LiveState) recalculatePositions() {
 		cars = append(cars, car)
 	}
 
-	sort.Slice(cars, func(i, j int) bool { return cars[i].Position < cars[j].Position })
+	sort.Slice(cars, func(i, j int) bool {
+		if cars[i].BestLapMS > 0 {
+			if cars[j].BestLapMS > 0 { // Both i and j have a lap
+				return cars[i].BestLapMS < cars[j].BestLapMS
+			} else { // Only i has a lap
+				return true
+			}
+		} else {
+			if cars[j].BestLapMS > 0 { // Only j has a lap
+				return false
+			} else { // Neither i nor j has a lap
+				return cars[i].Position < cars[j].Position
+			}
+		}
+	})
 
 	for i := 0; i < len(cars); i++ {
 		if cars[i].Position != i+1 {
@@ -232,6 +246,18 @@ func (ls *LiveState) recalculatePositions() {
 			ls.setCarState(cars[i])
 		}
 	}
+}
+
+func (ls *LiveState) advanceSession() {
+	for _, car := range ls.CarState {
+		if len(car.Drivers) == 0 {
+			ls.purgeCar(car.CarID)
+		} else {
+			car.BestLapMS = 0
+			ls.setCarState(car)
+		}
+	}
+	ls.recalculatePositions()
 }
 
 //--- Event reading and handling ---//
@@ -299,6 +325,8 @@ func (ls *LiveState) handleLogEvent(event interface{}) {
 		ls.handleCarPurged(e)
 	} else if e, ok := event.(logEventNewLapTime); ok {
 		ls.handleNewLapTime(e)
+	} else if e, ok := event.(logEventGridPosition); ok {
+		ls.handleGridPosition(e)
 	}
 }
 
@@ -326,7 +354,14 @@ func (ls *LiveState) handleTrack(event logEventTrack) {
 }
 
 func (ls *LiveState) handleSessionPhaseChanged(event logEventSessionPhaseChanged) {
-	ls.setSessionState(&SessionState{event.Type, event.Phase})
+	oldState := ls.SessionState
+	newState := &SessionState{event.Type, event.Phase}
+
+	ls.setSessionState(newState)
+
+	if newState.Type != oldState.Type {
+		ls.advanceSession()
+	}
 }
 
 func (ls *LiveState) handleNewConnectionRequest(event logEventNewConnectionRequest) {
@@ -391,5 +426,12 @@ func (ls *LiveState) handleNewLapTime(event logEventNewLapTime) {
 			ls.setCarState(carState)
 			ls.recalculatePositions()
 		}
+	}
+}
+
+func (ls *LiveState) handleGridPosition(event logEventGridPosition) {
+	if carState := ls.CarState[event.CarID]; carState != nil {
+		carState.Position = event.Position
+		ls.setCarState(carState)
 	}
 }
