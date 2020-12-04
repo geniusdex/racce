@@ -138,6 +138,16 @@ func TestLiveState_Track(t *testing.T) {
 	assert.Equal(t, accdata.TrackByLabel("brands_hatch"), f.state.Track)
 }
 
+//--- Session State ---//
+func TestLiveState_SessionPhase(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventSessionPhaseChanged{"Qualifying", "session"}
+	assert.Equal(t, &SessionState{SessionTypeQualifying, SessionPhaseSession}, <-f.events.SessionState)
+	assert.Equal(t, SessionTypeQualifying, f.state.SessionState.Type)
+	assert.Equal(t, SessionPhaseSession, f.state.SessionState.Phase)
+}
+
 //--- Car Updates ---//
 func TestLiveState_NewCar(t *testing.T) {
 	f := newTestLiveStateFixture(t)

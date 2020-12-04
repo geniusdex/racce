@@ -67,6 +67,12 @@ type logEventNewLapTime struct {
 	Flags int
 }
 
+// logEventSessionPhaseChanged indicates a change to session type or phasse
+type logEventSessionPhaseChanged struct {
+	Type  string
+	Phase string
+}
+
 const (
 	flagLapHasCut   = 1
 	flagLapIsOutLap = 4
@@ -117,6 +123,9 @@ func makeLogMatchers() (ret []*logMatcher) {
 		newLogMatcher(
 			`^Track ([a-zA-Z0-9_]+) was set and updated$`,
 			func(matches []string) interface{} { return logEventTrack{matches[1]} }),
+		newLogMatcher(
+			`^Detected sessionPhase <([A-Za-z ]+)> -> <([A-Za-z ]+)> \(([A-Za-z ]+)\)$`,
+			func(matches []string) interface{} { return logEventSessionPhaseChanged{matches[3], matches[2]} }),
 		newLogMatcher(
 			`^New connection request: id (\d+) (.+) (S\d+) on car model (\d+)$`,
 			func(matches []string) interface{} {

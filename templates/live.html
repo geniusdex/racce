@@ -27,12 +27,16 @@
                     Offline
                 </li>
                 <li class="mdl-list__item" data-serverisrunning="true">
-                    <i class="material-icons mdl-list__item-icon server_log">people</i>
+                    <i class="material-icons mdl-list__item-icon">people</i>
                     <span id="live_nrclients"></span>
                 </li>
                 <li class="mdl-list__item" data-serverisrunning="true">
-                    <i class="material-icons mdl-list__item-icon server_log">place</i>
+                    <i class="material-icons mdl-list__item-icon">place</i>
                     <span id="live_track"></span>
+                </li>
+                <li class="mdl-list__item" data-serverisrunning="true">
+                    <i class="material-icons mdl-list__item-icon">label_important</i>
+                    <span id="live_session_type"></span><span id="live_session_phase"></span>
                 </li>
             </ul>
         </div>
@@ -109,6 +113,20 @@ function setTrack(track)
     document.getElementById('live_track').innerText = `${track.Name} (${track.Competition.Year})`;
 }
 
+function setSessionState(state)
+{
+    document.getElementById('live_session_type').innerText = state.Type;
+
+    var phase = "";
+    if ((state.Phase != "session") && (state.Phase != "session overtime"))
+    {
+        phase = '(' + state.Phase + ')';
+        if ((state.Phase == "singleFile") || (state.Phase == "doubleFile"))
+            phase = "(formation)";
+    }
+    document.getElementById('live_session_phase').innerText = phase;
+}
+
 var g_leaderboardTable = document.getElementById("live_leaderboard");
 var g_leaderboardTBody = document.getElementById("live_leaderboard_body");
 var g_leaderboardCarRows = {};
@@ -171,7 +189,7 @@ function formatLapTime(lapTime_ms)
     var lapTime_s = (lapTime_ms - ms) / 1000;
     var s = lapTime_s % 60;
     var m = (lapTime_s - s) / 60;
-    return m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0') + '.' + ms.toString().padStart(3, '0');
+    return m.toString() + ':' + s.toString().padStart(2, '0') + '.' + ms.toString().padStart(3, '0');
 }
 
 function setCarState(carState)
@@ -219,6 +237,7 @@ document.addEventListener('DOMContentLoaded', function()
     setServerState('{{$state.ServerState}}');
     setNrClients({{$state.NrClients}});
     setTrack({{$state.Track}});
+    setSessionState({{$state.SessionState}});
     {{range (sortOn $state.CarState ".Position")}}
         setCarState({{.}});
     {{end}}
@@ -274,6 +293,7 @@ function newHandler(type, handler)
 newHandler('serverState', setServerState);
 newHandler('nrClients', setNrClients);
 newHandler('track', setTrack);
+newHandler('sessionState', setSessionState);
 newHandler('carState', setCarState);
 newHandler('carPurged', purgeCar);
 </script>

@@ -15,6 +15,19 @@ const (
 	ServerStateStarting      ServerState = "starting"
 	ServerStateNotRegistered ServerState = "not_registered"
 	ServerStateOnline        ServerState = "online"
+
+	SessionTypePractice   string = "Practice"
+	SessionTypeQualifying string = "Qualifying"
+	SessionTypeRace       string = "Race"
+
+	SessionPhaseWaitingForDrivers string = "waiting for drivers"
+	SessionPhasePreSession        string = "pre session"
+	SessionPhaseFormation         string = "formation"
+	SessionPhaseSingleFile        string = "singleFile"
+	SessionPhaseDoubleFile        string = "doubleFile"
+	SessionPhaseSession           string = "session"
+	SessionPhaseSessionOvertime   string = "session overtime"
+	SessionPhaseSessionCompleted  string = "session completed"
 )
 
 // Driver contains the information about a single driver
@@ -41,6 +54,12 @@ func newCarState() *CarState {
 	}
 }
 
+// SessionState bundles the state information about the current session
+type SessionState struct {
+	Type  string
+	Phase string
+}
+
 // LiveStateEvents contains channels for all types of events sent
 //
 // All channels must always be fully read until they are closed, to avoid hanging the
@@ -48,11 +67,12 @@ func newCarState() *CarState {
 // is no guarantee that there are no pending messages on any other channel when one is
 // closed. There is helper method Flush() to empty all channels on shutdown.
 type LiveStateEvents struct {
-	ServerState chan ServerState
-	NrClients   chan int
-	Track       chan *accdata.Track
-	CarState    chan *CarState
-	CarPurged   chan int
+	ServerState  chan ServerState
+	NrClients    chan int
+	Track        chan *accdata.Track
+	SessionState chan *SessionState
+	CarState     chan *CarState
+	CarPurged    chan int
 }
 
 // Flush reads all remaining events on all channels until they are closed.
@@ -64,6 +84,8 @@ func (events *LiveStateEvents) Flush() {
 	for range events.NrClients {
 	}
 	for range events.Track {
+	}
+	for range events.SessionState {
 	}
 	for range events.CarState {
 	}
@@ -79,6 +101,8 @@ type LiveState struct {
 	NrClients int
 	// Track is the current track on the server; will never be nil
 	Track *accdata.Track
+	// SessionState contains the current state of the active session
+	SessionState *SessionState
 	// CarState contains the current state for all cars, keyed on car ID
 	CarState map[int]*CarState
 
@@ -99,6 +123,7 @@ func newLiveState() *LiveState {
 		ServerState:         ServerStateOffline,
 		NrClients:           0,
 		Track:               accdata.Tracks[0],
+		SessionState:        &SessionState{SessionTypePractice, SessionPhaseWaitingForDrivers},
 		CarState:            make(map[int]*CarState),
 		connectionRequests:  make([]*logEventNewConnectionRequest, 0),
 		driverPerConnection: make(map[int]*Driver),
@@ -109,11 +134,12 @@ func newLiveState() *LiveState {
 // NewEventChannels creates new channels for the state events
 func (ls *LiveState) NewEventChannels() *LiveStateEvents {
 	events := &LiveStateEvents{
-		ServerState: make(chan ServerState),
-		NrClients:   make(chan int),
-		Track:       make(chan *accdata.Track),
-		CarState:    make(chan *CarState),
-		CarPurged:   make(chan int),
+		ServerState:  make(chan ServerState),
+		NrClients:    make(chan int),
+		Track:        make(chan *accdata.Track),
+		SessionState: make(chan *SessionState),
+		CarState:     make(chan *CarState),
+		CarPurged:    make(chan int),
 	}
 
 	ls.eventListeners = append(ls.eventListeners, events)
@@ -148,6 +174,13 @@ func (ls *LiveState) setTrack(track *accdata.Track) {
 	ls.Track = track
 	for _, listener := range ls.eventListeners {
 		listener.Track <- track
+	}
+}
+
+func (ls *LiveState) setSessionState(state *SessionState) {
+	ls.SessionState = state
+	for _, listener := range ls.eventListeners {
+		listener.SessionState <- state
 	}
 }
 
@@ -254,6 +287,8 @@ func (ls *LiveState) handleLogEvent(event interface{}) {
 		ls.handleNrClientsOnline(e)
 	} else if e, ok := event.(logEventTrack); ok {
 		ls.handleTrack(e)
+	} else if e, ok := event.(logEventSessionPhaseChanged); ok {
+		ls.handleSessionPhaseChanged(e)
 	} else if e, ok := event.(logEventNewConnectionRequest); ok {
 		ls.handleNewConnectionRequest(e)
 	} else if e, ok := event.(logEventNewCarConnection); ok {
@@ -288,6 +323,10 @@ func (ls *LiveState) handleTrack(event logEventTrack) {
 	if track != nil {
 		ls.setTrack(track)
 	}
+}
+
+func (ls *LiveState) handleSessionPhaseChanged(event logEventSessionPhaseChanged) {
+	ls.setSessionState(&SessionState{event.Type, event.Phase})
 }
 
 func (ls *LiveState) handleNewConnectionRequest(event logEventNewConnectionRequest) {

@@ -443,6 +443,12 @@ section h5:after {
     content: "(live state unavailable)";
 }
 
+#live_session_phase {
+    margin-left: 8px;
+    color: #808080;
+    font-size: 14px;
+}
+
 .live_leaderboard .car_without_current_drivers td {
     color: #b0b0b0;
 }

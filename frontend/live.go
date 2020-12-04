@@ -67,6 +67,12 @@ func (f *frontend) sendLiveStateUpdates(ws webSocketWriter) {
 			}
 			writeMessageToWebSocket(ws, "track", track)
 
+		case state, ok := <-events.SessionState:
+			if !ok {
+				return
+			}
+			writeMessageToWebSocket(ws, "sessionState", state)
+
 		case carState, ok := <-events.CarState:
 			if !ok {
 				return

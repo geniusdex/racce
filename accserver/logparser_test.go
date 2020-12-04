@@ -109,6 +109,17 @@ func TestLogParser_Event_Track(t *testing.T) {
 	assert.Equal(t, logEventTrack{"barcelona_2019"}, f.ReadEvent())
 }
 
+func TestLogParser_Event_SessionPhaseChanged(t *testing.T) {
+	f := newTestLogParserFixture(t)
+	defer f.Close()
+
+	f.SendMessage(`Detected sessionPhase <session> -> <session> (Qualifying)`)
+	assert.Equal(t, logEventSessionPhaseChanged{"Qualifying", "session"}, f.ReadEvent())
+
+	f.SendMessage(`Detected sessionPhase <waiting for drivers> -> <pre session> (Race)`)
+	assert.Equal(t, logEventSessionPhaseChanged{"Race", "pre session"}, f.ReadEvent())
+}
+
 func TestLogParser_Event_NewConnectionRequest(t *testing.T) {
 	f := newTestLogParserFixture(t)
 	defer f.Close()
