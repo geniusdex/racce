@@ -127,6 +127,35 @@ function setSessionState(state)
     document.getElementById('live_session_phase').innerText = phase;
 }
 
+
+
+function formatLapTime(lapTime_ms)
+{
+    if (lapTime_ms <= 0)
+        return '-';
+    var ms = lapTime_ms % 1000;
+    var lapTime_s = (lapTime_ms - ms) / 1000;
+    var s = lapTime_s % 60;
+    var m = (lapTime_s - s) / 60;
+    return m.toString() + ':' + s.toString().padStart(2, '0') + '.' + ms.toString().padStart(3, '0');
+}
+
+function formatInterval(entry, reference)
+{
+    if ((entry.BestLapMS <= 0) || (reference.BestLapMS <= 0))
+        return '-';
+    var difference_ms = entry.BestLapMS - reference.BestLapMS;
+    var ms = difference_ms % 1000;
+    var difference_s = (difference_ms - ms) / 1000;
+    var s = difference_s % 60;
+    var m = (difference_s - s) / 60;
+    if (m > 0)
+        return '+ ' + m.toString() + ':' + s.toString().padStart(2, '0') + '.' + ms.toString().padStart(3, '0');
+    else
+        return '+ ' + s.toString() + '.' + ms.toString().padStart(3, '0');
+}
+
+
 var g_leaderboardTable = document.getElementById("live_leaderboard");
 var g_leaderboardTBody = document.getElementById("live_leaderboard_body");
 var g_leaderboardCarRows = {};
@@ -159,6 +188,8 @@ function getTableEntryForCarID(carID, carState)
 
 function sortLeaderboardTable()
 {
+    var leader = null;
+
     Object.values(g_leaderboardCarRows)
         .sort(function(a, b)
         {
@@ -178,18 +209,17 @@ function sortLeaderboardTable()
         {
             item.cellPosition.innerText = (index + 1).toString() + '.';
             g_leaderboardTBody.appendChild(item.row)
-        });
-}
 
-function formatLapTime(lapTime_ms)
-{
-    if (lapTime_ms <= 0)
-        return '-';
-    var ms = lapTime_ms % 1000;
-    var lapTime_s = (lapTime_ms - ms) / 1000;
-    var s = lapTime_s % 60;
-    var m = (lapTime_s - s) / 60;
-    return m.toString() + ':' + s.toString().padStart(2, '0') + '.' + ms.toString().padStart(3, '0');
+            if (leader === null)
+            {
+                leader = item;
+                item.cellInterval.innerText = formatLapTime(item.state.BestLapMS);
+            }
+            else
+            {
+                item.cellInterval.innerText = formatInterval(item.state, leader.state);
+            }
+        });
 }
 
 function setCarState(carState)
