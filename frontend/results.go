@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/geniusdex/racce/accdata"
+
 	"github.com/geniusdex/racce/accresults"
 )
 
@@ -75,6 +77,49 @@ func (f *frontend) playerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	f.executeTemplate(w, r, "player.html", &playerPage{f.db, player})
+}
+
+type playerTrackPage struct {
+	Player          *accresults.Player
+	Track           *accdata.Track
+	PlayerTrackData *accresults.PlayerTrackData
+}
+
+func (f *frontend) playerTrackHandler(w http.ResponseWriter, r *http.Request) {
+	pathComponents := strings.Split(r.URL.Path, "/")
+	if len(pathComponents) != 4 {
+		log.Printf("Not enough components in path '%s', components: %v, len: %v", r.URL.Path, pathComponents, len(pathComponents))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	f.db.Mutex.RLock()
+	defer f.db.Mutex.RUnlock()
+
+	playerID := pathComponents[2]
+	player, ok := f.db.Players[playerID]
+	if !ok {
+		log.Printf("Player '%s' not found in database", playerID)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	trackName := pathComponents[3]
+	track := accdata.TrackByLabel(trackName)
+	if track == nil {
+		log.Printf("Track '%s' does not exist", trackName)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	playerTrackData := player.TrackData[trackName]
+	if playerTrackData == nil {
+		log.Printf("Player '%s' never drove on track '%s'", playerID, trackName)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	f.executeTemplate(w, r, "playertrack.html", &playerTrackPage{player, track, playerTrackData})
 }
 
 func (f *frontend) sessionHandler(w http.ResponseWriter, r *http.Request) {

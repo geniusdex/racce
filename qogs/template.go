@@ -15,6 +15,9 @@ import (
 //  filterEq(container,          Get all container values where the value at
 //    valuePath, comparePath)    valuePath equals comparePath of the container
 //  reverse(container)           Reverse the order of the container values
+//  limit(container, amount)     Keep only the first elements of the container
+//
+//  literal(str)                 Construct a path representing a string literal
 func TemplateFuncs() template.FuncMap {
 	return template.FuncMap{
 		"contains": func(haystack interface{}, needle interface{}) bool {
@@ -34,6 +37,10 @@ func TemplateFuncs() template.FuncMap {
 		},
 		"limit": func(data interface{}, amount int) []interface{} {
 			return Limit(data, amount)
+		},
+
+		"literal": func(str string) string {
+			return "literal " + str
 		},
 	}
 }

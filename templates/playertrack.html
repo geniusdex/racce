@@ -1,8 +1,9 @@
-{{$db := .Database}}
 {{$player := .Player}}
+{{$track := .Track}}
+{{$playertrack := .PlayerTrackData}}
 {{$name := $player.MostRecentName}}
 
-{{template "header.inc.html" (print $name.FirstName " " $name.LastName)}}
+{{template "header.inc.html" (print $name.FirstName " " $name.LastName " at " $track.Name " (" $track.Competition.Year ")")}}
 
 <div class="mdl-grid">
   <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--top">
@@ -19,7 +20,7 @@
           </tr>
         </thead>
         <tbody>
-{{range reverse (sortOn $player.Events ".EndTime")}}
+{{range reverse (sortOn (filterEq $player.Events ".TrackName" (literal $track.Label)) ".EndTime")}}
           <tr data-href="{{basePath}}/event/{{.EventId}}">
             <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/event/{{.EventId}}">{{.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
             <td class="mdl-data-table__cell--non-numeric">{{(track .TrackName).Name}}</td>
@@ -39,18 +40,18 @@
       <table class="mdl-data-table mdl-js-data-table">
         <thead>
           <tr>
-            <th class="mdl-data-table__cell--non-numeric">Track</th>
-            <th class="mdl-data-table__cell--non-numeric">Best Lap</th>
             <th></th>
+            <th class="mdl-data-table__cell--non-numeric">Car</th>
+            <th class="mdl-data-table__cell--non-numeric">Best Lap</th>
           </tr>
         </thead>
         <tbody>
-{{range sortOn $player.TrackData ".TrackName"}}
-          <tr data-href="{{basePath}}/playertrack/{{$player.PlayerId}}/{{.TrackName}}">
-            <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/playertrack/{{$player.PlayerId}}/{{.TrackName}}">{{(track .TrackName).Name}} ({{(track .TrackName).Competition.Year}})</a></td>
-            <td class="mdl-data-table__cell--non-numeric">{{laptime .BestLap}}</td>
-            {{$carmodel := carmodel .BestLapCarModel}}
+{{range sortOn $playertrack.CarData ".BestLap"}}
+          <tr>
+            {{$carmodel := carmodel .CarModel}}
             <td class="carlogo"><img src="{{basePath}}/static/carlogo/{{$carmodel.ManufacturerLabel}}.png" title="{{$carmodel.Manufacturer}} {{$carmodel.Model}}"></td>
+            <td class="mdl-data-table__cell--non-numeric">{{$carmodel.Manufacturer}} {{$carmodel.Model}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{laptime .BestLap}}</td>
           </tr>
 {{end}}
         </tbody>

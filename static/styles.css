@@ -83,11 +83,11 @@ body {
     color: red;
 }
 
-.sessionleaderboard img {
+.carlogo img {
     max-height: 100%;
 }
 
-.sessionleaderboard .carlogo {
+.sessionleaderboard .carlogo, table .carlogo {
     width: 48px;
     padding: 6px 12px;
 }

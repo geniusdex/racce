@@ -31,6 +31,7 @@ func TestPath(t *testing.T) {
 	}
 
 	// Selectors
+	assert.Equal(5, Path(data.ID, "."))
 	assert.Equal(5, Path(data, ".ID"))
 	assert.Equal("Entry", Path(data, ".Entry.Name"))
 
@@ -44,4 +45,9 @@ func TestPath(t *testing.T) {
 
 	// Function 'tolower'
 	assert.Equal("entry", Path(data, "tolower .Entry.Name"))
+
+	// Function 'literal'
+	assert.Equal("5", Path(data, "literal 5"))
+	assert.Equal("foo", Path(data, "literal foo"))
+	assert.Equal(".ID", Path(data, "literal .ID"))
 }

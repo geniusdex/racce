@@ -181,6 +181,7 @@ func Run(config *Configuration, database *accresults.Database, server *accserver
 	http.HandleFunc("/indexfull/", f.indexFullHandler)
 	http.HandleFunc("/event/", f.eventHandler)
 	http.HandleFunc("/player/", f.playerHandler)
+	http.HandleFunc("/playertrack/", f.playerTrackHandler)
 	http.HandleFunc("/session/", f.sessionHandler)
 	http.HandleFunc("/sessioncar/", f.sessionCarHandler)
 	if config.Live {

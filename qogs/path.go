@@ -17,6 +17,9 @@ func evaluatePathFunction(value reflect.Value, name string, args []string) refle
 	case "tolower":
 		lowered := strings.ToLower(fmt.Sprint(pathElemValueFromValue(value, args[0]).Interface()))
 		return reflect.ValueOf(lowered)
+	case "literal":
+		literal := strings.Join(args, " ")
+		return reflect.ValueOf(literal)
 	default:
 		panic(fmt.Sprintf("qogs invalid function call (%s %s)", name, strings.Join(args, "")))
 	}
@@ -25,7 +28,9 @@ func evaluatePathFunction(value reflect.Value, name string, args []string) refle
 // pathValueFromValue is Path but accepts and returns a reflection value instead
 func pathValueFromValue(value reflect.Value, path string) reflect.Value {
 	value = elemValueFromValue(value)
-	if path[0] == '.' {
+	if path == "." {
+		return value
+	} else if path[0] == '.' {
 		fieldName := path[1:]
 		end := strings.IndexAny(fieldName, ".()") + 1 // offset by 1 to get index in path
 		if end == 0 {

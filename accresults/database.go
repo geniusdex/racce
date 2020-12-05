@@ -74,7 +74,7 @@ type Database struct {
 func (db *Database) getOrCreatePlayer(playerId string) *Player {
 	player, ok := db.Players[playerId]
 	if !ok {
-		player = NewPlayer(playerId)
+		player = newPlayer(playerId)
 		db.Players[playerId] = player
 	}
 	return player
@@ -85,8 +85,7 @@ func (db *Database) resolvePlayersInSession(sessionName string, session *Session
 		for _, driver := range line.Car.Drivers {
 			player := db.getOrCreatePlayer(driver.PlayerId)
 			player.mergeDriver(driver)
-			player.SessionNames = append(player.SessionNames, sessionName)
-			player.Events[event.EventId] = event
+			player.addCarInSession(line.Car, session, event)
 		}
 	}
 
