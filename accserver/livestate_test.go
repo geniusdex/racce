@@ -269,41 +269,62 @@ func TestLiveState_NewLapTime(t *testing.T) {
 	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
 	assert.NotNil(t, <-f.events.CarState)
 
-	f.logEvents <- logEventNewLapTime{1002, 123456, 0}
+	f.logEvents <- logEventNewLapTime{1002, 123456, 100, 0}
 	carState := <-f.events.CarState
 	assert.Equal(t, 123456, carState.BestLapMS)
 	assert.Equal(t, 1, carState.NrLaps)
+	assert.Equal(t, 123456, carState.LastLapMS)
+	assert.Equal(t, 100, carState.LastLapTimestampMS)
 	assert.Equal(t, carState, f.state.CarState[1002])
 
-	f.logEvents <- logEventNewLapTime{1002, 123457, 0}
+	f.logEvents <- logEventNewLapTime{1002, 123457, 101, 0}
 	carState = <-f.events.CarState
 	assert.Equal(t, 123456, carState.BestLapMS)
 	assert.Equal(t, 2, carState.NrLaps)
+	assert.Equal(t, 123457, carState.LastLapMS)
+	assert.Equal(t, 101, carState.LastLapTimestampMS)
 
-	f.logEvents <- logEventNewLapTime{1002, 123000, 1}
+	f.logEvents <- logEventNewLapTime{1002, 123000, 102, 1}
 	carState = <-f.events.CarState
 	assert.Equal(t, 123456, carState.BestLapMS)
 	assert.Equal(t, 3, carState.NrLaps)
+	assert.Equal(t, 123000, carState.LastLapMS)
+	assert.Equal(t, 102, carState.LastLapTimestampMS)
 
-	f.logEvents <- logEventNewLapTime{1002, 123000, 4}
+	f.logEvents <- logEventNewLapTime{1002, 123001, 103, 4}
 	carState = <-f.events.CarState
 	assert.Equal(t, 123456, carState.BestLapMS)
 	assert.Equal(t, 4, carState.NrLaps)
+	assert.Equal(t, 123001, carState.LastLapMS)
+	assert.Equal(t, 103, carState.LastLapTimestampMS)
 
-	f.logEvents <- logEventNewLapTime{1002, 123000, 8}
+	f.logEvents <- logEventNewLapTime{1002, 123002, 104, 8}
 	carState = <-f.events.CarState
 	assert.Equal(t, 123456, carState.BestLapMS)
 	assert.Equal(t, 5, carState.NrLaps)
+	assert.Equal(t, 123002, carState.LastLapMS)
+	assert.Equal(t, 104, carState.LastLapTimestampMS)
 
-	f.logEvents <- logEventNewLapTime{1002, 123000, 13}
+	f.logEvents <- logEventNewLapTime{1002, 123003, 105, 13}
 	carState = <-f.events.CarState
 	assert.Equal(t, 123456, carState.BestLapMS)
 	assert.Equal(t, 6, carState.NrLaps)
+	assert.Equal(t, 123003, carState.LastLapMS)
+	assert.Equal(t, 105, carState.LastLapTimestampMS)
 
-	f.logEvents <- logEventNewLapTime{1002, 123400, 0}
+	f.logEvents <- logEventNewLapTime{1002, 123004, 106, 1024}
+	carState = <-f.events.CarState
+	assert.Equal(t, 123456, carState.BestLapMS)
+	assert.Equal(t, 7, carState.NrLaps)
+	assert.Equal(t, 123004, carState.LastLapMS)
+	assert.Equal(t, 106, carState.LastLapTimestampMS)
+
+	f.logEvents <- logEventNewLapTime{1002, 123400, 107, 0}
 	carState = <-f.events.CarState
 	assert.Equal(t, 123400, carState.BestLapMS)
-	assert.Equal(t, 7, carState.NrLaps)
+	assert.Equal(t, 8, carState.NrLaps)
+	assert.Equal(t, 123400, carState.LastLapMS)
+	assert.Equal(t, 107, carState.LastLapTimestampMS)
 	assert.Equal(t, carState, f.state.CarState[1002])
 }
 
@@ -317,16 +338,102 @@ func TestLiveState_LapsRemovedWhenSessionTypeChanges(t *testing.T) {
 	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
 	assert.NotNil(t, <-f.events.CarState)
 
-	f.logEvents <- logEventNewLapTime{1002, 123456, 0}
-	<-f.events.CarState
-	assert.Equal(t, 123456, f.state.CarState[1002].BestLapMS)
-	assert.Equal(t, 1, f.state.CarState[1002].NrLaps)
+	f.logEvents <- logEventNewLapTime{1002, 123456, 100, 0}
+	carState := <-f.events.CarState
+	assert.Equal(t, 123456, carState.BestLapMS)
+	assert.Equal(t, 1, carState.NrLaps)
+	assert.Equal(t, 123456, carState.LastLapMS)
+	assert.Equal(t, 100, carState.LastLapTimestampMS)
+	assert.Equal(t, carState, f.state.CarState[1002])
 
 	f.logEvents <- logEventSessionPhaseChanged{"Race", "session"}
 	<-f.events.SessionState
-	carState := <-f.events.CarState
+	carState = <-f.events.CarState
 	assert.Equal(t, 0, carState.BestLapMS)
 	assert.Equal(t, 0, carState.NrLaps)
-	assert.Equal(t, 0, f.state.CarState[1002].BestLapMS)
-	assert.Equal(t, 0, f.state.CarState[1002].NrLaps)
+	assert.Equal(t, 0, carState.LastLapMS)
+	assert.Equal(t, 0, carState.LastLapTimestampMS)
+	assert.Equal(t, carState, f.state.CarState[1002])
+}
+
+func TestLiveState_PositionDuringQualifying(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventSessionPhaseChanged{"Qualifying", "session"}
+	<-f.events.SessionState
+
+	f.logEvents <- logEventNewConnectionRequest{6, "Driver One", "S76543210987654321", 5}
+	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
+	<-f.events.CarState
+
+	f.logEvents <- logEventNewConnectionRequest{7, "Driver Two", "S5", 6}
+	f.logEvents <- logEventNewCarConnection{1004, 6, 37}
+	<-f.events.CarState
+
+	assert.Equal(t, 1, f.state.CarState[1002].Position)
+	assert.Equal(t, 2, f.state.CarState[1004].Position)
+
+	f.logEvents <- logEventNewLapTime{1002, 123050, 100, 0}
+	<-f.events.CarState
+	assert.Equal(t, 1, f.state.CarState[1002].Position)
+	assert.Equal(t, 2, f.state.CarState[1004].Position)
+
+	f.logEvents <- logEventNewLapTime{1004, 123040, 101, 0}
+	<-f.events.CarState
+	<-f.events.CarState
+	<-f.events.CarState
+	assert.Equal(t, 2, f.state.CarState[1002].Position)
+	assert.Equal(t, 1, f.state.CarState[1004].Position)
+
+	f.logEvents <- logEventNewLapTime{1004, 123060, 102, 0}
+	<-f.events.CarState
+	assert.Equal(t, 2, f.state.CarState[1002].Position)
+	assert.Equal(t, 1, f.state.CarState[1004].Position)
+
+	f.logEvents <- logEventNewLapTime{1002, 123030, 102, 0}
+	<-f.events.CarState
+	<-f.events.CarState
+	<-f.events.CarState
+	assert.Equal(t, 1, f.state.CarState[1002].Position)
+	assert.Equal(t, 2, f.state.CarState[1004].Position)
+}
+
+func TestLiveState_PositionDuringRace(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventSessionPhaseChanged{"Race", "session"}
+	<-f.events.SessionState
+
+	f.logEvents <- logEventNewConnectionRequest{6, "Driver One", "S76543210987654321", 5}
+	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
+	<-f.events.CarState
+
+	f.logEvents <- logEventNewConnectionRequest{7, "Driver Two", "S5", 6}
+	f.logEvents <- logEventNewCarConnection{1004, 6, 37}
+	<-f.events.CarState
+
+	assert.Equal(t, 1, f.state.CarState[1002].Position)
+	assert.Equal(t, 2, f.state.CarState[1004].Position)
+
+	f.logEvents <- logEventNewLapTime{1002, 123050, 100, 0}
+	<-f.events.CarState
+	assert.Equal(t, 1, f.state.CarState[1002].Position)
+	assert.Equal(t, 2, f.state.CarState[1004].Position)
+
+	f.logEvents <- logEventNewLapTime{1004, 123040, 101, 0}
+	<-f.events.CarState
+	assert.Equal(t, 1, f.state.CarState[1002].Position)
+	assert.Equal(t, 2, f.state.CarState[1004].Position)
+
+	f.logEvents <- logEventNewLapTime{1004, 123060, 102, 0}
+	<-f.events.CarState
+	<-f.events.CarState
+	<-f.events.CarState
+	assert.Equal(t, 2, f.state.CarState[1002].Position)
+	assert.Equal(t, 1, f.state.CarState[1004].Position)
+
+	f.logEvents <- logEventNewLapTime{1002, 123030, 102, 0}
+	<-f.events.CarState
+	assert.Equal(t, 2, f.state.CarState[1002].Position)
+	assert.Equal(t, 1, f.state.CarState[1004].Position)
 }

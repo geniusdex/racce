@@ -179,14 +179,26 @@ func TestLogParser_Event_NewLapTime(t *testing.T) {
 	f := newTestLogParserFixture(t)
 	defer f.Close()
 
+	// These matches were used for laptimes previously, and should no longer match to avoid counting laps twice
 	f.SendMessage(`New laptime: 142474 for carId 1002 with lapstates: HasCut, IsOutLap, IsInLap,  (raw 13)`)
-	assert.Equal(t, logEventNewLapTime{1002, 142474, 13}, f.ReadEvent())
-
 	f.SendMessage(`New laptime: 107466 for carId 1004 with lapstates: HasCut,  (raw 1)`)
-	assert.Equal(t, logEventNewLapTime{1004, 107466, 1}, f.ReadEvent())
-
 	f.SendMessage(`New laptime: 107142 for carId 1005 with lapstates:  (raw 0)`)
-	assert.Equal(t, logEventNewLapTime{1005, 107142, 0}, f.ReadEvent())
+
+	// These lines should not trigger an update
+	f.SendMessage(`Lap  carId 1020, driverId 0, lapTime 35791:23:647, timestampMS 2192453.000000, flags: %d0, S1 4:11:730, S2 0:40:917, S3 0:34:929, fuel 0.000000`)
+	f.SendMessage(`Lap carId 1003, driverId 0, lapTime 35791:23:647, timestampMS 3558634.000000, flags: %d0, S1 0:30:777, fuel 0.000000`)
+	f.SendMessage(`Lap  carId 1012, driverId 0, lapTime 35791:23:647, timestampMS 3571140.000000, flags: %d1, S1 0:30:360, S2 0:41:811, fuel 0.000000, hasCut `)
+	f.SendMessage(`Lap  carId 1009, driverId 0, lapTime 35791:23:647, timestampMS 3885634.000000, flags: %d4, S1 10:00:510, S2 0:42:834, S3 0:36:777, fuel 0.000000, OutLap `)
+
+	// These lines do
+	f.SendMessage(`Lap carId 1020, driverId 0, lapTime 5:27:576, timestampMS 2192453.000000, flags: %d0, S1 4:11:730, S2 0:40:917, S3 0:34:929, fuel 56.000000`)
+	assert.Equal(t, logEventNewLapTime{1020, 327576, 2192453, 0}, f.ReadEvent())
+
+	f.SendMessage(`Lap carId 1009, driverId 0, lapTime 11:20:121, timestampMS 3885634.000000, flags: %d4, S1 10:00:510, S2 0:42:834, S3 0:36:777, fuel 22.000000, OutLap `)
+	assert.Equal(t, logEventNewLapTime{1009, 680121, 3885634, 4}, f.ReadEvent())
+
+	f.SendMessage(`Lap carId 1046, driverId 0, lapTime 1:46:830, timestampMS 4004213.000000, flags: %d1025, S1 0:29:832, S2 0:40:917, S3 0:36:081, fuel 73.000000, hasCut , SessionOver`)
+	assert.Equal(t, logEventNewLapTime{1046, 106830, 4004213, 1025}, f.ReadEvent())
 }
 
 func TestLogParser_Event_GridPosition(t *testing.T) {

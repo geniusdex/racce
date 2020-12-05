@@ -39,14 +39,16 @@ type Driver struct {
 
 // CarState represents the current state of a single car
 type CarState struct {
-	CarID         int
-	RaceNumber    int
-	CarModel      *accdata.CarModel
-	Drivers       []*Driver
-	CurrentDriver *Driver
-	Position      int
-	NrLaps        int
-	BestLapMS     int
+	CarID              int
+	RaceNumber         int
+	CarModel           *accdata.CarModel
+	Drivers            []*Driver
+	CurrentDriver      *Driver
+	Position           int
+	NrLaps             int
+	BestLapMS          int
+	LastLapMS          int
+	LastLapTimestampMS int
 }
 
 func newCarState() *CarState {
@@ -226,6 +228,32 @@ func (ls *LiveState) lookupDriverForNewCarConnection(carEvent logEventNewCarConn
 	return nil
 }
 
+func cmpPositionFastestLap(a, b *CarState) bool {
+	if a.BestLapMS > 0 {
+		if b.BestLapMS > 0 { // Both a and b have a lap
+			return a.BestLapMS < b.BestLapMS
+		} else { // Only a has a lap
+			return true
+		}
+	} else {
+		if b.BestLapMS > 0 { // Only b has a lap
+			return false
+		} else { // Neither a nor b has a lap
+			return a.Position < b.Position
+		}
+	}
+}
+
+func cmpPositionMostDistance(a, b *CarState) bool {
+	if a.NrLaps != b.NrLaps {
+		return a.NrLaps > b.NrLaps
+	}
+	if a.LastLapTimestampMS != b.LastLapTimestampMS {
+		return a.LastLapTimestampMS < b.LastLapTimestampMS
+	}
+	return a.Position < b.Position
+}
+
 func (ls *LiveState) recalculatePositions() {
 	cars := make([]*CarState, 0, len(ls.CarState))
 	for _, car := range ls.CarState {
@@ -233,19 +261,10 @@ func (ls *LiveState) recalculatePositions() {
 	}
 
 	sort.Slice(cars, func(i, j int) bool {
-		if cars[i].BestLapMS > 0 {
-			if cars[j].BestLapMS > 0 { // Both i and j have a lap
-				return cars[i].BestLapMS < cars[j].BestLapMS
-			} else { // Only i has a lap
-				return true
-			}
-		} else {
-			if cars[j].BestLapMS > 0 { // Only j has a lap
-				return false
-			} else { // Neither i nor j has a lap
-				return cars[i].Position < cars[j].Position
-			}
+		if ls.SessionState.Type == SessionTypeRace {
+			return cmpPositionMostDistance(cars[i], cars[j])
 		}
+		return cmpPositionFastestLap(cars[i], cars[j])
 	})
 
 	for i := 0; i < len(cars); i++ {
@@ -263,6 +282,8 @@ func (ls *LiveState) advanceSession() {
 		} else {
 			car.NrLaps = 0
 			car.BestLapMS = 0
+			car.LastLapMS = 0
+			car.LastLapTimestampMS = 0
 			ls.setCarState(car)
 		}
 	}
@@ -431,6 +452,8 @@ func (ls *LiveState) handleCarPurged(event logEventCarPurged) {
 func (ls *LiveState) handleNewLapTime(event logEventNewLapTime) {
 	if carState := ls.CarState[event.CarID]; carState != nil {
 		carState.NrLaps++
+		carState.LastLapMS = event.LapTimeMS
+		carState.LastLapTimestampMS = event.TimestampMS
 		if event.Flags == 0 && (carState.BestLapMS <= 0 || event.LapTimeMS < carState.BestLapMS) {
 			carState.BestLapMS = event.LapTimeMS
 		}

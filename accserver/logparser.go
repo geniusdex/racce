@@ -67,8 +67,9 @@ type logEventCarPurged struct {
 
 // logEventNewLapTime indicates a lap was completed by a car
 type logEventNewLapTime struct {
-	CarID     int
-	LapTimeMS int
+	CarID       int
+	LapTimeMS   int
+	TimestampMS int
 	// Flags as binary bitfield with 1=HasCut, 4=IsOutLap, 8=IsInLap (flagLap* constants)
 	Flags int
 }
@@ -80,9 +81,10 @@ type logEventGridPosition struct {
 }
 
 const (
-	flagLapHasCut   = 1
-	flagLapIsOutLap = 4
-	flagLapIsInLap  = 8
+	flagLapHasCut        = 1
+	flagLapIsOutLap      = 4
+	flagLapIsInLap       = 8
+	flagLapIsSessionOver = 1024
 )
 
 type logMatcher struct {
@@ -152,9 +154,13 @@ func makeLogMatchers() (ret []*logMatcher) {
 			`^Purging car_id (\d+)$`,
 			func(matches []string) interface{} { return logEventCarPurged{intOrPanic(matches[1])} }),
 		newLogMatcher(
-			`^New laptime: (\d+) for carId (\d+) with lapstates: [a-zA-Z, ]* \(raw (\d+)\)$`,
+			`^Lap carId (\d+), driverId (\d+), lapTime (\d+):(\d+):(\d+), timestampMS (\d+).000000, flags: %d(\d+),`,
 			func(matches []string) interface{} {
-				return logEventNewLapTime{intOrPanic(matches[2]), intOrPanic(matches[1]), intOrPanic(matches[3])}
+				lapTimeMS := intOrPanic(matches[3])*60000 + intOrPanic(matches[4])*1000 + intOrPanic(matches[5])
+				if lapTimeMS == 2147483647 { // Constant used for laps not yet completed
+					return nil
+				}
+				return logEventNewLapTime{intOrPanic(matches[1]), lapTimeMS, intOrPanic(matches[6]), intOrPanic(matches[7])}
 			}),
 		newLogMatcher(
 			`^\s*Car (\d+) Pos (\d+)$`,
@@ -196,8 +202,10 @@ func (parser *logParser) parseMessage(msg string) {
 	for _, matcher := range parser.matchers {
 		matches := matcher.matcher.FindStringSubmatch(msg)
 		if matches != nil {
-			parser.Events <- matcher.handler(matches)
-			return
+			if event := matcher.handler(matches); event != nil {
+				parser.Events <- event
+				return
+			}
 		}
 	}
 }
