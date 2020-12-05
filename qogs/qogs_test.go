@@ -89,3 +89,9 @@ func TestContains(t *testing.T) {
 	assert.True(t, Contains([]string{"foo", "bar"}, "foo"))
 	assert.False(t, Contains([]string{"foo", "bar"}, "test"))
 }
+
+func TestLimit(t *testing.T) {
+	assert.Equal(t, []interface{}{1, 2, 3}, Limit([]int{1, 2, 3, 4, 5}, 3))
+	assert.Equal(t, []interface{}{1, 2, 3}, Limit([]int{1, 2, 3}, 5))
+	assert.Equal(t, []interface{}{1, 2, 3}, Limit([]int{1, 2, 3}, 3))
+}

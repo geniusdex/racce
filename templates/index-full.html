@@ -1,6 +1,6 @@
 {{$db := .}}
 
-{{template "header.inc.html" "Index"}}
+{{template "header.inc.html" "Full Index"}}
 
 <div class="mdl-grid">
   <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--top">
@@ -17,7 +17,7 @@
           </tr>
         </thead>
         <tbody>
-{{range limit (reverse (sortOn $db.Events ".EndTime")) 50}}
+{{range reverse (sortOn $db.Events ".EndTime")}}
           <tr data-href="{{basePath}}/event/{{.EventId}}">
             <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/event/{{.EventId}}">{{.EndTime.Format "2006-01-02 15:04:05"}}</a></td>
             <td class="mdl-data-table__cell--non-numeric">{{(track .TrackName).Name}}</td>
@@ -26,11 +26,6 @@
 {{end}}
         </tbody>
       </table>
-    </div>
-    <div class="mdl-card__menu">
-      <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="{{basePath}}/indexfull">
-        Show All
-      </a>
     </div>
   </div>
 
@@ -48,7 +43,7 @@
           </tr>
         </thead>
         <tbody>
-{{range limit (reverse (sortOn (reverse (sortOn $db.Players "tolower .MostRecentName.LastName")) "len .Events")) 50}}
+{{range reverse (sortOn (reverse (sortOn $db.Players "tolower .MostRecentName.LastName")) "len .Events")}}
           <tr data-href="{{basePath}}/player/{{.PlayerId}}">
             <td class="mdl-data-table__cell--non-numeric">{{.MostRecentName.ShortName}}</td>
             <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/player/{{.PlayerId}}">{{.MostRecentName.FirstName}} {{.MostRecentName.LastName}}</a></td>
@@ -57,11 +52,6 @@
         </tbody>
 {{end}}
       </table>
-    </div>
-    <div class="mdl-card__menu">
-      <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="{{basePath}}/indexfull">
-        Show All
-      </a>
     </div>
   </div>
 </div>

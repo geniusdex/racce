@@ -32,5 +32,8 @@ func TemplateFuncs() template.FuncMap {
 		"reverse": func(data interface{}) []interface{} {
 			return Reverse(data)
 		},
+		"limit": func(data interface{}, amount int) []interface{} {
+			return Limit(data, amount)
+		},
 	}
 }

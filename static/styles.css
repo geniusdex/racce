@@ -1,3 +1,7 @@
+header > div.mdl-layout__header-row {
+    padding: 0 40px;
+}
+
 body {
     background: #fafafa;
     position: relative;

@@ -108,3 +108,12 @@ func Contains(haystack interface{}, needle interface{}) bool {
 	}
 	return false
 }
+
+// Limit removes all elements after the limit from an array, slice, map or string
+func Limit(data interface{}, amount int) []interface{} {
+	values := Values(data)
+	if amount > len(values) {
+		amount = len(values)
+	}
+	return values[:amount]
+}

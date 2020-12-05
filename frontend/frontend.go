@@ -26,20 +26,29 @@ type Configuration struct {
 	AdminWithoutPassword bool `json:"adminWithoutPassword"`
 	// Live indicates the live server status page should be enabled.
 	Live bool `json:"live"`
+	// DisableTemplateCache will parse templates on every page load, instead of at startup
+	DisableTemplateCache bool `json:"disableTemplateCache"`
+}
+
+// templateData contains dynamic data to be used while rendering templates
+type templateData struct {
+	basePath string
 }
 
 type frontend struct {
-	config *Configuration
-	db     *accresults.Database
-	server *accserver.Server
+	config       *Configuration
+	db           *accresults.Database
+	server       *accserver.Server
+	templates    *template.Template
+	templateData *templateData
 }
 
-func (f *frontend) addTemplateFunctions(t *template.Template, basePath string) *template.Template {
+func (f *frontend) addTemplateFunctions(t *template.Template, templateData *templateData) *template.Template {
 	t.Funcs(template.FuncMap(qogs.TemplateFuncs()))
 	t.Funcs(template.FuncMap{
 		// Environment
 		"basePath": func() string {
-			return basePath
+			return templateData.basePath
 		},
 		// Arithmetic
 		"add": func(a, b int) int {
@@ -111,6 +120,17 @@ func (f *frontend) addTemplateFunctions(t *template.Template, basePath string) *
 	return t
 }
 
+func (f *frontend) initializeTemplates() (*template.Template, error) {
+	return f.addTemplateFunctions(template.New("templates"), f.templateData).ParseGlob("templates/*.html")
+}
+
+func (f *frontend) getTemplates() (*template.Template, error) {
+	if f.templates != nil {
+		return f.templates, nil
+	}
+	return f.initializeTemplates()
+}
+
 func basePath(r *http.Request) string {
 	return r.Header.Get("X-Forwarded-Prefix")
 }
@@ -118,7 +138,9 @@ func basePath(r *http.Request) string {
 func (f *frontend) executeTemplate(w http.ResponseWriter, r *http.Request, name string, data interface{}) {
 	sessions.Save(r, w)
 
-	t, err := f.addTemplateFunctions(template.New("templates"), basePath(r)).ParseGlob("templates/*.html")
+	f.templateData.basePath = basePath(r)
+
+	t, err := f.getTemplates()
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -142,9 +164,21 @@ func Run(config *Configuration, database *accresults.Database, server *accserver
 		config,
 		database,
 		server,
+		nil,
+		&templateData{},
+	}
+
+	if !config.DisableTemplateCache {
+		templates, err := f.initializeTemplates()
+		if err != nil {
+			return fmt.Errorf("cannot initialize templates: %w", err)
+		}
+		f.templates = templates
 	}
 
 	http.HandleFunc("/", f.indexHandler)
+	http.HandleFunc("/indexfull", f.indexFullHandler)
+	http.HandleFunc("/indexfull/", f.indexFullHandler)
 	http.HandleFunc("/event/", f.eventHandler)
 	http.HandleFunc("/player/", f.playerHandler)
 	http.HandleFunc("/session/", f.sessionHandler)

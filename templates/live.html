@@ -196,7 +196,6 @@ function formatIntervalMostDistance(entry, previous)
     if (entry.NrLaps == previous.NrLaps - 1)
     {
         var previousLapTimestampMS = previous.LastLapTimestampMS - previous.LastLapMS;
-        // console.log(entry, previous, previousLapTimestampMS);
         if (entry.LastLapTimestampMS > previousLapTimestampMS)
             return formatTimeDifference(entry.LastLapTimestampMS - previousLapTimestampMS)
     }

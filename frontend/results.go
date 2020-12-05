@@ -21,6 +21,13 @@ func (f *frontend) indexHandler(w http.ResponseWriter, r *http.Request) {
 	f.executeTemplate(w, r, "index.html", f.db)
 }
 
+func (f *frontend) indexFullHandler(w http.ResponseWriter, r *http.Request) {
+	f.db.Mutex.RLock()
+	defer f.db.Mutex.RUnlock()
+
+	f.executeTemplate(w, r, "index-full.html", f.db)
+}
+
 func (f *frontend) eventHandler(w http.ResponseWriter, r *http.Request) {
 	pathComponents := strings.Split(r.URL.Path, "/")
 	if len(pathComponents) != 3 {

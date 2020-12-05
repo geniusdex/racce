@@ -20,14 +20,14 @@
       <div class="mdl-layout-spacer"></div>
       <!-- Navigation. We hide it in small screens. -->
       <nav class="mdl-navigation mdl-layout--large-screen-only">
-        <!-- <a class="mdl-navigation__link" href="">Link</a> -->
-        <!-- <a class="mdl-navigation__link" href="">Link</a> -->
-        <!-- <a class="mdl-navigation__link" href="">Link</a> -->
-        <!-- <a class="mdl-navigation__link" href="">Link</a> -->
+        <a class="mdl-navigation__link" href="{{basePath}}/">Index</a>
+{{if isLiveStateEnabled}}
+        <a class="mdl-navigation__link" href="{{basePath}}/live/">Live</a>
+{{end}}
       </nav>
     </div>
   </header>
-  <div class="mdl-layout__drawer">
+  <!-- <div class="mdl-layout__drawer">
     <span class="mdl-layout-title">ACC Results</span>
     <nav class="mdl-navigation">
       <a class="mdl-navigation__link" href="{{basePath}}/">Index</a>
@@ -35,6 +35,6 @@
       <a class="mdl-navigation__link" href="{{basePath}}/live/">Live</a>
 {{end}}
     </nav>
-  </div>
+  </div> -->
   <main class="mdl-layout__content">
     <div class="page-content">
