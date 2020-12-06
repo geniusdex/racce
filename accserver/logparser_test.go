@@ -189,6 +189,7 @@ func TestLogParser_Event_NewLapTime(t *testing.T) {
 	f.SendMessage(`Lap carId 1003, driverId 0, lapTime 35791:23:647, timestampMS 3558634.000000, flags: %d0, S1 0:30:777, fuel 0.000000`)
 	f.SendMessage(`Lap  carId 1012, driverId 0, lapTime 35791:23:647, timestampMS 3571140.000000, flags: %d1, S1 0:30:360, S2 0:41:811, fuel 0.000000, hasCut `)
 	f.SendMessage(`Lap  carId 1009, driverId 0, lapTime 35791:23:647, timestampMS 3885634.000000, flags: %d4, S1 10:00:510, S2 0:42:834, S3 0:36:777, fuel 0.000000, OutLap `)
+	f.SendMessage(`Lap  carId 1003, driverId 0, lapTime 35791:23:647, timestampMS 1202339.000000, flags: 00, S1 0:40:380, S2 1:01:878, S3 0:28:749, fuel 0.000000`)
 
 	// These lines do
 	f.SendMessage(`Lap carId 1020, driverId 0, lapTime 5:27:576, timestampMS 2192453.000000, flags: %d0, S1 4:11:730, S2 0:40:917, S3 0:34:929, fuel 56.000000`)
@@ -199,6 +200,12 @@ func TestLogParser_Event_NewLapTime(t *testing.T) {
 
 	f.SendMessage(`Lap carId 1046, driverId 0, lapTime 1:46:830, timestampMS 4004213.000000, flags: %d1025, S1 0:29:832, S2 0:40:917, S3 0:36:081, fuel 73.000000, hasCut , SessionOver`)
 	assert.Equal(t, logEventNewLapTime{1046, 106830, 4004213, 1025}, f.ReadEvent())
+
+	f.SendMessage(`Lap carId 1003, driverId 0, lapTime 2:11:007, timestampMS 1202340.000000, flags: 00, 1 0:40:380, S2 1:01:878, S3 0:28:749, fuel 23.000000`)
+	assert.Equal(t, logEventNewLapTime{1003, 131007, 1202340, 0}, f.ReadEvent())
+
+	f.SendMessage(`Lap carId 1020, driverId 0, lapTime 2:35:097, timestampMS 2033151.000000, flags: 01, S1 0:39:060, S2 1:11:364, S3 0:44:673, fuel 3.000000, hasCut`)
+	assert.Equal(t, logEventNewLapTime{1020, 155097, 2033151, 1}, f.ReadEvent())
 }
 
 func TestLogParser_Event_GridPosition(t *testing.T) {

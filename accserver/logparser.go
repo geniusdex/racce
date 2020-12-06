@@ -154,13 +154,13 @@ func makeLogMatchers() (ret []*logMatcher) {
 			`^Purging car_id (\d+)$`,
 			func(matches []string) interface{} { return logEventCarPurged{intOrPanic(matches[1])} }),
 		newLogMatcher(
-			`^Lap carId (\d+), driverId (\d+), lapTime (\d+):(\d+):(\d+), timestampMS (\d+).000000, flags: %d(\d+),`,
+			`^Lap carId (\d+), driverId (\d+), lapTime (\d+):(\d+):(\d+), timestampMS (\d+).000000, flags: (%d|0)(\d+),`,
 			func(matches []string) interface{} {
 				lapTimeMS := intOrPanic(matches[3])*60000 + intOrPanic(matches[4])*1000 + intOrPanic(matches[5])
 				if lapTimeMS == 2147483647 { // Constant used for laps not yet completed
 					return nil
 				}
-				return logEventNewLapTime{intOrPanic(matches[1]), lapTimeMS, intOrPanic(matches[6]), intOrPanic(matches[7])}
+				return logEventNewLapTime{intOrPanic(matches[1]), lapTimeMS, intOrPanic(matches[6]), intOrPanic(matches[8])}
 			}),
 		newLogMatcher(
 			`^\s*Car (\d+) Pos (\d+)$`,
