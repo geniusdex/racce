@@ -346,6 +346,8 @@ func (ls *LiveState) handleLogEvent(event interface{}) {
 		ls.handleTrack(e)
 	} else if e, ok := event.(logEventSessionPhaseChanged); ok {
 		ls.handleSessionPhaseChanged(e)
+	} else if e, ok := event.(logEventResettingWeekend); ok {
+		ls.handleResettingWeekend(e)
 	} else if e, ok := event.(logEventNewConnectionRequest); ok {
 		ls.handleNewConnectionRequest(e)
 	} else if e, ok := event.(logEventNewCarConnection); ok {
@@ -393,6 +395,10 @@ func (ls *LiveState) handleSessionPhaseChanged(event logEventSessionPhaseChanged
 	if newState.Type != oldState.Type {
 		ls.advanceSession()
 	}
+}
+
+func (ls *LiveState) handleResettingWeekend(event logEventResettingWeekend) {
+	ls.advanceSession()
 }
 
 func (ls *LiveState) handleNewConnectionRequest(event logEventNewConnectionRequest) {

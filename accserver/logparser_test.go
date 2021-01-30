@@ -120,6 +120,14 @@ func TestLogParser_Event_SessionPhaseChanged(t *testing.T) {
 	assert.Equal(t, logEventSessionPhaseChanged{"Race", "pre session"}, f.ReadEvent())
 }
 
+func TestLogParser_Event_ResettingWeekend(t *testing.T) {
+	f := newTestLogParserFixture(t)
+	defer f.Close()
+
+	f.SendMessage(`Resetting race weekend`)
+	assert.Equal(t, logEventResettingWeekend{}, f.ReadEvent())
+}
+
 func TestLogParser_Event_NewConnectionRequest(t *testing.T) {
 	f := newTestLogParserFixture(t)
 	defer f.Close()

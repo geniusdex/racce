@@ -35,6 +35,10 @@ type logEventSessionPhaseChanged struct {
 	Phase string
 }
 
+// logEventResettingWeekend indicates a reset of the race weekend, typically because all clients left
+type logEventResettingWeekend struct {
+}
+
 // logEventNewConnectionRequest is sent whenever a new driver connection is made
 type logEventNewConnectionRequest struct {
 	ConnectionID int
@@ -134,6 +138,9 @@ func makeLogMatchers() (ret []*logMatcher) {
 		newLogMatcher(
 			`^Detected sessionPhase <([A-Za-z ]+)> -> <([A-Za-z ]+)> \(([A-Za-z ]+)\)$`,
 			func(matches []string) interface{} { return logEventSessionPhaseChanged{matches[3], matches[2]} }),
+		newLogMatcher(
+			`^Resetting race weekend$`,
+			func(matches []string) interface{} { return logEventResettingWeekend{} }),
 		newLogMatcher(
 			`^New connection request: id (\d+) (.+) (S\d+) on car model (\d+)$`,
 			func(matches []string) interface{} {

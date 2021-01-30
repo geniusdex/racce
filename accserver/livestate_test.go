@@ -265,7 +265,29 @@ func TestLiveState_CarsWithoutDriversPurgedWhenSessionTypeChanges(t *testing.T) 
 
 	f.logEvents <- logEventSessionPhaseChanged{"Race", "session"}
 	<-f.events.SessionState
-	go func() { <-f.events.CarState }() // Eat car state update vor 1002
+	go func() { <-f.events.CarState }() // Eat car state update for 1002
+	assert.Equal(t, 1004, <-f.events.CarPurged)
+	assert.Nil(t, f.state.CarState[1004])
+	assert.NotNil(t, f.state.CarState[1002])
+}
+
+func TestLiveState_CarsWithoutDriversPurgedWhenResettingRaceWeekend(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventNewConnectionRequest{6, "Driver One", "S76543210987654321", 5}
+	f.logEvents <- logEventNewCarConnection{1002, 5, 42}
+	<-f.events.CarState
+
+	f.logEvents <- logEventNewConnectionRequest{7, "Driver Two", "S5", 6}
+	f.logEvents <- logEventNewCarConnection{1004, 6, 37}
+	<-f.events.CarState
+
+	f.logEvents <- logEventDeadConnection{7}
+	<-f.events.CarState
+
+	f.logEvents <- logEventResettingWeekend{}
+
+	go func() { <-f.events.CarState }() // Eat car state update for 1002
 	assert.Equal(t, 1004, <-f.events.CarPurged)
 	assert.Nil(t, f.state.CarState[1004])
 	assert.NotNil(t, f.state.CarState[1002])
