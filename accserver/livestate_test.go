@@ -176,6 +176,29 @@ func TestLiveState_NewCar(t *testing.T) {
 	assert.Equal(t, carState, f.state.CarState[1001])
 }
 
+func TestLiveState_UseMostRecentConnectionRequestForNewCar(t *testing.T) {
+	f := newTestLiveStateFixture(t)
+
+	f.logEvents <- logEventNewConnectionRequest{1, "Driver One", "S76543210987654321", 24}
+	f.logEvents <- logEventNewConnectionRequest{2, "Driver Two", "S76543210987654322", 24}
+	f.logEvents <- logEventNewCarConnection{1001, 24, 42}
+	driver := &Driver{
+		ConnectionID: 2,
+		Name:         "Driver Two",
+		PlayerID:     "S76543210987654322",
+	}
+	carState := &CarState{
+		CarID:         1001,
+		RaceNumber:    42,
+		CarModel:      accdata.CarModelByID(24),
+		Drivers:       []*Driver{driver},
+		CurrentDriver: driver,
+		Position:      1,
+	}
+	assert.Equal(t, carState, <-f.events.CarState)
+	assert.Equal(t, carState, f.state.CarState[1001])
+}
+
 func TestLiveState_CarPurged(t *testing.T) {
 	f := newTestLiveStateFixture(t)
 

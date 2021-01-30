@@ -211,7 +211,8 @@ func (ls *LiveState) serverOffline() {
 }
 
 func (ls *LiveState) lookupDriverForNewCarConnection(carEvent logEventNewCarConnection) *Driver {
-	for i, connEvent := range ls.connectionRequests {
+	for i := len(ls.connectionRequests) - 1; i >= 0; i-- {
+		connEvent := ls.connectionRequests[i]
 		if connEvent.CarModelID == carEvent.CarModelID {
 			lastIndex := len(ls.connectionRequests) - 1
 			ls.connectionRequests[i] = ls.connectionRequests[lastIndex]
