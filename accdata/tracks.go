@@ -6,6 +6,7 @@ type CompetitionSeries string
 const (
 	GTWorldChallenge            CompetitionSeries = "GT World Challenge"
 	IntercontinentalGTChallenge                   = "Intercontinental GT Challenge"
+	BritishGTChampionship                         = "British GT Championship"
 )
 
 // Competition describes a single competition
@@ -37,8 +38,8 @@ var (
 		&Track{"monza", "Monza", Competition{GTWorldChallenge, 2018}, 29, 60},
 		&Track{"zolder", "Zolder", Competition{GTWorldChallenge, 2018}, 34, 50},
 		&Track{"brands_hatch", "Brands Hatch", Competition{GTWorldChallenge, 2018}, 32, 50},
-		&Track{"silverstone", "Silverstone", Competition{GTWorldChallenge, 2018}, 36, 50},
-		&Track{"paul_ricard", "Paul Ricard", Competition{GTWorldChallenge, 2018}, 33, 60},
+		&Track{"silverstone", "Silverstone", Competition{GTWorldChallenge, 2018}, 36, 60},
+		&Track{"paul_ricard", "Paul Ricard", Competition{GTWorldChallenge, 2018}, 33, 80},
 		&Track{"misano", "Misano", Competition{GTWorldChallenge, 2018}, 30, 50},
 		&Track{"spa", "Spa", Competition{GTWorldChallenge, 2018}, 82, 82},
 		&Track{"nurburgring", "Nurburgring", Competition{GTWorldChallenge, 2018}, 30, 50},
@@ -48,8 +49,8 @@ var (
 		&Track{"monza_2019", "Monza", Competition{GTWorldChallenge, 2019}, 29, 60},
 		&Track{"zolder_2019", "Zolder", Competition{GTWorldChallenge, 2019}, 34, 50},
 		&Track{"brands_hatch_2019", "Brands Hatch", Competition{GTWorldChallenge, 2019}, 32, 50},
-		&Track{"silverstone_2019", "Silverstone", Competition{GTWorldChallenge, 2019}, 36, 50},
-		&Track{"paul_ricard_2019", "Paul Ricard", Competition{GTWorldChallenge, 2019}, 33, 60},
+		&Track{"silverstone_2019", "Silverstone", Competition{GTWorldChallenge, 2019}, 36, 60},
+		&Track{"paul_ricard_2019", "Paul Ricard", Competition{GTWorldChallenge, 2019}, 33, 80},
 		&Track{"misano_2019", "Misano", Competition{GTWorldChallenge, 2019}, 30, 50},
 		&Track{"spa_2019", "Spa", Competition{GTWorldChallenge, 2019}, 82, 82},
 		&Track{"nurburgring_2019", "Nurburgring", Competition{GTWorldChallenge, 2019}, 30, 50},
@@ -60,11 +61,14 @@ var (
 		&Track{"mount_panorama_2019", "Mount Panorama", Competition{IntercontinentalGTChallenge, 2019}, 36, 50},
 		&Track{"suzuka_2019", "Suzuka", Competition{IntercontinentalGTChallenge, 2019}, 51, 105},
 		&Track{"laguna_seca_2019", "Laguna Seca", Competition{IntercontinentalGTChallenge, 2019}, 30, 50},
+		&Track{"oulton_park_2019", "Oulton Park", Competition{BritishGTChampionship, 2019}, 28, 50},
+		&Track{"donington_2019", "Donington Park", Competition{BritishGTChampionship, 2019}, 37, 50},
+		&Track{"snetterton_2019", "Snetterton", Competition{BritishGTChampionship, 2019}, 26, 50},
 		&Track{"monza_2020", "Monza", Competition{GTWorldChallenge, 2020}, 29, 60},
 		&Track{"zolder_2020", "Zolder", Competition{GTWorldChallenge, 2020}, 34, 50},
 		&Track{"brands_hatch_2020", "Brands Hatch", Competition{GTWorldChallenge, 2020}, 32, 50},
-		&Track{"silverstone_2020", "Silverstone", Competition{GTWorldChallenge, 2020}, 36, 50},
-		&Track{"paul_ricard_2020", "Paul Ricard", Competition{GTWorldChallenge, 2020}, 33, 60},
+		&Track{"silverstone_2020", "Silverstone", Competition{GTWorldChallenge, 2020}, 36, 60},
+		&Track{"paul_ricard_2020", "Paul Ricard", Competition{GTWorldChallenge, 2020}, 33, 80},
 		&Track{"misano_2020", "Misano", Competition{GTWorldChallenge, 2020}, 30, 50},
 		&Track{"spa_2020", "Spa", Competition{GTWorldChallenge, 2020}, 82, 82},
 		&Track{"nurburgring_2020", "Nurburgring", Competition{GTWorldChallenge, 2020}, 30, 50},
