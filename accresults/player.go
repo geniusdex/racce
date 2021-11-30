@@ -3,6 +3,8 @@ package accresults
 import (
 	"math"
 	"reflect"
+
+	"github.com/geniusdex/racce/accdata"
 )
 
 type Name struct {
@@ -104,13 +106,19 @@ func (player *Player) mergeDriver(driver *Driver) {
 }
 
 func (player *Player) addTrackDataForCarInSession(car *Car, session *Session) {
-	if player.TrackData[session.TrackName] == nil {
-		player.TrackData[session.TrackName] = newPlayerTrackData(player, session.TrackName)
+	track := accdata.TrackByLabel(session.TrackName)
+	if track == nil {
+		// log.Printf("Ignoring data for unknown track '%v'", session.TrackName)
+		return
 	}
-	trackData := player.TrackData[session.TrackName]
+
+	if player.TrackData[track.Label] == nil {
+		player.TrackData[track.Label] = newPlayerTrackData(player, track.Label)
+	}
+	trackData := player.TrackData[track.Label]
 
 	if trackData.CarData[car.CarModel] == nil {
-		trackData.CarData[car.CarModel] = newPlayerTrackCarData(player, session.TrackName, car.CarModel)
+		trackData.CarData[car.CarModel] = newPlayerTrackCarData(player, track.Label, car.CarModel)
 	}
 	carData := trackData.CarData[car.CarModel]
 

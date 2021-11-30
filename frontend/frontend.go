@@ -80,7 +80,7 @@ func (f *frontend) addTemplateFunctions(t *template.Template, templateData *temp
 			if track := accdata.TrackByLabel(name); track != nil {
 				return track
 			}
-			return &accdata.Track{"-", "-", accdata.Competition{"-", 0}, 0, 0}
+			return &accdata.Track{"-", "-", accdata.Competition{"-"}, 0, 0, []string{}}
 		},
 		"tracks": func() []*accdata.Track {
 			return accdata.Tracks

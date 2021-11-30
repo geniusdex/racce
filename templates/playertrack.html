@@ -3,7 +3,7 @@
 {{$playertrack := .PlayerTrackData}}
 {{$name := $player.MostRecentName}}
 
-{{template "header.inc.html" (print $name.FirstName " " $name.LastName " at " $track.Name " (" $track.Competition.Year ")")}}
+{{template "header.inc.html" (print $name.FirstName " " $name.LastName " at " $track.Name)}}
 
 <div class="mdl-grid">
   <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--top">

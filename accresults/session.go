@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"time"
 
+	"github.com/geniusdex/racce/accdata"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -129,6 +130,12 @@ type Session struct {
 
 // Verify checks if the session is fully filled
 func (session *Session) Verify() error {
+	track := accdata.TrackByLabel(session.TrackName)
+	if track == nil {
+		return fmt.Errorf("unknown track '%v'", session.TrackName)
+	}
+	session.TrackName = track.Label
+
 	if session.SessionResult == nil {
 		return fmt.Errorf("SessionResult is not available")
 	}

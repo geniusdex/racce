@@ -47,7 +47,7 @@
         <tbody>
 {{range sortOn $player.TrackData ".TrackName"}}
           <tr data-href="{{basePath}}/playertrack/{{$player.PlayerId}}/{{.TrackName}}">
-            <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/playertrack/{{$player.PlayerId}}/{{.TrackName}}">{{(track .TrackName).Name}} ({{(track .TrackName).Competition.Year}})</a></td>
+            <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/playertrack/{{$player.PlayerId}}/{{.TrackName}}">{{(track .TrackName).Name}}</a></td>
             <td class="mdl-data-table__cell--non-numeric">{{laptime .BestLap}}</td>
             {{$carmodel := carmodel .BestLapCarModel}}
             <td class="carlogo"><img src="{{basePath}}/static/carlogo/{{$carmodel.ManufacturerLabel}}.png" title="{{$carmodel.Manufacturer}} {{$carmodel.Model}}"></td>

@@ -25,19 +25,19 @@ type CupCategory struct {
 var (
 	// DriverCategories contains information on all available driver categories
 	DriverCategories = []*DriverCategory{
-		&DriverCategory{3, "Platinum"},
-		&DriverCategory{2, "Gold"},
-		&DriverCategory{1, "Silver"},
-		&DriverCategory{0, "Bronze"},
+		{3, "Platinum"},
+		{2, "Gold"},
+		{1, "Silver"},
+		{0, "Bronze"},
 	}
 
 	// CupCategories contains information on all available cup categories
 	CupCategories = []*CupCategory{
-		&CupCategory{0, "Overall", color.RGBA{255, 255, 255, 255}, color.RGBA{0, 0, 0, 255}},
-		&CupCategory{1, "ProAm", color.RGBA{128, 128, 128, 255}, color.RGBA{0, 0, 0, 255}},
-		&CupCategory{2, "Am", color.RGBA{255, 0, 0, 255}, color.RGBA{0, 0, 0, 255}},
-		&CupCategory{3, "Silver", color.RGBA{128, 128, 128, 255}, color.RGBA{0, 0, 0, 255}},
-		&CupCategory{4, "National", color.RGBA{0, 0, 0, 255}, color.RGBA{255, 255, 255, 255}},
+		{0, "Overall", color.RGBA{255, 255, 255, 255}, color.RGBA{0, 0, 0, 255}},
+		{1, "ProAm", color.RGBA{128, 128, 128, 255}, color.RGBA{0, 0, 0, 255}},
+		{2, "Am", color.RGBA{255, 0, 0, 255}, color.RGBA{0, 0, 0, 255}},
+		{3, "Silver", color.RGBA{128, 128, 128, 255}, color.RGBA{0, 0, 0, 255}},
+		{4, "National", color.RGBA{0, 0, 0, 255}, color.RGBA{255, 255, 255, 255}},
 	}
 
 	// driverCategoriesByID is a cache for DriverCategoryByID

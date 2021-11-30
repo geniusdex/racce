@@ -21,8 +21,12 @@
       {{$carmodel := carmodel .Car.CarModel}}
       <td class="carlogo"><img src="{{basePath}}/static/carlogo/{{$carmodel.ManufacturerLabel}}.png" title="{{$carmodel.Manufacturer}} {{$carmodel.Model}}"></td>
       <td class="racenumber {{$carmodel.Group}} {{$cupcat.Name}}"><a href="{{basePath}}/sessioncar/{{$session.SessionName}}/{{.Car.CarId}}">{{.Car.RaceNumber}}</a></td>
+      <!-- <td class="mdl-data-table__cell--non-numeric"><a href="{{basePath}}/player/{{.CurrentDriver.PlayerId}}">{{.CurrentDriver.FirstName}} {{.CurrentDriver.LastName}}</a></td> -->
       <td class="mdl-data-table__cell--non-numeric">
-  {{range $driver_index, $driver := .Car.Drivers}}{{if gt $driver_index 0}}, {{end}}<a href="{{basePath}}/player/{{$driver.PlayerId}}">{{if and (gt (len $line.Car.Drivers) 1) (gt (len $driver.FirstName) 0)}}{{slice $driver.FirstName 0 1}}.{{else}}{{$driver.FirstName}}{{end}} {{$driver.LastName}}</a>{{end}}
+  {{range $driver_index, $driver := .Car.Drivers}}
+    {{if gt $driver_index 0}} / {{end}}
+        <a href="{{basePath}}/player/{{$driver.PlayerId}}">{{if and (gt (len $line.Car.Drivers) 1) (gt (len $driver.FirstName) 0)}}{{slice $driver.FirstName 0 1}}.{{else}}{{$driver.FirstName}}{{end}} {{$driver.LastName}}</a>
+  {{end}}
       </td>
       <td>{{.Timing.LapCount}}</td>
       <td>{{if gt .Timing.LapCount 0}}{{laptime .Timing.TotalTime}}{{else}}-{{end}}</td>

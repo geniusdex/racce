@@ -1,6 +1,6 @@
 package accdata
 
-// CompetitionSeries is a name for a series of competitions over possibly multiple years
+// CompetitionSeries is a name for a series of competitions
 type CompetitionSeries string
 
 const (
@@ -13,8 +13,6 @@ const (
 type Competition struct {
 	// Series is the series to which this competition belongs
 	Series CompetitionSeries
-	// Year is the year of the competition
-	Year int
 }
 
 // Track represents a single track in the game
@@ -30,52 +28,52 @@ type Track struct {
 	// PrivateServerSlots indicates how many car slots are available for this
 	// track on private servers
 	PrivateServerSlots int
+	// AlternateLabels are alternate labels used for this track, possibly used
+	// in older server versions
+	AlternateLabels []string
 }
 
 var (
 	// Tracks contains information on all supported tracks
 	Tracks = []*Track{
-		&Track{"monza", "Monza", Competition{GTWorldChallenge, 2018}, 29, 60},
-		&Track{"zolder", "Zolder", Competition{GTWorldChallenge, 2018}, 34, 50},
-		&Track{"brands_hatch", "Brands Hatch", Competition{GTWorldChallenge, 2018}, 32, 50},
-		&Track{"silverstone", "Silverstone", Competition{GTWorldChallenge, 2018}, 36, 60},
-		&Track{"paul_ricard", "Paul Ricard", Competition{GTWorldChallenge, 2018}, 33, 80},
-		&Track{"misano", "Misano", Competition{GTWorldChallenge, 2018}, 30, 50},
-		&Track{"spa", "Spa", Competition{GTWorldChallenge, 2018}, 82, 82},
-		&Track{"nurburgring", "Nurburgring", Competition{GTWorldChallenge, 2018}, 30, 50},
-		&Track{"barcelona", "Barcelona", Competition{GTWorldChallenge, 2018}, 29, 50},
-		&Track{"hungaroring", "Hungaroring", Competition{GTWorldChallenge, 2018}, 27, 50},
-		&Track{"zandvoort", "Zandvoort", Competition{GTWorldChallenge, 2018}, 25, 50},
-		&Track{"monza_2019", "Monza", Competition{GTWorldChallenge, 2019}, 29, 60},
-		&Track{"zolder_2019", "Zolder", Competition{GTWorldChallenge, 2019}, 34, 50},
-		&Track{"brands_hatch_2019", "Brands Hatch", Competition{GTWorldChallenge, 2019}, 32, 50},
-		&Track{"silverstone_2019", "Silverstone", Competition{GTWorldChallenge, 2019}, 36, 60},
-		&Track{"paul_ricard_2019", "Paul Ricard", Competition{GTWorldChallenge, 2019}, 33, 80},
-		&Track{"misano_2019", "Misano", Competition{GTWorldChallenge, 2019}, 30, 50},
-		&Track{"spa_2019", "Spa", Competition{GTWorldChallenge, 2019}, 82, 82},
-		&Track{"nurburgring_2019", "Nurburgring", Competition{GTWorldChallenge, 2019}, 30, 50},
-		&Track{"barcelona_2019", "Barcelona", Competition{GTWorldChallenge, 2019}, 29, 50},
-		&Track{"hungaroring_2019", "Hungaroring", Competition{GTWorldChallenge, 2019}, 27, 50},
-		&Track{"zandvoort_2019", "Zandvoort", Competition{GTWorldChallenge, 2019}, 25, 50},
-		&Track{"kyalami_2019", "Kyalami", Competition{IntercontinentalGTChallenge, 2019}, 40, 50},
-		&Track{"mount_panorama_2019", "Mount Panorama", Competition{IntercontinentalGTChallenge, 2019}, 36, 50},
-		&Track{"suzuka_2019", "Suzuka", Competition{IntercontinentalGTChallenge, 2019}, 51, 105},
-		&Track{"laguna_seca_2019", "Laguna Seca", Competition{IntercontinentalGTChallenge, 2019}, 30, 50},
-		&Track{"oulton_park_2019", "Oulton Park", Competition{BritishGTChampionship, 2019}, 28, 50},
-		&Track{"donington_2019", "Donington Park", Competition{BritishGTChampionship, 2019}, 37, 50},
-		&Track{"snetterton_2019", "Snetterton", Competition{BritishGTChampionship, 2019}, 26, 50},
-		&Track{"monza_2020", "Monza", Competition{GTWorldChallenge, 2020}, 29, 60},
-		&Track{"zolder_2020", "Zolder", Competition{GTWorldChallenge, 2020}, 34, 50},
-		&Track{"brands_hatch_2020", "Brands Hatch", Competition{GTWorldChallenge, 2020}, 32, 50},
-		&Track{"silverstone_2020", "Silverstone", Competition{GTWorldChallenge, 2020}, 36, 60},
-		&Track{"paul_ricard_2020", "Paul Ricard", Competition{GTWorldChallenge, 2020}, 33, 80},
-		&Track{"misano_2020", "Misano", Competition{GTWorldChallenge, 2020}, 30, 50},
-		&Track{"spa_2020", "Spa", Competition{GTWorldChallenge, 2020}, 82, 82},
-		&Track{"nurburgring_2020", "Nurburgring", Competition{GTWorldChallenge, 2020}, 30, 50},
-		&Track{"barcelona_2020", "Barcelona", Competition{GTWorldChallenge, 2020}, 29, 50},
-		&Track{"hungaroring_2020", "Hungaroring", Competition{GTWorldChallenge, 2020}, 27, 50},
-		&Track{"zandvoort_2020", "Zandvoort", Competition{GTWorldChallenge, 2020}, 25, 50},
-		&Track{"imola_2020", "Imola", Competition{GTWorldChallenge, 2020}, 30, 50},
+		{"monza", "Monza", Competition{GTWorldChallenge}, 29, 60,
+			[]string{"monza_2019", "monza_2020"}},
+		{"zolder", "Zolder", Competition{GTWorldChallenge}, 34, 50,
+			[]string{"zolder_2019", "zolder_2020"}},
+		{"brands_hatch", "Brands Hatch", Competition{GTWorldChallenge}, 32, 50,
+			[]string{"brands_hatch_2019", "brands_hatch_2020"}},
+		{"silverstone", "Silverstone", Competition{GTWorldChallenge}, 36, 60,
+			[]string{"silverstone_2019", "silverstone_2020"}},
+		{"paul_ricard", "Paul Ricard", Competition{GTWorldChallenge}, 33, 80,
+			[]string{"paul_ricard_2019", "paul_ricard_2020"}},
+		{"misano", "Misano", Competition{GTWorldChallenge}, 30, 50,
+			[]string{"misano_2019", "misano_2020"}},
+		{"spa", "Spa", Competition{GTWorldChallenge}, 82, 82,
+			[]string{"spa_2019", "spa_2020"}},
+		{"nurburgring", "Nurburgring", Competition{GTWorldChallenge}, 30, 50,
+			[]string{"nurburgring_2019", "nurburgring_2020"}},
+		{"barcelona", "Barcelona", Competition{GTWorldChallenge}, 29, 50,
+			[]string{"barcelona_2019", "barcelona_2020"}},
+		{"hungaroring", "Hungaroring", Competition{GTWorldChallenge}, 27, 50,
+			[]string{"hungaroring_2019", "hungaroring_2020"}},
+		{"zandvoort", "Zandvoort", Competition{GTWorldChallenge}, 25, 50,
+			[]string{"zandvoort_2019", "zandvoort_2020"}},
+		{"imola", "Imola", Competition{GTWorldChallenge}, 30, 50,
+			[]string{"imola_2020"}},
+		{"kyalami", "Kyalami", Competition{IntercontinentalGTChallenge}, 40, 50,
+			[]string{"kyalami_2019"}},
+		{"mount_panorama", "Mount Panorama", Competition{IntercontinentalGTChallenge}, 36, 50,
+			[]string{"mount_panorama_2019"}},
+		{"suzuka", "Suzuka", Competition{IntercontinentalGTChallenge}, 51, 105,
+			[]string{"suzuka_2019"}},
+		{"laguna_seca", "Laguna Seca", Competition{IntercontinentalGTChallenge}, 30, 50,
+			[]string{"laguna_seca_2019"}},
+		{"oulton_park", "Oulton Park", Competition{BritishGTChampionship}, 28, 50,
+			[]string{"oulton_park_2019"}},
+		{"donington", "Donington Park", Competition{BritishGTChampionship}, 37, 50,
+			[]string{"donington_2019"}},
+		{"snetterton", "Snetterton", Competition{BritishGTChampionship}, 26, 50,
+			[]string{"snetterton_2019"}},
 	}
 
 	// tracksByLabel is a cache for TrackByLabel
@@ -88,6 +86,9 @@ func TrackByLabel(label string) *Track {
 		tracksByLabel = make(map[string]*Track)
 		for _, track := range Tracks {
 			tracksByLabel[track.Label] = track
+			for _, label := range track.AlternateLabels {
+				tracksByLabel[label] = track
+			}
 		}
 	}
 	return tracksByLabel[label]

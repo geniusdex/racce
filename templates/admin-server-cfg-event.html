@@ -19,17 +19,15 @@
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                             <select id="track" name="track" class="mdl-textfield__input">
 {{$lastcomp_series := ""}}
-{{$lastcomp_year := 0}}
 {{range tracks}}
-    {{if or (ne .Competition.Series $lastcomp_series) (ne .Competition.Year $lastcomp_year)}}
-        {{if ne $lastcomp_year 0}}
+    {{if ne .Competition.Series $lastcomp_series}}
+        {{if ne $lastcomp_series ""}}
                                 </optgroup>
         {{end}}
-                                <optgroup label="{{.Competition.Series}} ({{.Competition.Year}})">
+                                <optgroup label="{{.Competition.Series}}">
         {{$lastcomp_series = .Competition.Series}}
-        {{$lastcomp_year = .Competition.Year}}
     {{end}}
-                                    <option {{if eq .Label $server.Cfg.Event.Track}}selected{{end}} value="{{.Label}}">{{.Name}} ({{.Competition.Year}})</option>
+                                    <option {{if eq .Label $server.Cfg.Event.Track}}selected{{end}} value="{{.Label}}">{{.Name}}</option>
 {{end}}
                                 </optgroup>
                             </select>
