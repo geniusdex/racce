@@ -4,10 +4,10 @@ package accdata
 type CarGroup string
 
 const (
-	GT3         CarGroup = "GT3"
-	GT4                  = "GT4"
-	PorscheCup           = "Cup"
-	SuperTrofeo          = "ST"
+	GT3 CarGroup = "GT3"
+	GT4          = "GT4"
+	GTC          = "GTC"
+	TCX          = "TCX"
 )
 
 // CarModel describes a single car model
@@ -33,6 +33,7 @@ var (
 		{20, "aston_martin", "Aston Martin", "V8 Vantage GT3", 2019, GT3},
 		{3, "audi", "Audi", "R8 LMS", 2015, GT3},
 		{19, "audi", "Audi", "R8 LMS Evo", 2019, GT3},
+		{31, "audi", "Audi", "R8 LMS Evo II", 2022, GT3},
 		{11, "bentley", "Bentley", "Continental GT3", 2015, GT3},
 		{8, "bentley", "Bentley", "Continental GT3", 2018, GT3},
 		{30, "bmw", "BMW", "M4 GT3", 2022, GT3},
@@ -44,7 +45,6 @@ var (
 		{21, "honda", "Honda", "NSX GT3 Evo", 2019, GT3},
 		{4, "lamborghini", "Lamborghini", "Huracan GT3", 2015, GT3},
 		{16, "lamborghini", "Lamborghini", "Huracan GT3 Evo", 2019, GT3},
-		{18, "lamborghini", "Lamborghini", "Huracan Super Trofeo", 2015, SuperTrofeo},
 		{15, "lexus", "Lexus", "RC F GT3", 2016, GT3},
 		{5, "mclaren", "McLaren", "650S GT3", 2015, GT3},
 		{22, "mclaren", "McLaren", "720S GT3", 2019, GT3},
@@ -53,7 +53,6 @@ var (
 		{10, "nissan", "Nissan", "GT-R Nismo GT3", 2015, GT3},
 		{6, "nissan", "Nissan", "GT-R Nismo GT3", 2018, GT3},
 		{0, "porsche", "Porsche", "991 GT3 R", 2018, GT3},
-		{9, "porsche", "Porsche", "991 II GT3 Cup", 2017, PorscheCup},
 		{23, "porsche", "Porsche", "991 II GT3 R", 2019, GT3},
 		{13, "reiter_engineering", "Reiter Engineering", "R-EX GT3", 2017, GT3},
 
@@ -68,6 +67,14 @@ var (
 		{59, "mclaren", "McLaren", "570S GT4", 2016, GT4},
 		{60, "mercedes-amg", "Mercedes-AMG", "GT4", 2016, GT4},
 		{61, "porsche", "Porsche", "718 Cayman GT4 Clubsport", 2019, GT4},
+
+		{26, "ferrari", "Ferrari", "488 Challenge Evo", 2020, GTC},
+		{18, "lamborghini", "Lamborghini", "Huracan Super Trofeo", 2015, GTC},
+		{29, "lamborghini", "Lamborghini", "Huracan Super Trofeo EVO2", 2021, GTC},
+		{9, "porsche", "Porsche", "991 II GT3 Cup", 2017, GTC},
+		{28, "porsche", "Porsche", "992 GT3 Cup", 2021, GTC},
+
+		{27, "bmw", "BMW", "M2 CS Racing", 2020, TCX},
 	}
 
 	// carModelsByID is a cache for CarModelByID

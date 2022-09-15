@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
 )
 
 // SessionType describes the type of a single session
@@ -28,11 +27,11 @@ const (
 	Saturday              = 2
 	Sunday                = 3
 
-	FreeForAll  CarGroup = "FreeForAll"
-	GT3                  = "GT3"
-	GT4                  = "GT4"
-	PorscheCup           = "Cup"
-	SuperTrofeo          = "ST"
+	FreeForAll CarGroup = "FreeForAll"
+	GT3                 = "GT3"
+	GT4                 = "GT4"
+	GTC                 = "GTC"
+	TCX                 = "TCX"
 )
 
 // CfgConfiguration contains the main server connectivity configuration.
@@ -63,6 +62,8 @@ type CfgEvent struct {
 	CloudLevel                float32            `json:"cloudLevel"`
 	Rain                      float32            `json:"rain"`
 	WeatherRandomness         int                `json:"weatherRandomness"`
+	PostQualySeconds          int                `json:"postQualySeconds"`
+	PostRaceSeconds           int                `json:"postRaceSeconds"`
 	Sessions                  []*CfgEventSession `json:"sessions"`
 	MetaData                  string             `json:"metaData,omitempty"`
 	ConfigVersion             int                `json:"configVersion"`
@@ -87,6 +88,7 @@ type CfgSettings struct {
 	ShortFormationLap          int      `json:"shortFormationLap"`
 	DumpEntryList              int      `json:"dumpEntryList"`
 	FormationLapType           int      `json:"formationLapType"`
+	IgnorePrematureDisconnects int      `json:"ignorePrematureDisconnects"`
 	ConfigVersion              int      `json:"configVersion"`
 }
 
@@ -124,7 +126,7 @@ func parseCfgFile(path string, target interface{}) error {
 
 	if isUtf16(data) {
 		decoder := unicode.UTF16(unicode.LittleEndian, unicode.UseBOM).NewDecoder()
-		data, _, err = transform.Bytes(decoder, data)
+		data, err = decoder.Bytes(data)
 		if err != nil {
 			return err
 		}
@@ -135,6 +137,12 @@ func parseCfgFile(path string, target interface{}) error {
 
 func writeCfgFile(path string, source interface{}) error {
 	encoded, err := json.MarshalIndent(source, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	encoder := unicode.UTF16(unicode.LittleEndian, unicode.UseBOM).NewEncoder()
+	encoded, err = encoder.Bytes(encoded)
 	if err != nil {
 		return err
 	}

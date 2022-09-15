@@ -7,6 +7,7 @@ const (
 	GTWorldChallenge            CompetitionSeries = "GT World Challenge"
 	IntercontinentalGTChallenge                   = "Intercontinental GT Challenge"
 	BritishGTChampionship                         = "British GT Championship"
+	AmericanTrackPack                             = "American Track Pack"
 )
 
 // Competition describes a single competition
@@ -59,21 +60,27 @@ var (
 		{"zandvoort", "Zandvoort", Competition{GTWorldChallenge}, 25, 50,
 			[]string{"zandvoort_2019", "zandvoort_2020"}},
 		{"imola", "Imola", Competition{GTWorldChallenge}, 30, 50,
-			[]string{"imola_2020"}},
+			[]string{"imola_2019", "imola_2020"}},
 		{"kyalami", "Kyalami", Competition{IntercontinentalGTChallenge}, 40, 50,
-			[]string{"kyalami_2019"}},
+			[]string{"kyalami_2019", "kyalami_2020"}},
 		{"mount_panorama", "Mount Panorama", Competition{IntercontinentalGTChallenge}, 36, 50,
-			[]string{"mount_panorama_2019"}},
+			[]string{"mount_panorama_2019", "mount_panorama_2020"}},
 		{"suzuka", "Suzuka", Competition{IntercontinentalGTChallenge}, 51, 105,
-			[]string{"suzuka_2019"}},
+			[]string{"suzuka_2019", "suzuka_2020"}},
 		{"laguna_seca", "Laguna Seca", Competition{IntercontinentalGTChallenge}, 30, 50,
-			[]string{"laguna_seca_2019"}},
+			[]string{"laguna_seca_2019", "laguna_seca_2020"}},
 		{"oulton_park", "Oulton Park", Competition{BritishGTChampionship}, 28, 50,
-			[]string{"oulton_park_2019"}},
+			[]string{"oulton_park_2019", "oulton_park_2020"}},
 		{"donington", "Donington Park", Competition{BritishGTChampionship}, 37, 50,
-			[]string{"donington_2019"}},
+			[]string{"donington_2019", "donnington_2020"}},
 		{"snetterton", "Snetterton", Competition{BritishGTChampionship}, 26, 50,
-			[]string{"snetterton_2019"}},
+			[]string{"snetterton_2019", "snetterton_2020"}},
+		{"cota", "Circuit of the Americas", Competition{AmericanTrackPack}, 30, 70,
+			[]string{}},
+		{"indianapolis", "Indianapolis", Competition{AmericanTrackPack}, 30, 60,
+			[]string{}},
+		{"watkins_glen", "Watkins Glen", Competition{AmericanTrackPack}, 30, 60,
+			[]string{}},
 	}
 
 	// tracksByLabel is a cache for TrackByLabel

@@ -52,10 +52,11 @@
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                             <select id="carGroup" name="carGroup" class="mdl-textfield__input">
-                                <option value="FreeForAll" {{if eq $server.Cfg.Settings.CarGroup "FreeForAll"}}selected{{end}}>Free For All</option>
+                                <option value="FreeForAll" {{if eq $server.Cfg.Settings.CarGroup "FreeForAll"}}selected{{end}}>Mixed</option>
                                 <option value="GT3" {{if eq $server.Cfg.Settings.CarGroup "GT3"}}selected{{end}}>GT3</option>
                                 <option value="GT4" {{if eq $server.Cfg.Settings.CarGroup "GT4"}}selected{{end}}>GT4</option>
-                                <option value="GTC" {{if eq $server.Cfg.Settings.CarGroup "GTC"}}selected{{end}}>GT Cup</option>
+                                <option value="GTC" {{if eq $server.Cfg.Settings.CarGroup "GTC"}}selected{{end}}>GTC</option>
+                                <option value="TCX" {{if eq $server.Cfg.Settings.CarGroup "TCX"}}selected{{end}}>TCX</option>
                             </select>
                             <label class="mdl-textfield__label" for="carGroup">Car Group</label>
                         </div>
@@ -135,6 +136,10 @@
                             </select>
                             <label class="mdl-textfield__label" for="formationLapType">Formation Lap Type</label>
                         </div>
+                        <label for="ignorePrematureDisconnects" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                            <input type="checkbox" id="ignorePrematureDisconnects" name="ignorePrematureDisconnects" class="mdl-switch__input" {{if eq $server.Cfg.Settings.IgnorePrematureDisconnects 1}}checked{{end}}>
+                            <span class="mdl-switch__label">Ignore Premature Disconnects (recommended)</span>
+                        </label>
                 </section>
                 </div>
             </div>

@@ -151,8 +151,8 @@ func (a *admin) parseServerCfgEventForm(form url.Values) (*accserver.CfgEvent, e
 		CloudLevel:                parser.Float32("cloudLevel"),
 		Rain:                      parser.Float32("rain"),
 		WeatherRandomness:         parser.Int("weatherRandomness"),
-		// event.PostQualySeconds = parser.Int("postQualySeconds")
-		// event.PostRaceSeconds = parser.Int("PostRaceSeconds")
+		PostQualySeconds:          parser.Int("postQualySeconds"),
+		PostRaceSeconds:           parser.Int("postRaceSeconds"),
 		// event.MetaData = ??
 		ConfigVersion: 1,
 	}
@@ -197,6 +197,7 @@ func (a *admin) parseServerCfgGlobalForm(form url.Values) (*accserver.CfgConfigu
 		ShortFormationLap:          parser.BoolInt("shortFormationLap"),
 		DumpEntryList:              parser.BoolInt("dumpEntryList"),
 		FormationLapType:           parser.Int("formationLapType"),
+		IgnorePrematureDisconnects: parser.BoolInt("ignorePrematureDisconnects"),
 		ConfigVersion:              1,
 	}
 
