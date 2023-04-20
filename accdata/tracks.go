@@ -61,6 +61,8 @@ var (
 			[]string{"zandvoort_2019", "zandvoort_2020"}},
 		{"imola", "Imola", Competition{GTWorldChallenge}, 30, 50,
 			[]string{"imola_2019", "imola_2020"}},
+		{"valencia", "Valencia", Competition{GTWorldChallenge}, 30, 60,
+			[]string{}},
 		{"kyalami", "Kyalami", Competition{IntercontinentalGTChallenge}, 40, 50,
 			[]string{"kyalami_2019", "kyalami_2020"}},
 		{"mount_panorama", "Mount Panorama", Competition{IntercontinentalGTChallenge}, 36, 50,
