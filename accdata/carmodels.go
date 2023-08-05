@@ -50,7 +50,7 @@ var (
 		{15, "lexus", "Lexus", "RC F GT3", 2016, GT3},
 		{5, "mclaren", "McLaren", "650S GT3", 2015, GT3},
 		{22, "mclaren", "McLaren", "720S GT3", 2019, GT3},
-		{22, "mclaren", "McLaren", "720S GT3 Evo", 2023, GT3},
+		{35, "mclaren", "McLaren", "720S GT3 Evo", 2023, GT3},
 		{1, "mercedes-amg", "Mercedes-AMG", "GT3", 2015, GT3}, // {1, "lord_mercedes_amg", "LORD MERCEDES AMG", "AMG GT THE THIRD", 2015, GT3},
 		{25, "mercedes-amg", "Mercedes-AMG", "GT3 2020", 2020, GT3},
 		{10, "nissan", "Nissan", "GT-R Nismo GT3", 2015, GT3},
